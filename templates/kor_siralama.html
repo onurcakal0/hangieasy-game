@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ oyun_basligi }} | Kör Sıralama</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #0f0f13; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 40px;}
+        
+        .baslik h2 { color: #f39c12; font-size: 32px; margin-bottom: 5px; text-transform: uppercase; text-align: center;}
+        .alt-bilgi { color: #aaa; font-size: 16px; margin-bottom: 40px; text-align: center; }
+        
+        /* SOL VE SAĞ KISIMLARI AYIRAN ANA KUTU */
+        .oyun-alani { display: flex; gap: 50px; width: 100%; max-width: 1000px; justify-content: center; flex-wrap: wrap;}
+        
+        /* SOL TARAF: O ANKİ GİZEMLİ ÖĞE */
+        .gizemli-oge { flex: 1; min-width: 300px; max-width: 400px; text-align: center;}
+        .gizemli-oge h3 { font-size: 24px; color: #fff; margin-bottom: 15px;}
+        .resim-kutusu { background-color: #1a1a24; border: 3px solid #f39c12; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(243, 156, 18, 0.3); height: 400px;}
+        .resim-kutusu img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* SAĞ TARAF: SIRALAMA LİSTESİ */
+        .siralama-listesi { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 10px;}
+        .siralama-slotu { display: flex; align-items: center; background-color: #1a1a24; border: 2px solid #2c2c38; border-radius: 12px; overflow: hidden; height: 60px; transition: 0.3s;}
+        .sira-no { background-color: #f39c12; color: #0f0f13; font-weight: 900; font-size: 24px; width: 60px; height: 100%; display: flex; justify-content: center; align-items: center;}
+        
+        .slot-icerik { flex: 1; padding: 0 15px; display: flex; align-items: center; justify-content: space-between;}
+        .slot-isim { font-size: 18px; font-weight: bold; color: #fff;}
+        .yerlestir-btn { background-color: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s;}
+        .yerlestir-btn:hover { background-color: #2ecc71;}
+        
+        .dolu-slot { border-color: #27ae60; background-color: rgba(39, 174, 96, 0.1);}
+        .dolu-slot .sira-no { background-color: #27ae60; color: white;}
+        
+        .buton-mavi { margin-top: 40px; padding:15px 30px; font-size:18px; font-weight:bold; background:#2980b9; color:white; border:none; border-radius:10px; cursor:pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="baslik">
+        <h2>{{ oyun_basligi }}</h2>
+        <div class="alt-bilgi">Sonraki resmi bilmiyorsun. Sıralamanı yap ve kaderine razı ol!</div>
+    </div>
+
+    <div class="oyun-alani" id="ana-sahne">
+        <div class="gizemli-oge">
+            <h3 id="aktif-isim">Yükleniyor...</h3>
+            <div class="resim-kutusu">
+                <img id="aktif-resim" src="" alt="Gizemli Öğe">
+            </div>
+        </div>
+
+        <div class="siralama-listesi" id="siralama-kutusu">
+            </div>
+    </div>
+
+    <script>
+        const OYUN_ID = "{{ aktif_oyun }}";
+        let sorular = [];
+        let mevcutSoruIndex = 0;
+        let siralamaDizisi = []; // Kullanıcının yaptığı sıralamayı tutar
+
+        window.onload = () => {
+            fetch(`/api/sorular/${OYUN_ID}`)
+                .then(res => res.json())
+                .then(data => {
+                    // Heyecan yaratmak için diziyi rastgele karıştırıyoruz!
+                    sorular = data.sort(() => Math.random() - 0.5);
+                    
+                    // Soru sayısı kadar boş slot oluştur (Örn: 5 soru varsa 5 slot)
+                    siralamaDizisi = new Array(sorular.length).fill(null);
+                    
+                    slotlariCiz();
+                    soruyuEkranaBas();
+                });
+        };
+
+        function soruyuEkranaBas() {
+            // Eğer eklenecek öğe kalmadıysa bitir
+            if (mevcutSoruIndex >= sorular.length) {
+                oyunuBitir();
+                return;
+            }
+
+            let aktifOge = sorular[mevcutSoruIndex];
+            // Biz app.py'de secenekler kısmına sadece ismi kaydetmiştik, onu alıyoruz (Dizi olarak geliyor)
+            document.getElementById('aktif-isim').innerText = aktifOge.secenekler[0];
+            document.getElementById('aktif-resim').src = aktifOge.resim;
+        }
+
+        function slotlariCiz() {
+            let kutu = document.getElementById('siralama-kutusu');
+            kutu.innerHTML = '';
+
+            for (let i = 0; i < siralamaDizisi.length; i++) {
+                let slotDiv = document.createElement('div');
+                
+                // Eğer slot doluysa yeşil tasarım yap ve ismi yaz
+                if (siralamaDizisi[i] !== null) {
+                    slotDiv.className = 'siralama-slotu dolu-slot';
+                    slotDiv.innerHTML = `
+                        <div class="sira-no">${i + 1}</div>
+                        <div class="slot-icerik">
+                            <span class="slot-isim">${siralamaDizisi[i]}</span>
+                        </div>
+                    `;
+                } 
+                // Eğer slot boşsa "Buraya Koy" butonu çıkar
+                else {
+                    slotDiv.className = 'siralama-slotu';
+                    slotDiv.innerHTML = `
+                        <div class="sira-no">${i + 1}</div>
+                        <div class="slot-icerik">
+                            <span class="slot-isim" style="color:#555;">Boş...</span>
+                            <button class="yerlestir-btn" onclick="slotaYerlestir(${i})">Bunu ${i + 1}. Yap</button>
+                        </div>
+                    `;
+                }
+                kutu.appendChild(slotDiv);
+            }
+        }
+
+        function slotaYerlestir(index) {
+            let aktifOge = sorular[mevcutSoruIndex];
+            
+            // O slotu doldur
+            siralamaDizisi[index] = aktifOge.secenekler[0];
+            
+            // Sonraki öğeye geç
+            mevcutSoruIndex++;
+            
+            // Ekranı güncelle
+            slotlariCiz();
+            soruyuEkranaBas();
+        }
+
+        function oyunuBitir() {
+            document.querySelector('.gizemli-oge').style.display = 'none';
+            document.getElementById('ana-sahne').style.justifyContent = 'center';
+            document.getElementById('siralama-kutusu').style.maxWidth = '500px';
+            
+            // VİRAL BÜYÜME MOTORU
+            let oyunLink = window.location.href;
+            let paylasimMetni = `Kusursuz Kör Sıralama listemi yaptım! 😎 Sen listeni nasıl dizeceksin? Cesaretin varsa oyna: ${oyunLink}`;
+            let wpLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(paylasimMetni)}`;
+            let xLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(paylasimMetni)}`;
+
+            document.querySelector('.baslik').innerHTML = `
+                <h2 style="color: #27ae60; font-size:40px;">KUSURSUZ LİSTEN HAZIR!</h2>
+                
+                <div style="margin-top: 20px; margin-bottom: 20px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <a href="${wpLink}" target="_blank" style="background-color: #25D366; color: white; padding: 12px 20px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 16px; display: flex; align-items: center; transition: 0.3s; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);">
+                        💬 WhatsApp'ta Paylaş
+                    </a>
+                    <a href="${xLink}" target="_blank" style="background-color: #0f0f13; color: white; padding: 12px 20px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 16px; display: flex; align-items: center; border: 2px solid #333; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
+                        𝕏 X'te Paylaş
+                    </a>
+                </div>
+
+                <button class="buton-mavi" style="margin-top:0; margin-bottom:30px;" onclick="location.href='/'">Ana Sayfaya Dön ve Başka Test Çöz</button>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ oyun_basligi }} | QuizHub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="oyun-kutusu">
+        <div class="baslik">
+            <h2>{{ oyun_basligi }}</h2>
+            <p>Skor: <span id="skor">0</span></p>
+        </div>
+
+        <div class="resim-alani">
+            <img id="soru-resmi" src="" alt="Soru Görseli" style="display: none;">
+        </div>
+
+        <div class="secenekler" id="buton-kutusu">
+            </div>
+    </div>
+
+    <script>
+        const OYUN_ID = "{{ aktif_oyun }}";
+        console.log("Python'dan gelen oyun ID'si:", OYUN_ID); // Test için konsola yazdıralım
+    </script>
+    
+    <script src="{{ url_for('static', filename='js/script.js') }}?v=3"></script>
+</body>
+</html>

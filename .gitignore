@@ -1,0 +1,18 @@
+# Python önbelleği
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Sanal ortam
+venv/
+ENV/
+
+# Veritabanı (İleride sunucuda sıfırdan oluşacak)
+*.db
+
+# Mac sistem dosyaları
+.DS_Store
+
+# Yüklenen resimler (Geliştirme aşamasındakileri göndermiyoruz)
+static/uploads/*
+!static/uploads/.gitkeep

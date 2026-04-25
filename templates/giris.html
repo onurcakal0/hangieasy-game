@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>QuizHub | Giriş Yap</title>
+    <style>
+        body { background-color: #0f0f13; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .form-kutusu { background-color: #1a1a24; padding: 40px; border-radius: 15px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .form-kutusu h2 { color: #f39c12; margin-bottom: 20px; }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: none; background-color: #2c2c38; color: white; outline: none; box-sizing: border-box;}
+        button { width: 100%; padding: 15px; background-color: #f39c12; color: #0f0f13; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background-color: #e67e22; }
+        a { color: #27ae60; text-decoration: none; font-size: 14px; display: block; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="form-kutusu">
+        <h2>Sisteme Giriş Yap</h2>
+        <form method="POST">
+            <input type="text" name="kullanici_adi" placeholder="Kullanıcı Adı" required>
+            <input type="password" name="sifre" placeholder="Şifre" required>
+            <button type="submit">Giriş Yap</button>
+        </form>
+        <a href="/kayit">Hesabın yok mu? Yeni kayıt oluştur</a>
+        <a href="/" style="color:#aaa;">Ana Sayfaya Dön</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>QuizHub | Yeni Test Oluştur</title>
+    <style>
+        body { background-color: #0f0f13; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px;}
+        .form-kutusu { background-color: #1a1a24; padding: 40px; border-radius: 15px; width: 100%; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .form-kutusu h2 { color: #f39c12; margin-bottom: 30px; text-align: center; border-bottom: 2px solid #2c2c38; padding-bottom: 10px;}
+        .grup { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #aaa; font-weight: bold; font-size: 14px;}
+        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background-color: #2c2c38; color: white; outline: none; box-sizing: border-box;}
+        button { width: 100%; padding: 15px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 16px;}
+        button:hover { background-color: #219653; }
+        .geri-btn { display: block; text-align: center; margin-top: 15px; color: #888; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="form-kutusu">
+        <h2>🚀 1. Aşama: Krallığın Kapağı</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="grup">
+                <label>Testin Başlığı</label>
+                <input type="text" name="baslik" placeholder="Örn: Efsane Arabalar Testi" required>
+            </div>
+            <div class="grup">
+                <label>Kısa Açıklama</label>
+                <input type="text" name="aciklama" placeholder="İnsanları bu testi çözmeye ikna et..." required>
+            </div>
+            <div class="grup">
+                <label>Kapak Resmi Seç</label>
+                <input type="file" name="kapak_resmi" accept="image/*" required>
+            </div>
+            <div class="grup">
+                <label>Kategori</label>
+                <select name="kategori">
+                    <option value="Futbol">Futbol</option>
+                    <option value="Teknoloji">Teknoloji</option>
+                    <option value="Otomobil">Otomobil</option>
+                    <option value="Genel Kültür">Genel Kültür</option>
+                </select>
+            </div>
+            <div class="grup" style="margin-top: 30px; padding: 15px; border: 1px solid #f39c12; border-radius: 8px; background-color: #211c10;">
+                <label style="color: #f39c12; font-size: 16px;">🔥 Oyun Modunu Seç</label>
+                <select name="oyun_modu" style="border-color: #f39c12; font-weight: bold; cursor: pointer;">
+                    <option value="normal">Klasik Test (1 Doğru 3 Yanlış)</option>
+                    <option value="omu_bumu">O mu Bu mu? (İki Seçenekli Kapışma)</option>
+                    <option value="kor_siralama">Kör Sıralama (Blind Ranking 1-10)</option>
+                    <option value="turnuva">Turnuva Ağacı (Bracket - Yakında!)</option>
+                </select>
+            </div>
+            <button type="submit">İleri: Soruları Eklemeye Başla ➔</button>
+        </form>
+        <a href="/" class="geri-btn">Vazgeç</a>
+    </div>
+</body>
+</html>

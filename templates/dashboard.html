@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform | Ana Sayfa</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0f0f13; color: #ffffff; }
+        
+        /* Üst Menü (Navbar) */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background-color: #1a1a24;
+            border-bottom: 1px solid #333;
+        }
+        .logo { font-size: 24px; font-weight: bold; color: #f39c12; cursor: pointer; }
+        .arama-kiti input {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: none;
+            background-color: #2c2c38;
+            color: white;
+            width: 300px;
+            outline: none;
+        }
+        .profil-btn {
+            background-color: #f39c12;
+            color: #0f0f13;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .profil-btn:hover { background-color: #e67e22; }
+
+        /* Ana İçerik ve Grid Yapısı */
+        .icerik { padding: 40px 5%; }
+        .baslik { margin-bottom: 30px; font-size: 28px; }
+        
+        .oyun-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        /* Oyun Kartları */
+        .oyun-karti {
+            background-color: #1a1a24;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: 1px solid #2a2a35;
+        }
+        .oyun-karti:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(243, 156, 18, 0.2);
+        }
+        .oyun-resmi {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+        .kart-icerik { padding: 20px; }
+        .kategori-etiketi {
+            background-color: #2c2c38;
+            color: #aaa;
+            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .kart-baslik { font-size: 18px; margin-bottom: 10px; }
+        .kart-aciklama { font-size: 14px; color: #888; margin-bottom: 15px; }
+        
+        .oyna-btn {
+            display: block;
+            text-align: center;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .oyna-btn:hover { background-color: #219653; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">QuizHub</div>
+        
+        <div class="arama-kiti">
+            <input type="text" id="arama-kutusu" placeholder="Futbol, yazılım, dizi ara...">
+        </div>  
+        
+        <div class="kullanici-paneli">
+            {% if 'kullanici_adi' in session %}
+                <a href="/test-olustur" class="profil-btn" style="background-color: #27ae60; color: white; margin-right: 15px;">+ Test Oluştur</a>
+                
+                <a href="/profil" class="profil-btn" style="background-color: #f39c12; color: #0f0f13; margin-right: 15px;">👤 Stüdyom</a>
+                
+                <a href="/cikis" class="profil-btn" style="background-color: transparent; border: 1px solid #c0392b; color: #c0392b;">Çıkış</a>
+            
+            {% else %}
+                <a href="/giris" class="profil-btn" style="background-color: transparent; border: 1px solid #f39c12; color: #f39c12; margin-right: 10px;">Giriş Yap</a>
+                <a href="/kayit" class="profil-btn">Kayıt Ol</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="icerik">
+        <h2 class="baslik">Trend Testler 🔥</h2>
+        
+        <div class="oyun-grid" id="oyun-listesi">
+            {% for oyun in oyunlar %}
+            <div class="oyun-karti">
+                <img src="{{ oyun.resim }}" alt="Oyun Resmi" class="oyun-resmi">
+                <div class="kart-icerik">
+                    <div class="kategori-etiketi">{{ oyun.kategori }}</div>
+                    <h3 class="kart-baslik">{{ oyun.baslik }}</h3>
+                    <p class="kart-aciklama">{{ oyun.aciklama }}</p>
+                    <p style="font-size: 12px; color: #555; margin-bottom: 15px;">👥 {{ oyun.oynanma_sayisi }} oynanma</p>
+                    <a href="/oyun/{{ oyun.id }}" class="oyna-btn">Hemen Oyna</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('arama-kutusu').addEventListener('keyup', function() {
+            let arananKelime = this.value.toLowerCase();
+            let kartlar = document.querySelectorAll('.oyun-karti');
+
+            kartlar.forEach(kart => {
+                let baslik = kart.querySelector('.kart-baslik').innerText.toLowerCase();
+                let kategori = kart.querySelector('.kategori-etiketi').innerText.toLowerCase();
+
+                if(baslik.includes(arananKelime) || kategori.includes(arananKelime)) {
+                    kart.style.display = "block";
+                } else {
+                    kart.style.display = "none";
+                }
+            });
+        });
+    </script>
+</body>
+</html>

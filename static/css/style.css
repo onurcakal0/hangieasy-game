@@ -1,0 +1,71 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #121212; /* Koyu premium arka plan */
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.oyun-kutusu {
+    background-color: #1e1e1e;
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+.baslik h2 {
+    margin-bottom: 10px;
+    color: #f39c12; /* Altın sarısı, şampiyonluk hissi */
+}
+
+.baslik p {
+    font-size: 14px;
+    color: #aaa;
+    margin-bottom: 20px;
+}
+
+.resim-alani img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 2px solid #333;
+}
+
+.secenekler {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.secenek-btn {
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.secenek-btn:hover {
+    background-color: #34495e;
+}
+
+/* Cevap kontrol renkleri */
+.dogru { background-color: #27ae60 !important; }
+.yanlis { background-color: #c0392b !important; }
