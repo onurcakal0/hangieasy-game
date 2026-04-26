@@ -135,6 +135,13 @@
             document.getElementById('tur-basligi').innerHTML = "🌟 ŞAMPİYON 🌟";
             document.getElementById('tur-basligi').style.color = "#f39c12";
 
+            // VİRAL BÜYÜME MOTORU: Arka planda şampiyonu veritabanına yaz! (YENİ EKLENDİ)
+            fetch('/api/kazandi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ oyun_id: OYUN_ID, kazanan: sampiyon.isim })
+            });
+           
             // VİRAL BÜYÜME MOTORU: Paylaşım metnini ve linkleri hazırlıyoruz!
             let oyunLink = window.location.href; // O anki sayfanın linkini otomatik alır
             let paylasimMetni = `Benim favorim ${sampiyon.isim}! 🏆 Sen kimi seçeceksin? Hemen oyna: ${oyunLink}`;
@@ -157,9 +164,10 @@
                         <a href="${xLink}" target="_blank" style="background-color: #0f0f13; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 16px; display: flex; align-items: center; border: 2px solid #333; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
                             𝕏 X'te Paylaş
                         </a>
+                    <div style="margin-top: 30px; display:flex; gap:10px; justify-content:center;">
+                        <button class="buton-mavi" onclick="location.href='/'">Ana Sayfaya Dön</button>
+                        <button class="buton-mavi" style="background-color: #f39c12; color: #000;" onclick="location.href='/istatistikler/' + OYUN_ID">📊 Global Sonuçları Gör</button>
                     </div>
-
-                    <button class="buton-mavi" style="margin-top: 30px;" onclick="location.href='/'">Ana Sayfaya Dön</button>
                 </div>
             `;
         }

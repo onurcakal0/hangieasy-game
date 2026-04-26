@@ -48,6 +48,12 @@ class Soru(db.Model):
     resim_url_2 = db.Column(db.String(300), nullable=True) 
     secenekler = db.Column(db.String(500))
     dogru_cevap = db.Column(db.String(100))
+# 5. Tablo: İSTATİSTİKLER (Hangi seçenek kaç kere şampiyon oldu)
+class Istatistik(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    oyun_id = db.Column(db.Integer, db.ForeignKey('oyun.id'), nullable=False)
+    secenek_ismi = db.Column(db.String(100), nullable=False)
+    sampiyonluk_sayisi = db.Column(db.Integer, default=1)
 
 with app.app_context():
     db.create_all()
@@ -263,5 +269,65 @@ def oyun_sil(oyun_id):
     
     # Stüdyoya geri dön
     return redirect(url_for('profil'))
+# --- 👑 GİZLİ KONTROL MERKEZİ (ADMIN PANEL) ---
+@app.route('/admin-panel')
+def admin_panel():
+    # Sadece giriş yapmış ve adı "patron" (veya senin adın) olan kişi girebilir!
+    ADMIN_KULLANICI_ADI = 'onur1' # <-- BURAYA KENDİ KULLANICI ADINI YAZ KRAL!
+    
+    if session.get('kullanici_adi') != ADMIN_KULLANICI_ADI:
+        return "<h1 style='color:red; text-align:center; margin-top:50px;'>🚨 HOP! Burası Edu.X CTO'su Mustafa Onur Çakal'ın özel ofisidir. Giremezsin!</h1>", 403
+        
+    tum_oyunlar = Oyun.query.all()
+    tum_kullanicilar = Kullanici.query.all()
+    
+    return render_template('admin.html', oyunlar=tum_oyunlar, kullanici_sayisi=len(tum_kullanicilar))
+
+@app.route('/admin-sil/<int:oyun_id>', methods=['POST'])
+def admin_sil(oyun_id):
+    ADMIN_KULLANICI_ADI = 'onur1' # <-- BURAYA DA KENDİ KULLANICI ADINI YAZ!
+    
+    if session.get('kullanici_adi') != ADMIN_KULLANICI_ADI:
+        return "Yetkisiz Erişim!", 403
+        
+    silinecek_oyun = Oyun.query.get_or_404(oyun_id)
+    
+    # Acımak yok, sorularıyla beraber kökünden kazı!
+    Soru.query.filter_by(oyun_id=silinecek_oyun.id).delete()
+    db.session.delete(silinecek_oyun)
+    db.session.commit()
+    
+    return redirect(url_for('admin_panel'))
+# --- GLOBAL VERİ VE LİDERLİK MOTORU ---
+@app.route('/api/kazandi', methods=['POST'])
+def kazandi_kaydet():
+    data = request.json
+    oyun_id = data.get('oyun_id')
+    kazanan_isim = data.get('kazanan')
+    
+    # Bu seçenek daha önce bu oyunda şampiyon olmuş mu?
+    istatistik = Istatistik.query.filter_by(oyun_id=oyun_id, secenek_ismi=kazanan_isim).first()
+    if istatistik:
+        istatistik.sampiyonluk_sayisi += 1 # Varsa sayacı 1 artır
+    else:
+        # Yoksa yeni kayıt oluştur
+        yeni_istatistik = Istatistik(oyun_id=oyun_id, secenek_ismi=kazanan_isim, sampiyonluk_sayisi=1)
+        db.session.add(yeni_istatistik)
+        
+    db.session.commit()
+    return jsonify({"status": "success"})
+
+@app.route('/istatistikler/<int:oyun_id>')
+def istatistik_sayfasi(oyun_id):
+    oyun = Oyun.query.get_or_404(oyun_id)
+    # En çok şampiyon olandan en aza doğru ilk 10'u çek
+    istatistikler = Istatistik.query.filter_by(oyun_id=oyun_id).order_by(Istatistik.sampiyonluk_sayisi.desc()).limit(10).all()
+    
+    # Yüzdelik dilim hesaplamak için toplam şampiyonluk sayısını bul
+    toplam_oy = sum([ist.sampiyonluk_sayisi for ist in istatistikler]) if istatistikler else 0
+    
+    return render_template('istatistik.html', oyun=oyun, istatistikler=istatistikler, toplam_oy=toplam_oy)
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
