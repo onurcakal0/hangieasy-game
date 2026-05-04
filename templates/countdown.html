@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HangiEasy | Efsane Başlıyor</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        p {
+            font-size: 1.3rem;
+            color: #8b949e;
+            margin-bottom: 50px;
+        }
+        .countdown {
+            display: flex;
+            gap: 20px;
+        }
+        .time-box {
+            background: #161b22;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            text-align: center;
+            min-width: 90px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .time-box span {
+            display: block;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #58a6ff;
+        }
+        .time-box .label {
+            font-size: 1rem;
+            color: #8b949e;
+            text-transform: uppercase;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <h1>HANGIEASY</h1>
+    <p>Büyük lansmana hazırlanıyoruz. Beklemede kalın...</p>
+    
+    <div class="countdown">
+        <div class="time-box"><span id="days">00</span><div class="label">Gün</div></div>
+        <div class="time-box"><span id="hours">00</span><div class="label">Saat</div></div>
+        <div class="time-box"><span id="minutes">00</span><div class="label">Dakika</div></div>
+        <div class="time-box"><span id="seconds">00</span><div class="label">Saniye</div></div>
+    </div>
+
+    <script>
+        // Lansman tarihini buradan değiştirebilirsin
+        const countDownDate = new Date("May 10, 2026 20:00:00").getTime();
+
+        const x = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = countDownDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerHTML = days < 10 ? '0' + days : days;
+            document.getElementById("hours").innerHTML = hours < 10 ? '0' + hours : hours;
+            document.getElementById("minutes").innerHTML = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById("seconds").innerHTML = seconds < 10 ? '0' + seconds : seconds;
+
+            if (distance < 0) {
+                clearInterval(x);
+                document.querySelector(".countdown").innerHTML = "Vakit Geldi! Sistem Aktif.";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

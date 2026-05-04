@@ -363,11 +363,16 @@ def izleyici_cevap_gonder(data):
         aktif_yayinlar[oda]['izleyiciler'][oyuncu] = puan
         emit('canli_skor_guncelle', aktif_yayinlar[oda]['izleyiciler'], room=oda)
 
-# --- ANA SİSTEM ROTALARI ---
+# --- DIŞARIDAN GELENLER İÇİN YENİ ANA SAYFA ---
 @app.route('/')
-def dashboard():
-    return render_template('dashboard.html', oyunlar=Oyun.query.all())
+def coming_soon():
+    return render_template('countdown.html')
 
+# --- SENİN İÇİN GİZLİ TEST ODASI (Eski Ana Sayfan) ---
+@app.route('/gizli-test-odasi')
+def index():
+    # Burada senin eski ana sayfanı çalıştıran kodlar duracak
+    return render_template('index.html')
 @app.route('/test-olustur', methods=['GET', 'POST'])
 def test_olustur():
     kadi = session.get('kullanici_adi')
