@@ -443,8 +443,6 @@
         </div>
     </div>
 
-    <!-- TOAST (BİLDİRİM) KUTUSU -->
-    <div class="toast-container" id="toast-container"></div>
 
     <script>
         // --- 🚀 YENİ: SİDEBAR KONTROL MOTORU ---
@@ -536,34 +534,6 @@
             }
         }
 
-        // --- CANLI BİLDİRİMLER ---
-        const canliOyunlar = [
-            {% for oyun in oyunlar %}"{{ oyun.baslik|replace('"', '\\"') }}"{% if not loop.last %}, {% endif %}{% endfor %}
-        ];
-        const isimler = ["Onur", "Ali", "Berra", "Mert", "Zeynep", "Burak", "Elif", "Kerem"];
-        const aksiyonlar = ["şampiyonu belirledi! 👑", "testi yeni çözdü! ⚡", "turnuvayı tamamladı 🔥", "seçimini yaptı! 🎯"];
-
-        function bildirimGonder() {
-            if(canliOyunlar.length === 0) return;
-            let rastgeleOyun = canliOyunlar[Math.floor(Math.random() * canliOyunlar.length)];
-            let rastgeleIsim = isimler[Math.floor(Math.random() * isimler.length)];
-            let rastgeleAksiyon = aksiyonlar[Math.floor(Math.random() * aksiyonlar.length)];
-
-            let toast = document.createElement('div');
-            toast.className = 'toast-kutu';
-            toast.innerHTML = `
-                <div class="toast-ikon">🚀</div>
-                <div class="toast-icerik">
-                    <div class="toast-baslik">CANLI AKIŞ</div>
-                    <div class="toast-metin"><b>${rastgeleIsim}</b>, ${rastgeleOyun} oyununda ${rastgeleAksiyon}</div>
-                </div>
-            `;
-            document.getElementById('toast-container').appendChild(toast);
-            setTimeout(() => toast.classList.add('goster'), 100);
-            setTimeout(() => { toast.classList.remove('goster'); setTimeout(() => toast.remove(), 500); }, 5000);
-        }
-        setInterval(bildirimGonder, Math.floor(Math.random() * 6000) + 8000);
-        setTimeout(bildirimGonder, 3000);
 
         // --- STEALTH MODE ---
         const stealthSalteri = document.getElementById('stealth-salteri');

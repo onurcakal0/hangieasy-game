@@ -15,7 +15,6 @@
             min-height: 100vh; position: relative; overflow-x: hidden;
         }
         
-        /* 🌌 IŞILTILI RGB ARKAPLAN (Stüdyo Modu) */
         body::before, body::after {
             content: ''; position: fixed; width: 50vw; height: 50vw;
             border-radius: 50%; filter: blur(120px); z-index: -1;
@@ -28,7 +27,6 @@
             100% { transform: translate(40px, 60px) scale(1.15); }
         }
 
-        /* 🧊 CAM EFEKTLİ MENÜ */
         .navbar {
             display: flex; justify-content: space-between; align-items: center;
             padding: 20px 5%; background: rgba(15, 15, 20, 0.6);
@@ -54,20 +52,12 @@
 
         .icerik { padding: 50px 5%; max-width: 1400px; margin: 0 auto; z-index: 2; position: relative;}
         
-        /* 👑 1. SATIR: PROFİL VE ANALİTİKLER */
-        .profil-ust-alan {
-            display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-bottom: 30px;
-        }
-
-        /* 🚀 2. SATIR: BÜYÜME VE KARİYER PANOSU */
-        .buyume-paneli {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 60px;
-        }
+        .profil-ust-alan { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-bottom: 30px; }
+        .buyume-paneli { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 60px; }
         
-        @media (max-width: 900px) {
-            .profil-ust-alan { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 900px) { .profil-ust-alan { grid-template-columns: 1fr; } }
 
+        /* V.I.P YAZISI BURADAN SİLİNDİ */
         .profil-baslik-cam {
             display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
             background: rgba(25, 25, 35, 0.5); backdrop-filter: blur(15px);
@@ -75,40 +65,42 @@
             border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3);
             position: relative; overflow: hidden;
         }
-        .profil-baslik-cam::before {
-            content: 'ONUR ÇAKAL A.Ş. V.I.P.'; position: absolute; top: 15px; left: 0; width: 100%;
-            text-align: center; color: rgba(243, 156, 18, 0.2); font-size: 12px; font-weight: 900; letter-spacing: 4px;
-        }
         
+        /* 🚀 YENİ: PROFİL FOTOĞRAFI SİSTEMİ */
+        .avatar-container {
+            position: relative; display: inline-block; cursor: pointer; margin-bottom: 20px;
+        }
         .avatar { 
-            width: 100px; height: 100px; margin-bottom: 20px;
+            width: 100px; height: 100px; margin-bottom: 0;
             background: linear-gradient(135deg, #f39c12, #ff007a); color: #fff; 
             border-radius: 50%; display: flex; justify-content: center; align-items: center; 
             font-size: 48px; font-weight: 900; box-shadow: 0 0 30px rgba(243, 156, 18, 0.5);
-            border: 4px solid #0b0c10;
+            border: 4px solid #0b0c10; object-fit: cover; transition: 0.3s;
         }
+        .pp-degistir-icon {
+            position: absolute; bottom: -5px; right: -5px; background: rgba(11, 12, 16, 0.9);
+            border: 2px solid #00f2fe; border-radius: 50%; width: 35px; height: 35px;
+            display: flex; justify-content: center; align-items: center; font-size: 16px;
+            opacity: 0; transition: all 0.3s ease; box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+        }
+        .avatar-container:hover .avatar { filter: brightness(0.7); }
+        .avatar-container:hover .pp-degistir-icon { opacity: 1; transform: scale(1.1); }
+
         .profil-yazilar h2 { font-size: 28px; font-weight: 900; color: #fff; letter-spacing: 1px; margin-bottom: 5px; text-transform: uppercase;}
         .profil-yazilar p { color: #00f2fe; font-size: 14px; font-weight: 600; letter-spacing: 0.5px;}
 
-        /* 📊 ANALİTİK PANOSU */
-        .analitik-paneli {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
-        }
+        .analitik-paneli { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .analitik-kutu {
             background: rgba(20, 20, 30, 0.6); backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.05); padding: 30px 20px;
             border-radius: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4); position: relative; overflow: hidden;
-            transition: 0.3s;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4); position: relative; overflow: hidden; transition: 0.3s;
         }
         .analitik-kutu:hover { transform: translateY(-5px); border-color: rgba(0, 242, 254, 0.3); }
-        .analitik-kutu::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-        }
+        .analitik-kutu::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
         .kutu-1::after { background: linear-gradient(90deg, transparent, #f39c12, transparent); }
         .kutu-2::after { background: linear-gradient(90deg, transparent, #00f2fe, transparent); }
         .kutu-3::after { background: linear-gradient(90deg, transparent, #ff0055, transparent); }
-
         .analitik-deger { font-size: 48px; font-weight: 900; color: #fff; line-height: 1; margin-bottom: 10px; text-shadow: 0 5px 15px rgba(0,0,0,0.5);}
         .analitik-baslik { font-size: 13px; color: #aaa; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;}
         .kutu-1 .analitik-deger { color: #f39c12; }
@@ -122,22 +114,17 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.4);
         }
         .vip-kart:hover { transform: translateY(-5px); }
-        
         .kart-rutbe { border-left: 5px solid #3B82F6; }
         .kart-rutbe:hover { border-color: rgba(59, 130, 246, 0.8); box-shadow: 0 15px 30px rgba(59, 130, 246, 0.15); }
-        
         .kart-referans { border-left: 5px solid #8B5CF6; }
         .kart-referans:hover { border-color: rgba(139, 92, 246, 0.8); box-shadow: 0 15px 30px rgba(139, 92, 246, 0.15); }
 
         .vip-baslik { color: #94a3b8; font-size: 14px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;}
         .vip-deger { font-size: 32px; font-weight: 900; color: #fff; margin-bottom: 10px; }
-        
-        /* Progress Bar Stili */
         .progress-bg { background: rgba(0,0,0,0.5); border-radius: 10px; height: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); margin-top: 20px; margin-bottom: 8px;}
         .progress-bar { background: linear-gradient(90deg, #3B82F6, #00f2fe); height: 100%; transition: width 1s ease-in-out; box-shadow: 0 0 10px rgba(0, 242, 254, 0.5); max-width: 100%;}
         .progress-text { font-size: 12px; color: #94a3b8; text-align: right; }
         
-        /* Referans Kodu Stili */
         .ref-kodu-kutusu { 
             background: rgba(139, 92, 246, 0.1); border: 1px dashed #8B5CF6; 
             padding: 15px; border-radius: 12px; display: inline-block; 
@@ -147,23 +134,18 @@
         
         .btn { border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; width: 100%; }
 
-        /* OYUN VİTRİNİ BÖLÜMÜ */
         .seksiyon-basligi { 
             font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 25px;
             display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;
         }
 
         .oyun-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
-
         .oyun-karti { 
             background: rgba(20, 20, 30, 0.6); backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; 
             overflow: hidden; transition: all 0.4s ease; position: relative;
         }
-        .oyun-karti:hover { 
-            transform: translateY(-8px); border-color: rgba(0, 242, 254, 0.4);
-            box-shadow: 0 15px 30px rgba(0, 242, 254, 0.15);
-        }
+        .oyun-karti:hover { transform: translateY(-8px); border-color: rgba(0, 242, 254, 0.4); box-shadow: 0 15px 30px rgba(0, 242, 254, 0.15); }
         .oyun-resmi { width: 100%; height: 170px; object-fit: cover; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
         
         .kart-icerik { padding: 25px; }
@@ -176,7 +158,6 @@
         .kart-baslik { font-size: 18px; font-weight: 600; margin-bottom: 25px; color: #fff; min-height: 50px;}
         
         .aksiyon-grubu { display: flex; gap: 12px; }
-        
         .oyna-btn { 
             flex: 1; text-align: center; background: rgba(0, 242, 254, 0.1); 
             color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3);
@@ -201,6 +182,7 @@
         .bos-durum h3 { color: #aaa; font-weight: 600; margin-bottom: 20px; font-size: 20px;}
         .basla-link { color: #00b09b; text-decoration: none; font-weight: 800; font-size: 18px; letter-spacing: 1px; transition: 0.3s;}
         .basla-link:hover { color: #96c93d; text-shadow: 0 0 15px rgba(0, 176, 155, 0.5); }
+        
         /* KOZMETİK ÇERÇEVELER */
         .standart { border: 4px solid #0b0c10; }
         .neon_siber { border: 4px solid #00f2fe; box-shadow: 0 0 25px rgba(0, 242, 254, 0.8), inset 0 0 15px rgba(0, 242, 254, 0.5); animation: pulseSiber 2s infinite; }
@@ -224,47 +206,48 @@
 
     <div class="icerik">
         
-        <!-- 1. SATIR: VİTRİN (Profil + Analitikler) -->
-        <!-- 1. SATIR: VİTRİN (Profil + Analitikler) -->
         <div class="profil-ust-alan">
             
-            <!-- Sol Taraf: Profil Kartı -->
             <div class="profil-baslik-cam">
-               <div class="avatar {{ kullanici.profil_cercevesi }}">{{ kullanici.kullanici_adi[0]|upper }}</div>
+               <!-- 🚀 YENİ TIKLANABİLİR PROFİL FOTOĞRAFI ALANI -->
+               <div class="avatar-container" onclick="document.getElementById('pp-upload').click()">
+                   {% if kullanici.profil_resmi %}
+                       <img src="{{ kullanici.profil_resmi }}" alt="Avatar" class="avatar {{ kullanici.profil_cercevesi }}">
+                   {% else %}
+                       <div class="avatar {{ kullanici.profil_cercevesi }}">{{ kullanici.kullanici_adi[0]|upper }}</div>
+                   {% endif %}
+                   <div class="pp-degistir-icon">📷</div>
+               </div>
+               
+               <!-- 📸 ARKA PLANDA ÇALIŞAN GİZLİ YÜKLEME FORMU -->
+               <form id="pp-form" action="/pp-guncelle" method="POST" enctype="multipart/form-data" style="display: none;">
+                   <input type="file" id="pp-upload" name="profil_fotografi" accept="image/*" onchange="document.getElementById('pp-form').submit()">
+               </form>
+
                 <div class="profil-yazilar">
                     <h2>{{ kullanici.kullanici_adi }}</h2>
                     <p>Yönetmen Koltuğu</p>
                 </div>
             </div>
 
-            <!-- Sağ Taraf: Analitik Panosu (Eksik olan çerçeve buydu!) -->
             <div class="analitik-paneli">
-                
-                <!-- Aktif Test Kutusu -->
                 <div class="analitik-kutu kutu-1">
                     <div class="analitik-deger">{{ aktif_test_sayisi }}</div>
                     <div class="analitik-baslik">Aktif Test</div>
                 </div>
-
-                <!-- Global Etkileşim Kutusu -->
                 <div class="analitik-kutu kutu-2">
                     <div class="analitik-deger">{{ global_etkilesim }}</div>
                     <div class="analitik-baslik">Global Etkileşim</div>
                 </div>
-
-                <!-- Taçlanan Şampiyon Kutusu -->
                 <div class="analitik-kutu kutu-3">
                     <div class="analitik-deger">{{ taclanan_sampiyon }}</div>
                     <div class="analitik-baslik">Taçlanan Şampiyon</div>
                 </div>
-                
             </div>
             
         </div>
-        <!-- 2. SATIR: BÜYÜME VE KARİYER PANOSU (Rütbe + Referans + Günlük Görev) -->
+        
         <div class="buyume-paneli">
-            
-            <!-- Rütbe Kartı -->
             <div class="vip-kart kart-rutbe">
                 <div class="vip-baslik">Kariyer Hedefi</div>
                 <div class="vip-deger">🛡️ {{ kullanici.rutbe }}</div>
@@ -278,14 +261,12 @@
                 </div>
             </div>
 
-            <!-- Referans (Davet) Kartı -->
             <div class="vip-kart kart-referans">
                 <div class="vip-baslik">Büyüme Motoru (Growth)</div>
                 <div class="ref-kodu-kutusu">{{ kullanici.referans_kodu }}</div>
                 <p style="color: #a78bfa; font-size: 13px; line-height: 1.6;">Bu vizyoner kodu arkadaşlarına gönder. Senin kodunla kayıt olan her kişi için <span style="color: #22c55e; font-weight: bold;">100 HE-Coin</span> doğrudan kasanıza eklensin!</p>
             </div>
             
-            <!-- Günlük Görev Kartı -->
             <div class="vip-kart" style="border-left: 5px solid #22c55e;">
                 <div class="vip-baslik">🎯 Günlük Operasyon</div>
                 <div class="vip-deger" style="font-size: 20px; margin-bottom: 5px;">3 Test Çöz</div>
@@ -305,11 +286,8 @@
             </div>
         </div>
         
-        <!-- 3. SATIR: OYUN VİTRİNİ -->
-        <!-- 3. SATIR: OYUN VİTRİNİ -->
         <h3 class="seksiyon-basligi">🎬 Ürettiğin İçerikler</h3>
         
-        <!-- 🚀 KABLO TAMİRİ: 'oyunlar' yerine backend'den gelen gerçek isim olan 'kullanicinin_oyunlari' kullanıldı! -->
         {% if kullanicinin_oyunlari|length == 0 %}
             <div class="bos-durum">
                 <h3>Henüz hiç test üretmemişsin patron. Dünyanın senin vizyonuna ihtiyacı var!</h3>
@@ -319,7 +297,6 @@
             <div class="oyun-grid">
                 {% for oyun in kullanicinin_oyunlari %}
                 <div class="oyun-karti">
-                    <!-- 🚀 ZIRH: Kapak resmi kırık gelirse veya yoksa sistemi çirkin gösterme -->
                     <img src="{{ oyun.resim_url }}" onerror="this.src='https://via.placeholder.com/400x200/151520/00f2fe?text=Oyun+Kapak'" alt="Oyun Kapak" class="oyun-resmi">
                     <div class="kart-icerik">
                         <div class="kategori-etiketi">{{ oyun.kategori }} • {{ oyun.oyun_modu|upper }}</div>

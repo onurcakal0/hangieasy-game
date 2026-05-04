@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangieasy | E-posta Onayı Bekleniyor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Senin Tasarımınla Aynı (Yukarıdaki ile aynı CSS bloğunu buraya kopyalayabilirsin) */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #0b0c10; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; position: relative; padding: 40px 20px; }
+        body::before, body::after { content: ''; position: fixed; width: 50vw; height: 50vw; border-radius: 50%; filter: blur(120px); z-index: -1; animation: orbFloat 12s infinite alternate ease-in-out; }
+        body::before { background: rgba(0, 176, 155, 0.15); top: -10%; left: -10%; }
+        body::after { background: rgba(0, 242, 254, 0.12); bottom: -10%; right: -10%; animation-delay: -4s; }
+        @keyframes orbFloat { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(40px, 60px) scale(1.15); } }
+        .form-kutusu { background: rgba(20, 20, 30, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); padding: 50px 40px; border-radius: 20px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 20px rgba(0, 176, 155, 0.1); position: relative; z-index: 1; }
+        .logo { font-size: 36px; font-weight: 800; background: linear-gradient(90deg, #00b09b, #96c93d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 15px; display: inline-block; letter-spacing: 1px; }
+        .ikon { font-size: 50px; margin-bottom: 15px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .metin { color: #aaa; font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
+        .metin strong { color: #00b09b; }
+    </style>
+</head>
+<body>
+    <div class="form-kutusu">
+        <div class="ikon">📩</div>
+        <div class="logo">Son Bir Adım!</div>
+        <div class="metin">
+            Aramıza hoş geldin. Düellolara katılmadan önce son bir adım kaldı: <strong>E-posta kutunu kontrol et</strong> ve gönderdiğimiz gizli bağlantıya tıklayarak krallığını onayla.
+        </div>
+    </div>
+</body>
+</html>

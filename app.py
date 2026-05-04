@@ -16,6 +16,8 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from dotenv import load_dotenv
+from werkzeug.security import generate_password_hash
+from datetime import datetime
 
 # --- DIŞ SERVİSLER ---
 from supabase import create_client, Client
@@ -69,8 +71,16 @@ db = SQLAlchemy(app)
 # --- MODELLER ---
 class Kullanici(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    
+    # --- 🔒 TEMEL KİMLİK BİLGİLERİ (BUNLAR EKSİKTİ, EKLENDİ) ---
+    ad_soyad = db.Column(db.String(100), nullable=False)
     kullanici_adi = db.Column(db.String(50), unique=True, nullable=False)
-    sifre_hash = db.Column(db.String(200), nullable=False)
+    eposta = db.Column(db.String(120), unique=True, nullable=False)
+    dogum_tarihi = db.Column(db.String(20), nullable=False)
+    sifre_hash = db.Column(db.String(255), nullable=False) # Postgres için sınırı 255 yaptık
+    onayli_mi = db.Column(db.Boolean, default=False) # E-posta onayı için şart!
+    profil_resmi = db.Column(db.String(300), nullable=True)
+    # --- 💰 EKONOMİ VE OYUN SİSTEMİ ---
     he_coin = db.Column(db.Integer, default=50) 
     oyunlar = db.relationship('Oyun', backref='olusturan', lazy=True)
     
@@ -136,6 +146,7 @@ def inject_global_data():
 
 # --- 💰 EKONOMİ & 🚀 RÜTBE & GÖREV YAPAY ZEKASI ---
 # --- 💰 EKONOMİ YAPAY ZEKASI ---
+# --- 💰 EKONOMİ YAPAY ZEKASI ---
 @app.route('/api/odul_al', methods=['POST'])
 def odul_al():
     # Adam misafirse veya giriş yapmamışsa 0 coin ver, çökme!
@@ -144,17 +155,18 @@ def odul_al():
     
     # JSON bozuk gelirse diye güvenlik önlemi
     data = request.json or {}
-    kazanc = data.get('miktar', 10)
+    kazanc = data.get('miktar', 20) # Oyun bittiğinde gelen para
     
-    kullanici = Kullanici.query.filter_by(kullanici_adi=session['kullanici_adi']).first()
-    if kullanici:
-        kullanici.he_coin += kazanc
-        db.session.commit()
-        # DİKKAT: Frontend'e parayı "kazanc" ismiyle yolluyoruz!
+    # 🚀 CTO MOTORU DEVREDE! (Fişi prize taktık)
+    # Bu fonksiyon hem parayı ekler, hem sayacı artırır, hem de rütbeyi günceller!
+    motor_calisti_mi = ilerleme_kaydet(session['kullanici_adi'], kazanilan_puan=kazanc)
+    
+    if motor_calisti_mi:
+        # Motordan sonra en güncel bakiyeyi ekrana yansıtmak için kasaya son bir kez bakıyoruz
+        kullanici = Kullanici.query.filter_by(kullanici_adi=session['kullanici_adi']).first()
         return jsonify({"status": "success", "kazanc": kazanc, "yeni_bakiye": kullanici.he_coin})
         
     return jsonify({"status": "error", "kazanc": 0}), 400
-# GÖREV ÖDÜLÜNÜ KASAYA AKTARMA ROTASI
 @app.route('/api/gorev_odulu_al', methods=['POST'])
 def gorev_odulu_al():
     kadi = session.get('kullanici_adi')
@@ -176,36 +188,39 @@ def profil():
         
     aktif = Kullanici.query.filter_by(kullanici_adi=kadi).first()
     
-    # 🚀 HAYALET AVCISI YAMASI: Adamın tarayıcısında eski çerez kalmış ama veritabanında yoksa, çökmek yerine çıkış yaptır!
     if aktif is None:
-        session.clear() # Tarayıcıdaki eski bozuk hatıraları sil
-        return redirect(url_for('giris')) # Yeniden kayıt/giriş sayfasına yolla
+        session.clear() 
+        return redirect(url_for('giris'))
 
-    # Buradan aşağısı sende aynı zaten, dokunmana gerek yok...
+    # 🚀 CTO OTO-TAMİR SİSTEMİ (Self-Healing)
+    # Eğer adamın kodu None ise, ona hemen fiyakalı bir şirket kodu üret!
+    if not aktif.referans_kodu:
+        # Kullanıcı adının ilk 3 harfini alıp büyüt, yanına 4 haneli şifre ekle. (Örn: ONU5829)
+        isim_kismi = aktif.kullanici_adi[:3].upper()
+        # Eğer kullanıcı adı 3 harften kısaysa yanına X ekle
+        if len(isim_kismi) < 3:
+            isim_kismi = isim_kismi.ljust(3, 'X')
+            
+        rastgele_sayi = str(random.randint(1000, 9999))
+        aktif.referans_kodu = f"{isim_kismi}{rastgele_sayi}"
+        db.session.commit() # Kasaya kaydet ki bir daha None olmasın!
+
     kullanicinin_oyunlari = Oyun.query.filter_by(olusturan_id=aktif.id).all()
-    # ...query.filter_by(olusturan_id=aktif.id).all()
     
-    # 1. AKTİF TEST (Bunda sorun yok, direkt oyun sayısını ölçer)
     aktif_test_sayisi = len(kullanicinin_oyunlari)
-    
-    # 2. GLOBAL ETKİLEŞİM (ZIRHLI: Sütun yoksa 0 sayar, çökmez!)
     global_etkilesim = sum(getattr(oyun, 'oynanma_sayisi', 0) for oyun in kullanicinin_oyunlari)
     
-    # 3. TAÇLANAN ŞAMPİYON (ZIRHLI: Skor tablosu veya sütun yoksa 0 sayar)
     try:
-        # Eğer ayrı bir Skor tablon varsa buradan çeker
         taclanan_sampiyon = Skor.query.join(Oyun).filter(Oyun.olusturan_id == aktif.id).count()
     except Exception:
-        # Skor tablon yoksa Oyun tablosundaki bitirilme sayısına bakar, o da yoksa 0 verir
         taclanan_sampiyon = sum(getattr(oyun, 'bitirilme_sayisi', 0) for oyun in kullanicinin_oyunlari)
 
-    # 🚀 TAMİRAT: 'kullanicinin_oyunlari' verisini HTML'e paslıyoruz!
     return render_template('profil.html', 
                            kullanici=aktif,
                            aktif_test_sayisi=aktif_test_sayisi,
                            global_etkilesim=global_etkilesim,
                            taclanan_sampiyon=taclanan_sampiyon,
-                           kullanicinin_oyunlari=kullanicinin_oyunlari) # <-- EKSİK OLAN BU SATIRDI PATRON!
+                           kullanicinin_oyunlari=kullanicinin_oyunlari)
 @app.route('/api/ai_analiz', methods=['POST'])
 def ai_analiz():
     data = request.json
@@ -247,19 +262,24 @@ def duello_lobisi(oda_kodu):
 def odaya_katil():
     oda_kodu = request.form.get('oda_kodu').strip()
     
-    # 1. Aktif yayınlar listesinden veya veritabanından odayı bul
-    # (Senin sisteminde yayinlari nerede tutuyorsan oradan çekeceksin. Örn: aktif_yayinlar sözlüğü)
+    # Yayın var mı kontrolü
     if oda_kodu not in aktif_yayinlar:
-        # Eğer oda yoksa ana sayfaya hata ile döndür
-        return redirect(url_for('ana_sayfa')) # veya dashboard rotan neyse
+        flash("Böyle bir yayın bulunamadı veya sona ermiş!", "error")
+        return redirect(url_for('dashboard')) # veya ana_sayfa
         
-    # 2. Odanın hangi oyunu oynattığını bul
+    # 🚀 YENİ VİZYON: Adamı normal oyuna DEĞİL, özel izleyici odasına gönderiyoruz!
+    return redirect(url_for('canli_yayin_izle', oda_kodu=oda_kodu))
+@app.route('/canli-izle/<oda_kodu>')
+def canli_yayin_izle(oda_kodu):
+    if oda_kodu not in aktif_yayinlar:
+        return redirect(url_for('dashboard'))
+        
     oyun_id = aktif_yayinlar[oda_kodu]['oyun_id']
+    oyun = Oyun.query.get(oyun_id) # Veritabanından oyunu çek
     
-    # 🚀 VİZYONER HAMLE: Kullanıcıyı ORİJİNAL oyun sayfasına gönderiyoruz, 
-    # ama URL'nin sonuna "?oda=KOD" ekliyoruz ki sistem onun misafir olduğunu anlasın!
-    return redirect(url_for('oyun_sayfasi', oyun_id=oyun_id, oda=oda_kodu))
-
+    # İŞTE BURASI: Hazırladığın o neon tasarımlı izleyici HTML'ini çağırıyoruz!
+    # (Parantez içine o HTML dosyasının adını tam olarak yaz, örn: 'izleyici_ekrani.html')
+    return render_template('izleyici_ekrani.html', yayin_kodu=oda_kodu, oyun=oyun)
 @socketio.on('cevap_yolla')
 def cevap_yolla(data):
     oda = data.get('oda')
@@ -309,14 +329,19 @@ def yayinci_odasi(yayin_kodu):
 @socketio.on('yayina_katil')
 def yayina_katil(data):
     oda = data.get('yayin_kodu')
-    oyuncu = session.get('kullanici_adi')
+    
+    # 🚀 CTO HACK: Artık adamın o neon ekranda kendi elleriyle yazdığı ismi yakalıyoruz!
+    # Eğer boş gelirse (hata olursa) session'dan alır, o da yoksa Misafir deriz.
+    oyuncu = data.get('oyuncu_adi') or session.get('kullanici_adi') or "GizemliOyuncu"
     
     if oda in aktif_yayinlar:
         join_room(oda)
+        
+        # Adamı yayıncının listesine ekle
         if oyuncu != aktif_yayinlar[oda]['yayinci'] and oyuncu not in aktif_yayinlar[oda]['izleyiciler']:
             aktif_yayinlar[oda]['izleyiciler'][oyuncu] = 0
+            
         emit('izleyici_listesi_guncelle', aktif_yayinlar[oda]['izleyiciler'], room=oda)
-
 @socketio.on('yayin_hareketi')
 def yayin_hareketi(data):
     oda = data.get('yayin_kodu')
@@ -623,9 +648,29 @@ def kayit():
         sifre = request.form.get('sifre')
         referans_kodu = request.form.get('referans_kodu')
 
-        # 1. VERİTABANINA KAYDET (Henüz onaylı değil!)
-        # Burada kendi veritabanı kayıt kodunu (SQLAlchemy vs.) yazmalısın. 
-        # ÖNEMLİ: Veritabanında bu kullanıcının "onayli_mi" sütununu False olarak kaydet!
+        # 1. VERİTABANINA KAYDET (CTO Dokunuşu)
+        # Önce bu e-posta veya kullanıcı adı zaten var mı diye kontrol edelim ki veritabanı çökmesin
+        mevcut_kullanici = Kullanici.query.filter((Kullanici.eposta == eposta) | (Kullanici.kullanici_adi == kullanici_adi)).first()
+        if mevcut_kullanici:
+            flash("Bu e-posta veya kullanıcı adı zaten kullanımda! Lütfen giriş yapın veya başka bir tane deneyin.", "error")
+            return redirect(url_for('kayit'))
+
+        # Şifreyi güçlü bir şekilde şifrele (Hacklenemez yapıyoruz)
+        hashed_sifre = generate_password_hash(sifre, method='pbkdf2:sha256')
+
+        # Yeni kullanıcıyı oluştur (Başlangıçta onayli_mi = False olarak geliyor)
+        # Yeni kullanıcıyı oluştur
+        yeni_kullanici = Kullanici(
+            ad_soyad=ad_soyad,
+            kullanici_adi=kullanici_adi,
+            eposta=eposta,
+            dogum_tarihi=dogum_tarihi,
+            sifre_hash=hashed_sifre, # BURASI sifre YERİNE sifre_hash OLDU!
+            onayli_mi=False
+        )
+        # Kasaya ekle ve kilitle
+        db.session.add(yeni_kullanici)
+        db.session.commit()
         
         # 2. DOĞRULAMA JETONU ÜRET
         # Kullanıcının e-postasını şifreleyerek özel bir link oluşturuyoruz
@@ -645,13 +690,13 @@ def kayit():
         """
         try:
             mail.send(msg)
-            # Mail başarıyla gittiyse kullanıcıyı bilgilendirme sayfasına at
-            # "Lütfen mail kutunuzu kontrol edin" tarzı bir flash mesajı basabilirsin
-            return "Kayıt başarılı! Lütfen E-posta kutunu kontrol et ve hesabını onayla."
+            # BEYAZ EKRAN ÇÖPE GİTTİ! Artık efsanevi neon tasarımını çağırıyoruz:
+            return render_template('kayit_basarili.html')
         except Exception as e:
             return f"Mail gönderilirken bir hata oluştu: {str(e)}"
 
     return render_template('kayit.html')
+
 @app.route('/dogrula/<token>')
 def dogrula(token):
     try:
@@ -662,18 +707,23 @@ def dogrula(token):
     except Exception:
         return "<h1>❌ Geçersiz doğrulama linki!</h1>"
 
-    # BURADA VERİTABANINI GÜNCELLE
+    # BURADA VERİTABANINI GÜNCELLE (CTO Dokunuşu)
     # 1. Bu e-postaya sahip kullanıcıyı bul.
-    # 2. kullanici.onayli_mi = True yap ve veritabanına kaydet (commit).
+    kullanici = Kullanici.query.filter_by(eposta=eposta).first()
     
-    # Her şey başarılıysa adama şovunu yap!
-    return """
-    <div style="background:#0b0c10; color:white; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:sans-serif;">
-        <h1 style="color:#2ecc71;">✅ Hesabın Başarıyla Onaylandı!</h1>
-        <p>Artık Hangieasy arenasında savaşmaya hazırsın.</p>
-        <a href="/giris" style="padding:15px 30px; background:#00f2fe; color:#000; text-decoration:none; font-weight:bold; border-radius:10px; margin-top:20px;">Sisteme Giriş Yap</a>
-    </div>
-    """
+    if not kullanici:
+        return "<h1>❌ Bu e-postaya ait bir hesap bulunamadı!</h1>"
+        
+    if kullanici.onayli_mi:
+        # Adam zaten onaylamış, tekrar basarsa hata vermesin
+        return render_template('dogrulama_basarili.html')
+
+    # 2. kullanici.onayli_mi = True yap ve veritabanına kaydet (commit).
+    kullanici.onayli_mi = True
+    db.session.commit()
+    
+    # HER ŞEY BAŞARILIYSA EFSANE ONAY EKRANINI ÇAĞIR!
+    return render_template('dogrulama_basarili.html')
 @app.route('/giris', methods=['GET', 'POST'])
 def giris():
     hata = None
@@ -776,9 +826,74 @@ def aydinlatma_metni():
 def kullanici_sozlesmesi():
     return render_template('kullanici_sozlesmesi.html')
 
+@app.route('/pp-guncelle', methods=['POST'])
+def pp_guncelle():
+    kadi = session.get('kullanici_adi')
+    if not kadi: return redirect(url_for('giris'))
+    
+    dosya = request.files.get('profil_fotografi')
+    if dosya and dosya.filename != '':
+        uzanti = dosya.filename.split('.')[-1]
+        dosya_adi = f"pp_{kadi}_{uuid.uuid4().hex}.{uzanti}"
+        
+        # Supabase'e fırlatıyoruz!
+        supabase.storage.from_("medya").upload(
+            path=dosya_adi, 
+            file=dosya.read(), 
+            file_options={"content-type": dosya.content_type, "x-upsert": "true"}
+        )
+        
+        # Resmin herkese açık URL'ini çek ve kasaya kaydet
+        resim_url = supabase.storage.from_("medya").get_public_url(dosya_adi)
+        
+        kullanici = Kullanici.query.filter_by(kullanici_adi=kadi).first()
+        kullanici.profil_resmi = resim_url
+        db.session.commit()
+        
+    return redirect(url_for('profil'))
+
 @app.route('/veri-gizlilik')
 def veri_gizlilik():
     return render_template('veri_gizlilik.html')
+from datetime import datetime
+
+# 🚀 CTO DOKUNUŞU: HangiEasy Rütbe ve İlerleme Motoru
+def ilerleme_kaydet(kullanici_adi, kazanilan_puan=0):
+    kullanici = Kullanici.query.filter_by(kullanici_adi=kullanici_adi).first()
+    
+    if not kullanici:
+        return False # Eğer misafirse ilerleme kaydetme
+        
+    bugun = datetime.now().strftime('%Y-%m-%d')
+
+    # 1. Günlük Sıfırlama Kontrolü (Yeni bir gün mü?)
+    if kullanici.son_gorev_tarihi != bugun:
+        kullanici.gunluk_test_sayaci = 0
+        kullanici.gunluk_odul_alindi = False
+        kullanici.son_gorev_tarihi = bugun
+
+    # 2. İlerlemeyi Yaz (Skor Ekle ve Sayaçları Artır)
+    kullanici.he_coin += kazanilan_puan # Oyundan kazandığı puanı coin'e veya puana dönüştür
+    kullanici.cozulen_test_sayisi += 1
+    kullanici.gunluk_test_sayaci += 1
+
+    # 3. RÜTBE ALGORİTMASI (Şirket Hiyerarşisi)
+    toplam_test = kullanici.cozulen_test_sayisi
+    
+    if toplam_test >= 100:
+        kullanici.rutbe = "CEO" # Patron sensin, ama 100 teste ulaşan oyuncu da CEO olur!
+    elif toplam_test >= 50:
+        kullanici.rutbe = "Müdür"
+    elif toplam_test >= 20:
+        kullanici.rutbe = "Uzman"
+    elif toplam_test >= 5:
+        kullanici.rutbe = "Asistan"
+    else:
+        kullanici.rutbe = "Stajyer"
+
+    # Kasayı Kilitle
+    db.session.commit()
+    return True
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5001)

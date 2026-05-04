@@ -12,43 +12,57 @@
         
         body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1f0b2e 0%, #0b0c10 80%); z-index: -1; }
 
-        /* DURUM EKRANLARI (BEKLEME / BİTİŞ) */
-        .durum-ekrani { text-align: center; animation: pulse 2s infinite; }
-        .durum-ikon { font-size: 60px; margin-bottom: 20px; text-shadow: 0 0 20px #00f2fe; }
+        /* DURUM EKRANLARI */
+        .durum-ekrani { text-align: center; }
+        .durum-ikon { font-size: 60px; margin-bottom: 20px; text-shadow: 0 0 20px #00f2fe; animation: pulse 2s infinite; }
         .durum-metin { font-size: 24px; font-weight: 800; color: #00f2fe; text-transform: uppercase; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 0.8;} 50% { transform: scale(1.05); opacity: 1;} 100% { transform: scale(1); opacity: 0.8;} }
+
+        /* YENİ: İSİM GİRİŞ KUTUSU (LOBİ) */
+        .isim-kutusu { background: rgba(0, 242, 254, 0.05); border: 1px solid #00f2fe; padding: 40px; border-radius: 20px; box-shadow: 0 0 30px rgba(0, 242, 254, 0.2); width: 100%; max-width: 400px; text-align: center; }
+        .isim-input { width: 100%; padding: 15px; margin: 20px 0; border-radius: 12px; border: 2px solid #333; background: #000; color: #00f2fe; font-size: 20px; font-weight: 800; text-align: center; outline: none; transition: 0.3s; }
+        .isim-input:focus { border-color: #00f2fe; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+        .btn-katil { width: 100%; padding: 15px; background: linear-gradient(45deg, #00f2fe, #4facfe); border: none; border-radius: 12px; color: #000; font-size: 18px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
+        .btn-katil:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0, 242, 254, 0.4); }
 
         /* OYUN EKRANI */
         #oyun-ekrani { display: none; width: 100%; max-width: 600px; text-align: center; }
         .puan-tabelasi { background: rgba(0, 242, 254, 0.1); border: 1px solid #00f2fe; color: #00f2fe; padding: 10px 20px; border-radius: 20px; font-weight: 900; font-size: 18px; margin-bottom: 20px; display: inline-block;}
-        
-        .soru-resim { width: 100%; max-height: 300px; object-fit: cover; border-radius: 15px; border: 3px solid #f39c12; margin-bottom: 20px; box-shadow: 0 0 30px rgba(243,156,18,0.3); display: none; /* Başlangıçta gizli tutuyoruz */}
-        
+        .soru-resim { width: 100%; max-height: 300px; object-fit: cover; border-radius: 15px; border: 3px solid #f39c12; margin-bottom: 20px; box-shadow: 0 0 30px rgba(243,156,18,0.3); display: none; }
         .secenekler-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .btn-secenek { background: #222; border: 2px solid #444; color: white; padding: 20px 10px; border-radius: 12px; font-size: 18px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase;}
         
         /* Buton Tıklanma Efektleri */
         .btn-secenek:active { transform: scale(0.95); }
-        .btn-secenek.secildi { border-color: #f39c12; background: rgba(243, 156, 18, 0.2); }
         .btn-secenek.dogru { background: #2ecc71 !important; border-color: #2ecc71 !important; color: #000; }
         .btn-secenek.yanlis { background: #e74c3c !important; border-color: #e74c3c !important; color: #fff; }
-        
-        /* Kumanda Bekleniyor Kilidi */
         .kilitli { pointer-events: none; opacity: 0.6; }
     </style>
 </head>
 <body>
 
-    <!-- BEKLEME EKRANI -->
-    <div id="bekleme-ekrani" class="durum-ekrani">
+    <!-- YENİ: ADIM 1 - İSİM SORGULAMA EKRANI (LOBİ) -->
+    <div id="isim-ekrani" class="isim-kutusu">
+        <div class="durum-metin" style="font-size: 28px; margin-bottom: 10px;">Hangieasy Live</div>
+        <p style="color: #aaa; font-size: 14px;">Arenaya girmeden önce kendini tanıt!</p>
+        
+        <!-- Eğer adam zaten siteye üye ise ve giriş yapmışsa Jinja ile adını otomatik yazdırırız (CTO Hack) -->
+        <input type="text" id="oyuncu-ismi" class="isim-input" placeholder="Takma Adın" value="{{ current_user.kullanici_adi if current_user.is_authenticated else '' }}" autocomplete="off">
+        
+        <button class="btn-katil" onclick="oyunaGirisYap()">ARENAYA KATIL 🚀</button>
+    </div>
+
+    <!-- ADIM 2 - BEKLEME EKRANI (Başlangıçta Gizli) -->
+    <div id="bekleme-ekrani" class="durum-ekrani" style="display: none;">
         <div class="durum-ikon">⏳</div>
         <div class="durum-metin">Yayıncının Başlatması Bekleniyor...</div>
+        <div style="margin-top: 15px; font-size: 18px; color: #f39c12; font-weight: bold;">Oyuncu: <span id="gosterilecek-isim"></span></div>
         <p style="color: #aaa; margin-top: 10px; font-size: 14px;">Telefonu elinden bırakma, şov birazdan başlıyor!</p>
     </div>
 
     <!-- OYUN ALANI -->
     <div id="oyun-ekrani">
-        <div class="puan-tabelasi">Skorun: <span id="benim-puanim">0</span></div>
+        <div class="puan-tabelasi"><span id="ekran-oyuncu-ismi"></span> | Skor: <span id="benim-puanim">0</span></div>
         <img src="" id="soru-resmi" class="soru-resim">
         <div class="secenekler-grid" id="secenekler-alani"></div>
         <div id="kilit-uyarisi" style="display: none; color: #f39c12; margin-top: 20px; font-weight: 800; animation: pulse 1s infinite;">Yayıncının Sıradaki Soruya Geçmesi Bekleniyor...</div>
@@ -56,7 +70,7 @@
 
     <!-- BİTİŞ EKRANI -->
     <div id="bitis-ekrani" class="durum-ekrani" style="display: none;">
-        <div class="durum-ikon" style="color: #2ecc71;">🏁</div>
+        <div class="durum-ikon" style="color: #2ecc71; animation: none;">🏁</div>
         <div class="durum-metin" style="color: #2ecc71;">Yayın Sona Erdi!</div>
         <div style="font-size: 40px; font-weight: 900; margin-top: 20px;" id="final-skor">0 Puan</div>
         <p style="color: #aaa; margin-top: 10px;">Liderlik tablosu için yayıncının ekranına bak!</p>
@@ -71,18 +85,35 @@
         let SORULAR = [];
         let benimSkorum = 0;
         let soruCevaplandi = false;
+        let OYUNCU_ISMI = ""; // Hayaletleri önleyecek asıl silahımız
 
-        // 1. Odaya Bağlan
-        socket.on('connect', () => {
-            socket.emit('yayina_katil', { yayin_kodu: YAYIN_KODU });
-        });
-
-        // 2. Arka Planda Soruları İndir (Hazırda Beklesin)
+        // 1. Arka Planda Soruları İndir
         fetch(`/api/sorular/${OYUN_ID}`)
             .then(res => res.json())
             .then(data => { SORULAR = data; });
 
-        // 3. YAYINCIDAN GELEN EMRİ DİNLE! (Burası işin kalbi)
+        // 🚀 CTO MOTORU: Oyuncuyu Kayıt Et ve Odaya Al
+        function oyunaGirisYap() {
+            let girilenIsim = document.getElementById('oyuncu-ismi').value.trim();
+            
+            if (girilenIsim === "") {
+                alert("Kral, isimsiz arenaya girilmez! Bir takma ad belirle.");
+                return;
+            }
+            
+            OYUNCU_ISMI = girilenIsim; // İsmi hafızaya kazıdık
+            
+            // Ekranları Değiştir
+            document.getElementById('isim-ekrani').style.display = 'none';
+            document.getElementById('bekleme-ekrani').style.display = 'block';
+            document.getElementById('gosterilecek-isim').innerText = OYUNCU_ISMI;
+            document.getElementById('ekran-oyuncu-ismi').innerText = OYUNCU_ISMI;
+            
+            // 🚨 EN ÖNEMLİ HAMLE: Sunucuya kim olduğumuzu bildirerek odaya giriyoruz!
+            socket.emit('yayina_katil', { yayin_kodu: YAYIN_KODU, oyuncu_adi: OYUNCU_ISMI });
+        }
+
+        // 3. YAYINCIDAN GELEN EMRİ DİNLE
         socket.on('yayinci_emri', (data) => {
             let aksiyon = data.aksiyon;
             let index = data.index;
@@ -90,7 +121,7 @@
             if (aksiyon === 'baslat') {
                 document.getElementById('bekleme-ekrani').style.display = 'none';
                 document.getElementById('oyun-ekrani').style.display = 'block';
-                soruyuCiz(0); // İlk soruyu çiz
+                soruyuCiz(0); 
             } 
             else if (aksiyon === 'siradaki_soru') {
                 if (index < SORULAR.length) {
@@ -104,22 +135,19 @@
             }
         });
 
-        // 🚀 KABLO TAMİRİ: Ekrana Soruyu Basan Motor
         function soruyuCiz(index) {
             soruCevaplandi = false;
             document.getElementById('secenekler-alani').classList.remove('kilitli');
             document.getElementById('kilit-uyarisi').style.display = 'none';
             
             let soru = SORULAR[index];
-            
-            // 🚀 ZIRH: Kırık Resim Koruması
             let resimUrl = (soru.resim_url || soru.resim || "").split(',')[0]; 
             let resimElem = document.getElementById('soru-resmi');
             
             if(resimUrl && resimUrl.trim() !== "") {
                 resimElem.src = resimUrl.trim();
                 resimElem.style.display = 'block';
-                resimElem.onerror = function() { this.style.display = 'none'; }; // Yüklenemezse gizle
+                resimElem.onerror = function() { this.style.display = 'none'; }; 
             } else {
                 resimElem.style.display = 'none'; 
             }
@@ -127,43 +155,41 @@
             let secAlan = document.getElementById('secenekler-alani');
             secAlan.innerHTML = '';
             
-            // 🚀 MOTOR: Harf harf bölmeyi engelle, virgülden parçala!
             let hamSecenekler = soru.secenekler || "";
             let seceneklerDizisi = (typeof hamSecenekler === 'string') ? hamSecenekler.split(',') : hamSecenekler;
-            
-            // Şıkları Karıştır
             let karisik = [...seceneklerDizisi].sort(() => Math.random() - 0.5);
+            
             karisik.forEach(sec => {
                 let s = sec.trim();
                 if(s !== "") {
-                    // Güvenlik için tırnakları escape ediyoruz
                     let guvenliS = s.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                     let dogruCevap = (soru.dogru_cevap || "").trim().replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                    
                     secAlan.innerHTML += `<button class="btn-secenek" onclick="cevapVer(this, '${guvenliS}', '${dogruCevap}')">${s}</button>`;
                 }
             });
         }
 
-        // Tıklama Motoru
+        // Tıklama Motoru Güncellendi
         function cevapVer(buton, secim, dogruCevap) {
             if (soruCevaplandi) return;
             soruCevaplandi = true;
 
-            // Ekranı kilitle ki bir daha basamasın
             document.getElementById('secenekler-alani').classList.add('kilitli');
             document.getElementById('kilit-uyarisi').style.display = 'block';
 
             if (secim === dogruCevap || dogruCevap === "Farketmez") {
                 buton.classList.add('dogru');
-                benimSkorum += 10; // Doğru cevaba 10 puan!
+                benimSkorum += 10; 
                 document.getElementById('benim-puanim').innerText = benimSkorum;
                 
-                // SUNUCUYA HABER VER: Puan kazandım, liderlik tablomu güncelle!
-                socket.emit('izleyici_cevap_gonder', { yayin_kodu: YAYIN_KODU, puan: benimSkorum });
+                // 🚨 SUNUCUYA HABER VER: Artık ismimi de yolluyorum!
+                socket.emit('izleyici_cevap_gonder', { 
+                    yayin_kodu: YAYIN_KODU, 
+                    oyuncu_adi: OYUNCU_ISMI, // İSİM EKLENDİ!
+                    puan: benimSkorum 
+                });
             } else {
                 buton.classList.add('yanlis');
-                // Doğru olanı yeşil yak
                 let butonlar = document.querySelectorAll('.btn-secenek');
                 butonlar.forEach(b => { if(b.innerText === dogruCevap) b.classList.add('dogru'); });
             }
