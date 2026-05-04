@@ -896,4 +896,5 @@ def ilerleme_kaydet(kullanici_adi, kazanilan_puan=0):
     return True
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, port=5001)
+    port = int(os.environ.get('PORT', 5000))
+    socketio.run(app, host='0.0.0.0', port=port)
