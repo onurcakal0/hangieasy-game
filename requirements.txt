@@ -9,3 +9,4 @@ python-dotenv
 supabase
 stripe
 itsdangerous
+psycopg2-binary
