@@ -6,3 +6,6 @@ Werkzeug==3.0.1
 gunicorn
 gevent-websocket
 python-dotenv
+supabase
+stripe
+itsdangerous
