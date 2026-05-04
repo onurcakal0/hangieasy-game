@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ oyun_basligi }} | Sürat Yarışı</title>
+    
+    <meta property="og:title" content="{{ oyun.baslik }} | Hangieasy Sürat Yarışı">
+    <meta property="og:description" content="10 Saniyen var! Hızlı düşün, hızlı seç.">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: #0b0c10; color: #ffffff; 
+            display: flex; flex-direction: column; align-items: center; 
+            min-height: 100vh; padding: 40px 5%; overflow-x: hidden; position: relative;
+        }
+        
+        /* 🌌 IŞILTILI RGB ARKAPLAN (Adrenalin Kırmızısı ve Hız Sarısı) */
+        body::before, body::after {
+            content: ''; position: fixed; width: 50vw; height: 50vw;
+            border-radius: 50%; filter: blur(120px); z-index: -1;
+            animation: orbFloat 8s infinite alternate ease-in-out;
+        }
+        body::before { background: rgba(255, 0, 85, 0.15); top: -10%; left: -10%; } 
+        body::after { background: rgba(243, 156, 18, 0.15); bottom: -10%; right: -10%; animation-delay: -2s; }
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
+        }
+        
+        .oyun-alani { width: 100%; max-width: 1000px; text-align: center; z-index: 2; position: relative;}
+        
+        /* ⏱️ ZAMAN SAYACI (NEON BAR) */
+        .sayac-kutusu {
+            width: 100%; max-width: 600px; margin: 0 auto 30px;
+            background: rgba(20, 20, 30, 0.8); border-radius: 20px;
+            border: 2px solid #333; overflow: hidden; position: relative;
+            box-shadow: 0 0 20px rgba(255,0,85,0.2);
+        }
+        .sayac-bar {
+            height: 15px; width: 100%; background: linear-gradient(90deg, #00f2fe, #00b09b);
+            transition: width 0.1s linear, background 0.3s;
+        }
+        .sayac-metin {
+            font-size: 28px; font-weight: 900; color: #fff; margin-bottom: 10px;
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+
+        .kapisma-alani { display: flex; justify-content: center; align-items: stretch; gap: 30px; position: relative;}
+        
+        /* 🎮 KARTLAR (Daha Keskin ve Agresif) */
+        .kart { 
+            flex: 1; background: rgba(25, 25, 35, 0.8); backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.1); border-radius: 15px; 
+            overflow: hidden; cursor: pointer; padding-bottom: 15px;
+            transition: all 0.2s; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .kart:active { transform: scale(0.95); } /* Tıklama hissiyatı (Hız için önemli) */
+        .kart img { width: 100%; height: 320px; object-fit: cover; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .kart h3 { margin-top: 15px; font-size: 22px; font-weight: 800; color: #fff;}
+
+        /* 🔥 VS ROZETİ */
+        .vs-rozet { 
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); 
+            background: #ff0055; color: #fff; width: 60px; height: 60px; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 24px; font-weight: 900; z-index: 10;
+            box-shadow: 0 0 25px rgba(255, 0, 85, 0.8); border: 3px solid #0b0c10;
+        }
+
+        /* 🚨 GECİKTİN EFEKTİ (Ekran Titremesi) */
+        @keyframes sarsinti {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            100% { transform: translate(0px, 0px) rotate(0deg); }
+        }
+        .geciktin { animation: sarsinti 0.4s; border-color: #ff0055 !important; box-shadow: inset 0 0 50px rgba(255,0,85,0.5); }
+
+        /* 🎬 SİNEMATİK BAŞLANGIÇ PERDESİ (TÜM EKRANI KAPLAR) */
+        #baslangic-ekrani {
+            position: fixed; /* absolute yerine fixed yaptık, tüm ekranı kaplayacak */
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(11, 12, 16, 0.95); z-index: 1000; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            backdrop-filter: blur(15px);
+        }
+        
+        .buton-basla {
+            background: linear-gradient(45deg, #ff0055, #f39c12); color: white; border: none;
+            padding: 20px 50px; font-size: 24px; font-weight: 900; border-radius: 15px;
+            cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
+            box-shadow: 0 10px 30px rgba(255,0,85,0.5); transition: 0.3s;
+        }
+        .buton-basla:hover { transform: scale(1.1); box-shadow: 0 15px 40px rgba(243,156,18,0.6); }
+
+        .buton-mavi { margin-top: 30px; padding:15px 30px; font-size:16px; font-weight:800; background:linear-gradient(45deg, #00f2fe, #4facfe); color:white; border:none; border-radius:12px; cursor:pointer; text-transform:uppercase; }
+        /* 🪙 HE-COIN KAZANMA ANİMASYONU */
+        #coin-bildirim {
+            position: fixed; top: 20px; right: 20px; 
+            background: linear-gradient(45deg, #f1c40f, #f39c12); color: #000; 
+            padding: 15px 25px; border-radius: 50px; font-weight: 900; font-size: 18px;
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.6); z-index: 9999;
+            transform: translateX(150%); opacity: 0; 
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: flex; align-items: center; gap: 10px; border: 2px solid #fff;
+        }
+        .coin-goster { transform: translateX(0) !important; opacity: 1 !important; }
+    </style>
+</head>
+<body>
+<div id="coin-bildirim">🪙 <span>+10 HE-Coin Kazandın!</span></div>
+    <div class="oyun-alani" id="oyun-kutusu">
+        
+        <div class="sayac-metin" id="tur-bilgisi">SÜRAT YARIŞI HAZIR</div>
+        
+        <div class="sayac-kutusu">
+            <div class="sayac-bar" id="sayac-bar"></div>
+        </div>
+
+        <div class="kapisma-alani" id="kapisma-kutusu" style="position: relative;">
+            
+            <div id="baslangic-ekrani">
+                <h2 style="font-size: 36px; color:#f39c12; margin-bottom: 10px;">⚡ SÜRAT YARIŞI</h2>
+                <p style="color:#aaa; font-size: 18px; margin-bottom: 40px; text-align:center; max-width:400px;">
+                    Sadece 3 saniyen var! Süre bitmeden en sevdiğini seç. Hazır mısın patron?
+                </p>
+                <button class="buton-basla" onclick="oyunuBaslat()">MOTORU ATEŞLE</button>
+            </div>
+
+            </div>
+    </div>
+
+    <script>
+        const OYUN_ID = "{{ aktif_oyun }}";
+        const AKTIF_DIL = "{{ aktif_dil }}"; 
+
+        const SOZLUK = {
+            'tr': { 'kalan': 'KALAN:', 'hata': 'Yetersiz öğe!', 'sure_bitti': 'SÜRE BİTTİ!', 'favorin': 'HIZ ŞAMPİYONU' },
+            'en': { 'kalan': 'LEFT:', 'hata': 'Not enough items!', 'sure_bitti': 'TIME UP!', 'favorin': 'SPEED CHAMPION' }
+        };
+        const T = SOZLUK[AKTIF_DIL] || SOZLUK['tr'];
+
+        let adaylar = [];
+        let sonrakiTur = [];
+        let toplamMac = 0;
+        let oynananMac = 0;
+        let yapayZekaSecimleri = []; // 🧠 AI için seçim havuzu
+        
+        let timerZamani = 3000; 
+        let kalanZaman = timerZamani;
+        let sayacInterval;
+
+        window.onload = () => {
+            fetch(`/api/sorular/${OYUN_ID}`)
+                .then(res => res.json())
+                .then(data => {
+                    // 🚀 ZIRH 1: Veri yoksa sistemi dondur, patlamasını engelle
+                    if (!data || data.length === 0) {
+                        let kutu = document.getElementById('kapisma-kutusu');
+                        if(kutu) kutu.innerHTML = "<h3 style='color:white; text-align:center; width:100%;'>Teste henüz seçenek eklenmemiş patron!</h3>";
+                        return;
+                    }
+
+                    data.forEach(soru => {
+                        // 🚀 ZIRH 2: Akıllı ve Güvenli Veri Parçalayıcı
+                        let isimler = (soru.secenekler || "").split(',');
+                        let resimler = (soru.resim_url || "").split(',');
+
+                        let isim1 = isimler[0] ? isimler[0].trim() : "Seçenek 1";
+                        let isim2 = isimler[1] ? isimler[1].trim() : "Seçenek 2";
+                        let resim1 = resimler[0] ? resimler[0].trim() : "";
+                        let resim2 = resimler[1] ? resimler[1].trim() : resim1;
+
+                        adaylar.push({ isim: isim1, resim: resim1 });
+                        adaylar.push({ isim: isim2, resim: resim2 });
+                    });
+                    
+                    adaylar = adaylar.sort(() => Math.random() - 0.5);
+                    toplamMac = Math.floor(adaylar.length / 2);
+                })
+                .catch(err => console.error("Veri Çekme Hatası:", err));
+        };
+
+        function oyunuBaslat() {
+            let baslangic = document.getElementById('baslangic-ekrani');
+            if(baslangic) baslangic.style.display = 'none';
+            if (adaylar.length > 0) sahneyiKur();
+        }
+
+        function sahneyiKur() {
+            clearInterval(sayacInterval);
+
+            if (adaylar.length <= 1) {
+                if (adaylar.length === 1) sonrakiTur.push(adaylar.pop());
+                if (sonrakiTur.length === 1) {
+                    sampiyonuGoster(sonrakiTur[0]);
+                    return;
+                }
+                adaylar = sonrakiTur.sort(() => Math.random() - 0.5);
+                sonrakiTur = [];
+                oynananMac = 0;
+                toplamMac = Math.floor(adaylar.length / 2);
+            }
+
+            let sol = adaylar.pop();
+            let sag = adaylar.pop();
+            oynananMac++;
+
+            let turBilgisi = document.getElementById('tur-bilgisi');
+            if(turBilgisi) turBilgisi.innerText = `${T.kalan} ${toplamMac - oynananMac + 1}`;
+
+            let kapismaKutusu = document.getElementById('kapisma-kutusu');
+            if(kapismaKutusu) {
+                // 🚀 ZIRH 3: Kırık resim ikonu engellendi (onerror)
+                kapismaKutusu.innerHTML = `
+                    <div class="kart secenek-kart" id="sol-kart" onclick="secimYap('${sol.isim.replace(/'/g, "\\'")}', '${sol.resim}')">
+                        <img src="${sol.resim}" onerror="this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'">
+                        <h3>${sol.isim}</h3>
+                    </div>
+                    <div class="vs-rozet">⚡</div>
+                    <div class="kart secenek-kart" id="sag-kart" onclick="secimYap('${sag.isim.replace(/'/g, "\\'")}', '${sag.resim}')">
+                        <img src="${sag.resim}" onerror="this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'">
+                        <h3>${sag.isim}</h3>
+                    </div>
+                `;
+            }
+
+            zamanlayiciyiBaslat(sol, sag);
+        }
+
+        function zamanlayiciyiBaslat(sol, sag) {
+            kalanZaman = timerZamani;
+            let bar = document.getElementById('sayac-bar');
+            if(bar) {
+                bar.style.width = "100%";
+                bar.style.background = "linear-gradient(90deg, #00f2fe, #00b09b)";
+            }
+
+            sayacInterval = setInterval(() => {
+                kalanZaman -= 50; 
+                let yuzde = (kalanZaman / timerZamani) * 100;
+                if(bar) bar.style.width = yuzde + "%";
+
+                if (kalanZaman <= 1000 && bar) bar.style.background = "#ff0055";
+
+                if (kalanZaman <= 0) {
+                    clearInterval(sayacInterval);
+                    geciktinCezasi(sol, sag);
+                }
+            }, 50);
+        }
+
+        function geciktinCezasi(sol, sag) {
+            let turBilgi = document.getElementById('tur-bilgisi');
+            if(turBilgi) turBilgi.innerText = T.sure_bitti;
+            document.body.classList.add('geciktin');
+            document.querySelectorAll('.secenek-kart').forEach(k => k.onclick = null);
+
+            let sans = Math.random() > 0.5;
+            let kazanan = sans ? sol : sag;
+            let kazananKart = sans ? document.getElementById('sol-kart') : document.getElementById('sag-kart');
+            
+            if(kazananKart) kazananKart.style.borderColor = "#f39c12";
+
+            setTimeout(() => {
+                document.body.classList.remove('geciktin');
+                sonrakiTur.push(kazanan);
+                yapayZekaSecimleri.push(kazanan.isim); // Ceza olsa bile AI datasına işlensin
+                sahneyiKur();
+            }, 800);
+        }
+
+        function secimYap(secilenIsim, secilenResim) {
+            clearInterval(sayacInterval);
+            sonrakiTur.push({ isim: secilenIsim, resim: secilenResim });
+            yapayZekaSecimleri.push(secilenIsim); // Seçimi AI havuzuna kaydet
+            sahneyiKur();
+        }
+
+        function sampiyonuGoster(sampiyon) {
+            clearInterval(sayacInterval);
+            let sayacKutu = document.querySelector('.sayac-kutusu');
+            if(sayacKutu) sayacKutu.style.display = 'none';
+            let turBilgi = document.getElementById('tur-bilgisi');
+            if(turBilgi) turBilgi.style.display = 'none';
+
+            let kapismaKutusu = document.getElementById('kapisma-kutusu');
+            if(kapismaKutusu) {
+                kapismaKutusu.innerHTML = `
+                    <div style="width: 100%; text-align: center; animation: 1s ease-out 0s 1 fadeIn;">
+                        <h2 style="color: #00f2fe; font-size:40px; margin-bottom:20px; font-weight:900; text-transform:uppercase;">⚡ ${T.favorin} ⚡</h2>
+                        <div class="kart" style="max-width: 400px; margin: 0 auto; border-color: #00f2fe; box-shadow: 0 15px 50px rgba(0, 242, 254, 0.4); transform:scale(1.05);">
+                            <img src="${sampiyon.resim}" onerror="this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'" style="height: 350px;">
+                            <h3 style="font-size: 30px; color: #00f2fe; padding: 20px 0;">${sampiyon.isim}</h3>
+                        </div>
+                        <button class="buton-mavi" style="margin-top:30px;" onclick="location.href='/'">🏠 ANA SAYFAYA DÖN</button>
+                    </div>
+                `;
+            }
+            
+            // 🧠 ZIRH 4: AI Analizi Sisteme Bağlandı
+            fetch('/api/ai_analiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ secimler: yapayZekaSecimleri, oyun_basligi: "{{ oyun_basligi }}" })
+            })
+            .then(res => res.json())
+            .then(data => {
+                let aiKonteynir = document.getElementById('ai-analiz-konteynir');
+                if(aiKonteynir) aiKonteynir.style.display = 'block';
+                let aiMetni = document.getElementById('ai-analiz-metni');
+                if(aiMetni) aiMetni.innerText = data.analiz;
+            }).catch(err => console.log("AI API Hatası:", err));
+
+            // 🪙 KURŞUN GEÇİRMEZ COİN ALICI
+            fetch('/api/odul_al', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ miktar: 15 }) // Hız testi zordur, 15 coin!
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    let bildirim = document.getElementById('coin-bildirim');
+                    if(bildirim) {
+                        let kazanilan = data.kazanc || data.miktar || data.odul || 15;
+                        let span = bildirim.querySelector('span');
+                        if(span) span.innerText = `+${kazanilan} HE-Coin Kazandın!`;
+                        bildirim.classList.add('coin-goster');
+                        setTimeout(() => bildirim.classList.remove('coin-goster'), 4000);
+                    }
+                }
+            }).catch(err => console.log("Coin API Hatası:", err));
+        }
+    </script>
+</body>
+</html>

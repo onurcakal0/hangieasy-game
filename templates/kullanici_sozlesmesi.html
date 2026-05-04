@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terzi İşi Kullanıcı Sözleşmesi | Hangieasy</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: #0b0c10; color: #ffffff; 
+            overflow-x: hidden; position: relative; min-height: 100vh;
+        }
+        
+        /* 🌌 IŞILTILI RGB ARKAPLAN */
+        body::before, body::after {
+            content: ''; position: fixed; width: 50vw; height: 50vw;
+            border-radius: 50%; filter: blur(120px); z-index: -1;
+            animation: orbFloat 15s infinite alternate ease-in-out;
+        }
+        body::before { background: rgba(0, 242, 254, 0.15); top: -10%; left: -10%; }
+        body::after { background: rgba(243, 156, 18, 0.15); bottom: -10%; right: -10%; animation-delay: -5s; }
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 100px) scale(1.2); }
+        }
+
+        /* ---------------- NAVBAR ---------------- */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 5%; background: rgba(15, 15, 20, 0.8);
+            backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+        
+        .logo { 
+            font-size: 26px; font-weight: 800; 
+            background: linear-gradient(90deg, #f39c12, #ff007a); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none; letter-spacing: 1px;
+        }
+
+        .btn-geri {
+            background: rgba(0, 242, 254, 0.1); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3);
+            padding: 8px 20px; border-radius: 30px; text-decoration: none; font-weight: 800;
+            font-size: 13px; transition: 0.3s; text-transform: uppercase;
+        }
+        .btn-geri:hover { background: #00f2fe; color: #000; box-shadow: 0 0 15px rgba(0, 242, 254, 0.5); }
+
+        /* ---------------- HUKUKİ METİN KUTUSU ---------------- */
+        .icerik-kapsayici {
+            max-width: 900px; margin: 50px auto; padding: 0 20px;
+        }
+
+        .baslik-alani { text-align: center; margin-bottom: 40px; }
+        .baslik-alani h1 { font-size: 36px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; color: #fff;}
+        .baslik-alani p { color: #00f2fe; font-size: 14px; font-weight: 600; letter-spacing: 1px;}
+
+        .cam-pano {
+            background: rgba(25, 25, 35, 0.6); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px;
+            padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            line-height: 1.8; color: #ccc; font-size: 15px;
+        }
+
+        .madde-baslik {
+            color: #00f2fe; font-size: 18px; font-weight: 800; margin-top: 35px; margin-bottom: 15px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .madde-baslik::before {
+            content: '⚖️'; font-size: 18px;
+        }
+
+        .cam-pano p { margin-bottom: 15px; }
+        .cam-pano ul { margin-left: 20px; margin-bottom: 15px; }
+        .cam-pano li { margin-bottom: 8px; }
+        
+        .dikkat-kutu {
+            background: rgba(255, 0, 85, 0.1); border-left: 4px solid #ff0055;
+            padding: 15px 20px; border-radius: 0 10px 10px 0; margin: 25px 0;
+            color: #fff; font-weight: 600;
+        }
+
+        /* 🥷 STEALTH MODE UYUMU */
+        body.stealth-mode { background-color: #050505; }
+        body.stealth-mode::before, body.stealth-mode::after { display: none; }
+        body.stealth-mode .navbar { background: rgba(10, 10, 10, 0.9); border-bottom: 1px solid #222; }
+        body.stealth-mode .logo { background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; text-shadow: none; }
+        body.stealth-mode .cam-pano { background: #0a0a0c; border-color: #1a1a1a; box-shadow: none; color: #999;}
+        body.stealth-mode .baslik-alani p { color: #888; }
+        body.stealth-mode .madde-baslik { color: #fff; }
+        body.stealth-mode .dikkat-kutu { background: #111; border-color: #ff0055; color: #ccc;}
+        body.stealth-mode .btn-geri { border-color: #333; color: #fff; background: transparent; }
+        body.stealth-mode .btn-geri:hover { background: #fff; color: #000; box-shadow: none;}
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="logo">HangiEasy</a>
+        <a href="/" class="btn-geri">🏠 Merkeze Dön</a>
+    </nav>
+
+    <div class="icerik-kapsayici">
+        <div class="baslik-alani">
+            <h1>Terzi İşi Kullanıcı Sözleşmesi</h1>
+            <p>HANGİEASY ANAYASASI VE HİZMET ŞARTLARI</p>
+        </div>
+
+        <div class="cam-pano">
+            <p>Hoş geldin Vizyoner,</p>
+            <p>Hangieasy sadece test çözdüğün bir yer değil, zekanı ve tercihlerini milyonlarla yarıştırdığın bir arenadır. Bu platforma adım attığın an, aşağıdaki "Terzi İşi" kuralları okumuş, anlamış ve kanınla imzalamış sayılırsın. Kurallar basit, net ve şeffaftır.</p>
+
+            <div class="dikkat-kutu">
+                Hangieasy'de hileye, spam içeriklere ve platformun vizyonunu zedeleyecek hareketlere sıfır tolerans gösterilir. Kural ihlali yapanın bileti tek yönlü kesilir!
+            </div>
+
+            <h3 class="madde-baslik">1. Krallığın Kuralları (Hesap Kullanımı)</h3>
+            <ul>
+                <li>Kullanıcı hesabınız tamamen size aittir ve başkasına devredilemez veya satılamaz.</li>
+                <li>Profil adınızda veya ürettiğiniz testlerde küfür, nefret söylemi veya yasa dışı içerik barındıramazsınız. Vizyonerlere yakışan bir dil şarttır.</li>
+                <li>Aynı kişinin sahte oylar kasmak için birden fazla "Bot Hesap" açması, sistem algoritmalarımız tarafından anında tespit edilir ve tüm ağ ağdan kalıcı olarak uzaklaştırılır.</li>
+            </ul>
+
+            <h3 class="madde-baslik">2. Fikri Mülkiyet ve İçerik Üretimi</h3>
+            <p>Onur Çakal A.Ş. bünyesinde oluşturduğunuz tüm testler ve yaratıcı içerikler, sizin zihninizin ürünüdür. Ancak:</p>
+            <ul>
+                <li>Bu içerikleri platformda yayınladığınız an, Hangieasy'ye bu içerikleri global olarak sergileme, analiz etme ve trend listelerine sokma hakkı vermiş olursunuz.</li>
+                <li>Telif hakkı barındıran (örneğin izinsiz film sahneleri veya çalıntı sorular) içeriklerin hukuki sorumluluğu tamamen testi oluşturan yayıncıya aittir.</li>
+            </ul>
+
+            <h3 class="madde-baslik">3. HE-Coin ve Ekonomi Şartları</h3>
+            <p>Hangieasy'nin yerel para birimi olan HE-Coin (🪙), platform içi ödüllendirme ve rekabet sisteminin temelidir.</p>
+            <ul>
+                <li>HE-Coin'ler sadece platform içindeki VIP özellikler, kozmetik çerçeveler veya özel haklar için kullanılabilir. Gerçek paraya (Fiat currency) dönüştürülemez.</li>
+                <li>Sistem açığı (bug) bularak haksız HE-Coin kasan hesapların bakiyeleri, CEO yetkisiyle sıfırlanır ve hesaplar süresiz dondurulur.</li>
+            </ul>
+
+            <h3 class="madde-baslik">4. Feragatname (CEO Notu)</h3>
+            <p>Hangieasy, sistemin kesintisiz çalışması için elinden gelen tüm teknik altyapıyı (sunucu kalitesi, optimizasyon) sunar. Ancak siber saldırılar, global internet kesintileri veya planlı dev bakım günlerinde yaşanabilecek geçici kesintilerden Onur Çakal A.Ş. sorumlu tutulamaz. Biz motoru en iyi şekilde tasarladık, yolda yaşanacak sarsıntılar yolculuğun bir parçasıdır!</p>
+
+            <p style="margin-top: 30px; text-align: center; color: #888; font-size: 13px;">
+                <i>Yürürlük Tarihi: Tesisin Kurulduğu Tarih<br>
+                Hangieasy | Onur Çakal A.Ş. Hukuk Departmanı</i>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        if(localStorage.getItem('stealthMode') === 'aktif') {
+            document.body.classList.add('stealth-mode');
+        }
+    </script>
+
+</body>
+</html>

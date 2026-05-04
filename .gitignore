@@ -16,3 +16,4 @@ ENV/
 # Yüklenen resimler (Geliştirme aşamasındakileri göndermiyoruz)
 static/uploads/*
 !static/uploads/.gitkeep
+.env

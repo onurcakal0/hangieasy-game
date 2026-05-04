@@ -2,50 +2,192 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>QuizHub | Soru Ekle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HangiEasy Stüdyo | Soru Ekle</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
     <style>
-        body { background-color: #0f0f13; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px;}
-        .form-kutusu { background-color: #1a1a24; padding: 40px; border-radius: 15px; width: 100%; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #f39c12;}
-        .grup { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #ddd; font-weight: bold; font-size: 14px;}
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background-color: #2c2c38; color: white; outline: none;}
-        .buton-grup { display: flex; gap: 10px; margin-top: 30px; }
-        button { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 14px;}
-        .btn-devam { background-color: #f39c12; color: #0f0f13; }
-        .btn-bitir { background-color: #27ae60; color: white; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: #0b0c10; color: #ffffff; 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; padding: 40px 20px; position: relative; overflow-x: hidden;
+        }
+        
+        /* 🌌 IŞILTILI RGB ARKAPLAN (Üretim Modu) */
+        body::before, body::after {
+            content: ''; position: fixed; width: 50vw; height: 50vw;
+            border-radius: 50%; filter: blur(120px); z-index: -1;
+            animation: orbFloat 12s infinite alternate ease-in-out;
+        }
+        body::before { background: rgba(0, 242, 254, 0.15); top: -10%; left: -10%; } /* Siber Mavi */
+        body::after { background: rgba(243, 156, 18, 0.12); bottom: -10%; right: -10%; animation-delay: -4s; } /* Stüdyo Sarısı */
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 60px) scale(1.15); }
+        }
+
+        /* 🧊 CAM EFEKTLİ (GLASSMORPHISM) ANA FORM KUTUSU */
+        .form-kutusu { 
+            background: rgba(20, 20, 30, 0.6); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05); padding: 50px; 
+            border-radius: 20px; width: 100%; max-width: 750px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 20px rgba(0, 242, 254, 0.1); 
+            position: relative; z-index: 1;
+        }
+        
+        /* BAŞLIKLAR */
+        .form-kutusu h2 { 
+            font-size: 32px; font-weight: 900; text-align: center;
+            background: linear-gradient(90deg, #00f2fe, #4facfe); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .form-kutusu p.alt-bilgi { text-align: center; color: #aaa; font-weight: 600; margin-bottom: 40px; letter-spacing: 0.5px;}
+
+        /* FORM GRUPLARI VE INPUTLAR */
+        .grup { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 10px; color: #ddd; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;}
+        
+        input[type="text"], input[type="file"], select { 
+            width: 100%; padding: 15px; border-radius: 12px; 
+            border: 1px solid rgba(255,255,255,0.1); background: rgba(0, 0, 0, 0.4); 
+            color: white; outline: none; transition: all 0.3s ease; font-size: 15px;
+        }
+        input[type="text"]:focus, input[type="file"]:focus, select:focus { 
+            border-color: #00f2fe; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); background: rgba(0, 0, 0, 0.6);
+        }
+        
+        /* Dosya Seçici (File Input) Özelleştirmesi */
+        input[type="file"]::file-selector-button {
+            background: linear-gradient(45deg, #1a1a24, #2c2c38); border: 1px solid #444; 
+            color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer; 
+            font-weight: 600; transition: 0.3s; margin-right: 15px;
+        }
+        input[type="file"]::file-selector-button:hover { background: #00f2fe; color: #000; border-color: #00f2fe;}
+
+        /* ⚔️ O MU BU MU İÇİN MAVİ/KIRMIZI ALANLAR */
+        .vs-alan-mavi { background: rgba(0, 242, 254, 0.05); border-left: 4px solid #00f2fe; padding: 20px; border-radius: 0 12px 12px 0; margin-bottom: 20px;}
+        .vs-alan-kirmizi { background: rgba(255, 0, 85, 0.05); border-left: 4px solid #ff0055; padding: 20px; border-radius: 0 12px 12px 0; margin-bottom: 20px;}
+        .vs-baslik { font-size: 18px; font-weight: 800; margin-bottom: 15px; text-transform: uppercase;}
+
+        /* 📦 DİNAMİK KUTU (Turnuva ve Kör Sıralama İçin) */
+        .dinamik-kutu {
+            background: rgba(25, 25, 35, 0.5); border: 1px dashed rgba(255,255,255,0.2); 
+            padding: 25px; border-radius: 15px; margin-bottom: 20px; position: relative; 
+            transition: all 0.3s ease;
+        }
+        .dinamik-kutu:hover { border-color: #f39c12; background: rgba(243, 156, 18, 0.05); }
+        
+        /* RGB BUTONLAR */
+        .btn-ekle-mavi { 
+            background: linear-gradient(45deg, #00f2fe, #4facfe); color: white; padding: 15px; margin-bottom: 30px; 
+            border-radius: 12px; width: 100%; border: none; font-weight: 800; font-size: 15px; 
+            cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-ekle-mavi:hover { box-shadow: 0 8px 25px rgba(0, 242, 254, 0.5); transform: translateY(-2px);}
+
+        .btn-sil {
+            position: absolute; right: 15px; top: 15px; background: rgba(255,0,85,0.1); 
+            color: #ff0055; border: 1px solid #ff0055; border-radius: 8px; padding: 6px 12px; 
+            cursor: pointer; font-weight: 800; transition: 0.3s; font-size: 12px; text-transform: uppercase;
+        }
+        .btn-sil:hover { background: #ff0055; color: #fff; box-shadow: 0 0 15px rgba(255,0,85,0.5);}
+
+        /* ALT AKSİYON BUTONLARI (Devam ve Yayına Al) */
+        .buton-grup { display: flex; gap: 15px; margin-top: 40px; }
+        .btn-devam, .btn-bitir { 
+            flex: 1; padding: 18px; border: none; border-radius: 12px; 
+            font-weight: 800; font-size: 16px; cursor: pointer; transition: all 0.3s ease;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-devam { background: linear-gradient(45deg, #f39c12, #e67e22); color: #000; }
+        .btn-devam:hover { box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4); transform: translateY(-2px);}
+        
+        .btn-bitir { background: linear-gradient(45deg, #00b09b, #96c93d); color: #fff; }
+        .btn-bitir:hover { box-shadow: 0 10px 25px rgba(0, 176, 155, 0.4); transform: translateY(-2px);}
     </style>
 </head>
 <body>
     <div class="form-kutusu">
-        <h2 style="color: #f39c12; text-align: center;">{{ oyun.baslik }}</h2>
-        <p style="text-align: center; color: #aaa; margin-bottom: 25px;">{{ soru_sayisi }}. Soruyu ekliyorsun</p>
+        <h2>{{ oyun.baslik }}</h2>
+        <p class="alt-bilgi">🎬 {{ soru_sayisi }}. İçeriği Ekliyorsun</p>
         
         <form method="POST" enctype="multipart/form-data">
             
-            {% if oyun.oyun_modu == 'omu_bumu' %}
-                <h3 style="color:#2980b9; margin-bottom:10px;">1. Aday (Sol Taraf)</h3>
-                <div class="grup"><label>1. Resim Seç</label><input type="file" name="resim_1" accept="image/*" required></div>
-                <div class="grup"><label>1. Resmin Altındaki İsim (Örn: BMW M5)</label><input type="text" name="secenek_1" required></div>
+            {% if oyun.oyun_modu == 'omu_bumu' or oyun.oyun_modu == 'surat_yarisi' or oyun.oyun_modu == 'kim_populer' %}
+                <div class="vs-alan-mavi">
+                    <div class="vs-baslik" style="color: #00f2fe;">🔵 1. Aday (Sol Taraf)</div>
+                    <div class="grup">
+                        <label>1. Resim Seç</label>
+                        <input type="file" name="resim_1" accept="image/*" required>
+                    </div>
+                    <div class="grup" style="margin-bottom: 0;">
+                        <label>1. Resmin Altındaki İsim (Örn: BMW M5)</label>
+                        <input type="text" name="secenek_1" placeholder="Birinci seçeneğin adını yaz..." required>
+                    </div>
+                </div>
                 
-                <h3 style="color:#c0392b; margin-top:30px; margin-bottom:10px;">2. Aday (Sağ Taraf)</h3>
-                <div class="grup"><label>2. Resim Seç</label><input type="file" name="resim_2" accept="image/*" required></div>
-                <div class="grup"><label>2. Resmin Altındaki İsim (Örn: Audi RS6)</label><input type="text" name="secenek_2" required></div>
+                <div class="vs-alan-kirmizi">
+                    <div class="vs-baslik" style="color: #ff0055;">🔴 2. Aday (Sağ Taraf)</div>
+                    <div class="grup">
+                        <label>2. Resim Seç</label>
+                        <input type="file" name="resim_2" accept="image/*" required>
+                    </div>
+                    <div class="grup" style="margin-bottom: 0;">
+                        <label>2. Resmin Altındaki İsim (Örn: Audi RS6)</label>
+                        <input type="text" name="secenek_2" placeholder="İkinci seçeneğin adını yaz..." required>
+                    </div>
+                </div>
                 <input type="hidden" name="dogru_cevap" value="Farketmez">
 
+            {% elif oyun.oyun_modu == 'butce_savasi' %}
+                <div style="background: rgba(46, 204, 113, 0.1); padding: 20px; border-radius: 15px; border: 1px solid #2ecc71; margin-bottom: 30px;">
+                    <h3 style="color:#2ecc71; margin-bottom:10px;">💰 15$ Bütçe Savaşı Editörü</h3>
+                    <p style="color:#ccc; font-size: 14px;">Her kategori için <b>3x$5, 3x$3 ve 3x$1</b> eklemeyi unutmayın patron!</p>
+                </div>
+
+                <div class="grup">
+                    <label>Kategori İsmi (Örn: Forvetler, Arabalar, Saatler)</label>
+                    <input type="text" name="secenek_2" placeholder="Kullanıcının göreceği kategori adı..." required>
+                </div>
+
+                <div class="grup">
+                    <label>Öğe/Oyuncu Adı (Örn: L. Messi)</label>
+                    <input type="text" name="secenek_1" placeholder="Oyuncu veya ürün ismi..." required>
+                </div>
+
+                <div class="grup">
+                    <label>Bu Öğenin Fiyatı ($)</label>
+                    <select name="dogru_cevap" style="width: 100%; padding: 15px; border-radius: 12px; background: #000; color: #fff; border: 1px solid #444;">
+                        <option value="5">$5 (Yıldız / Süper Lüks)</option>
+                        <option value="3">$3 (Kaliteli / Standart)</option>
+                        <option value="1">$1 (Fiyat/Performans / Çaylak)</option>
+                    </select>
+                </div>
+
+                <div class="grup">
+                    <label>Öğe Resmi</label>
+                    <input type="file" name="soru_resmi" accept="image/*" required>
+                </div>
+
             {% elif oyun.oyun_modu == 'kor_siralama' or oyun.oyun_modu == 'turnuva' %}
-                <h3 style="color:#f39c12; margin-bottom:5px;">Sıralanacak / Kapışacak Öğeleri Ekle</h3>
-                <p style="color:#aaa; font-size:12px; margin-bottom:20px;">Turnuva için en az 4, 8 veya 16 öğe eklemeye çalış!</p>
+                <h3 style="color:#f39c12; margin-bottom:5px; font-size: 18px;">Sıralanacak / Kapışacak Öğeleri Ekle</h3>
+                <p style="color:#aaa; font-size:13px; margin-bottom:25px; font-weight: 400;">Turnuva için en az 4, 8 veya 16 öğe eklemeye çalış!</p>
+                
                 <div id="dinamik-liste">
-                    <div class="grup" style="border: 1px dashed #555; padding: 15px; border-radius: 10px; margin-bottom: 15px; background-color: #211c10;">
-                        <label style="color:#f39c12;">Öğe Resmi</label>
+                    <div class="dinamik-kutu">
+                        <label style="color:#00f2fe;">📸 Öğe Resmi</label>
                         <input type="file" name="soru_resmi" accept="image/*" required>
-                        <label style="margin-top:10px;">Öğenin İsmi</label>
+                        <label style="margin-top:15px; color:#fff;">🏷️ Öğenin İsmi</label>
                         <input type="text" name="secenekler" placeholder="Örn: Nissan GTR" required>
                     </div>
                 </div>
 
-                <button type="button" onclick="satirEkle()" style="background-color: #2980b9; color: white; padding: 10px; margin-bottom: 20px; border-radius: 8px; width: 100%; border: none; font-weight: bold; cursor: pointer;">
-                    + Yeni Bir Resim Kutusu Daha Ekle
+                <button type="button" onclick="satirEkle()" class="btn-ekle-mavi">
+                    + Yeni Bir Resim Kutusu Ekle
                 </button>
                 <input type="hidden" name="dogru_cevap" value="Farketmez">
 
@@ -53,25 +195,80 @@
                     function satirEkle() {
                         let kutu = document.getElementById('dinamik-liste');
                         let html = `
-                        <div class="grup" style="border: 1px dashed #555; padding: 15px; border-radius: 10px; margin-bottom: 15px; position: relative;">
-                            <button type="button" onclick="this.parentElement.remove()" style="position: absolute; right: 10px; top: 10px; background: #c0392b; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer;">Sil</button>
-                            <label>Öğe Resmi</label>
+                        <div class="dinamik-kutu">
+                            <button type="button" onclick="this.parentElement.remove()" class="btn-sil">🗑️ Sil</button>
+                            <label style="color:#00f2fe;">📸 Öğe Resmi</label>
                             <input type="file" name="soru_resmi" accept="image/*" required>
-                            <label style="margin-top:10px;">Öğenin İsmi</label>
-                            <input type="text" name="secenekler" required>
+                            <label style="margin-top:15px; color:#fff;">🏷️ Öğenin İsmi</label>
+                            <input type="text" name="secenekler" placeholder="Yeni öğenin adını yaz..." required>
                         </div>`;
                         kutu.insertAdjacentHTML('beforeend', html);
                     }
                 </script>
+            {% elif oyun.oyun_modu == 'casus_kim' %}
+                <h3 style="color:#ff0055; margin-bottom:10px;">🛡️ Ajanı (Casusu) Ekle</h3>
+                <p style="color:#aaa; font-size: 13px; margin-bottom:20px;">3 tane birbiriyle uyumlu, 1 tane tamamen alakasız (casus) resim ekle.</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div class="grup" style="margin-bottom:0;">
+                        <label>1. Resim Seç</label>
+                        <input type="file" name="resim_1" accept="image/*" required>
+                    </div>
+                    <div class="grup" style="margin-bottom:0;">
+                        <label>2. Resim Seç</label>
+                        <input type="file" name="resim_2" accept="image/*" required>
+                    </div>
+                    <div class="grup" style="margin-bottom:0;">
+                        <label>3. Resim Seç</label>
+                        <input type="file" name="resim_3" accept="image/*" required>
+                    </div>
+                    <div class="grup" style="margin-bottom:0;">
+                        <label>4. Resim Seç (Casus Burada Olmak Zorunda Değil)</label>
+                        <input type="file" name="resim_4" accept="image/*" required>
+                    </div>
+                </div>
+
+                <div class="grup">
+                    <label>Yukarıdaki 4 Resmin İsimlerini Virgülle Yazın (Sırası Önemli!)</label>
+                    <input type="text" name="secenekler" placeholder="Örn: BMW, Mercedes, Audi, Elma" required>
+                </div>
+                <div class="grup">
+                    <label>Casus Hangisi? (Doğru Cevap - Yukarıdakilerden biriyle BİREBİR aynı olmalı)</label>
+                    <input type="text" name="dogru_cevap" placeholder="Örn: Elma" required>
+                </div>
+                {% elif oyun.oyun_modu == 'sesli_quiz' %}
+                <h3 style="color:#00f2fe; margin-bottom:10px;">🎵 Ses Dosyasını ve Şıkları Ekle</h3>
+                <div class="grup">
+                    <label>Dinletilecek Sesi Seç (MP3, WAV)</label>
+                    <input type="file" name="soru_sesi" accept="audio/*" required>
+                </div>
+                <div class="grup">
+                    <label>Şıklar (Virgülle ayırın)</label>
+                    <input type="text" name="secenekler" placeholder="Örn: BMW M5, Audi RS6, Mercedes E63" required>
+                </div>
+                <div class="grup">
+                    <label>Doğru Cevap (Birebir aynı yazın)</label>
+                    <input type="text" name="dogru_cevap" placeholder="Örn: BMW M5" required>
+                </div>
             {% else %}
-                <div class="grup"><label>Soru Resmi Seç</label><input type="file" name="soru_resmi" accept="image/*" required></div>
-                <div class="grup"><label>Şıklar (Virgülle ayır)</label><input type="text" name="secenekler" required></div>
-                <div class="grup"><label>Doğru Cevap</label><input type="text" name="dogru_cevap" required></div>
+                <h3 style="color:#00f2fe; margin-bottom:20px; font-size: 18px;">🕵️ Soru Bilgilerini Girin</h3>
+                <div class="grup">
+                    <label>Soru Resmi Seç (Piksel Avcısı için net bir resim seçin, sistem onu otomatik bulandırır)</label>
+                    <input type="file" name="soru_resmi" accept="image/*" required>
+                </div>
+                <div class="grup">
+                    <label>Şıklar (Aralarına virgül koyarak yazın)</label>
+                    <input type="text" name="secenekler" placeholder="Örn: BMW M5, Audi RS6, Mercedes E63, Porsche Panamera" required>
+                </div>
+                <div class="grup">
+                    <label>Doğru Cevap (Yukarıya yazdığın şıklardan biriyle BİREBİR aynı olmalı)</label>
+                    <input type="text" name="dogru_cevap" placeholder="Örn: BMW M5" required>
+                </div>
             {% endif %}
 
             <div class="buton-grup">
-                <button type="submit" name="aksiyon" value="devam" class="btn-devam">+ Yeni Ekle</button>
-                <button type="submit" name="aksiyon" value="bitir" class="btn-bitir">✓ Yayına Al</button>
+                <button type="submit" name="aksiyon" value="devam" class="btn-devam">+ YENİ EKLE</button>
+                <button type="submit" name="aksiyon" value="bitir" class="btn-bitir">✓ YAYINA AL</button>
             </div>
         </form>
     </div>

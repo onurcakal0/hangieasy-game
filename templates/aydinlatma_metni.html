@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halka Açık Aydınlatma Metni | Hangieasy</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: #0b0c10; color: #ffffff; 
+            overflow-x: hidden; position: relative; min-height: 100vh;
+        }
+        
+        /* 🌌 IŞILTILI RGB ARKAPLAN */
+        body::before, body::after {
+            content: ''; position: fixed; width: 50vw; height: 50vw;
+            border-radius: 50%; filter: blur(120px); z-index: -1;
+            animation: orbFloat 15s infinite alternate ease-in-out;
+        }
+        body::before { background: rgba(138, 35, 135, 0.15); top: -10%; left: -10%; }
+        body::after { background: rgba(0, 242, 254, 0.15); bottom: -10%; right: -10%; animation-delay: -5s; }
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 100px) scale(1.2); }
+        }
+
+        /* ---------------- NAVBAR (BASİTLEŞTİRİLMİŞ) ---------------- */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 5%; background: rgba(15, 15, 20, 0.8);
+            backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+        
+        .logo { 
+            font-size: 26px; font-weight: 800; 
+            background: linear-gradient(90deg, #f39c12, #ff007a); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none; letter-spacing: 1px;
+        }
+
+        .btn-geri {
+            background: rgba(0, 242, 254, 0.1); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3);
+            padding: 8px 20px; border-radius: 30px; text-decoration: none; font-weight: 800;
+            font-size: 13px; transition: 0.3s; text-transform: uppercase;
+        }
+        .btn-geri:hover { background: #00f2fe; color: #000; box-shadow: 0 0 15px rgba(0, 242, 254, 0.5); }
+
+        /* ---------------- HUKUKİ METİN KUTUSU ---------------- */
+        .icerik-kapsayici {
+            max-width: 900px; margin: 50px auto; padding: 0 20px;
+        }
+
+        .baslik-alani { text-align: center; margin-bottom: 40px; }
+        .baslik-alani h1 { font-size: 36px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; color: #fff;}
+        .baslik-alani p { color: #00f2fe; font-size: 14px; font-weight: 600; letter-spacing: 1px;}
+
+        .cam-pano {
+            background: rgba(25, 25, 35, 0.6); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px;
+            padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            line-height: 1.8; color: #ccc; font-size: 15px;
+        }
+
+        .madde-baslik {
+            color: #f39c12; font-size: 18px; font-weight: 800; margin-top: 35px; margin-bottom: 15px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .madde-baslik::before {
+            content: '⚡'; font-size: 16px;
+        }
+
+        .cam-pano p { margin-bottom: 15px; }
+        .cam-pano ul { margin-left: 20px; margin-bottom: 15px; }
+        .cam-pano li { margin-bottom: 8px; }
+        
+        .onemli-kutu {
+            background: rgba(243, 156, 18, 0.1); border-left: 4px solid #f39c12;
+            padding: 15px 20px; border-radius: 0 10px 10px 0; margin: 25px 0;
+            color: #fff; font-weight: 600;
+        }
+
+        /* 🥷 STEALTH MODE UYUMU */
+        body.stealth-mode { background-color: #050505; }
+        body.stealth-mode::before, body.stealth-mode::after { display: none; }
+        body.stealth-mode .navbar { background: rgba(10, 10, 10, 0.9); border-bottom: 1px solid #222; }
+        body.stealth-mode .logo { background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; text-shadow: none; }
+        body.stealth-mode .cam-pano { background: #0a0a0c; border-color: #1a1a1a; box-shadow: none; color: #999;}
+        body.stealth-mode .baslik-alani p { color: #888; }
+        body.stealth-mode .madde-baslik { color: #fff; }
+        body.stealth-mode .onemli-kutu { background: #111; border-color: #444; color: #ccc;}
+        body.stealth-mode .btn-geri { border-color: #333; color: #fff; background: transparent; }
+        body.stealth-mode .btn-geri:hover { background: #fff; color: #000; box-shadow: none;}
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="/" class="logo">HangiEasy</a>
+        <a href="/" class="btn-geri">🏠 Merkeze Dön</a>
+    </nav>
+
+    <!-- METİN İÇERİĞİ -->
+    <div class="icerik-kapsayici">
+        <div class="baslik-alani">
+            <h1>Halka Açık Aydınlatma Metni</h1>
+            <p>VERİ GÜVENLİĞİ VE GİZLİLİK POLİTİKASI (KVKK)</p>
+        </div>
+
+        <div class="cam-pano">
+            <p>Değerli Hangieasy Oyuncusu ve Üreticisi,</p>
+            <p>Klasik ve sıkıcı testleri yıkarak yeni nesil rekabet ekosistemini inşa ettiğimiz bu platformda, kişisel verilerinizin güvenliği bizim için kodlarımızın temel taşıdır. <b>Onur Çakal A.Ş.</b> vizyonuyla kurulan Hangieasy, verilerinizi en üst düzey siber güvenlik kalkanlarıyla korumayı taahhüt eder.</p>
+
+            <div class="onemli-kutu">
+                Hangieasy'de pikselleriniz, skorlarınız ve dijital ayak iziniz sadece size ait birer VIP varlıktır. Verileriniz hiçbir karanlık 3. partiye satılmaz!
+            </div>
+
+            <h3 class="madde-baslik">1. Veri Sorumlusu Kimdir?</h3>
+            <p>Kişisel verileriniz, veri sorumlusu sıfatıyla <b>Hangieasy Stüdyoları</b> (Bundan böyle "Platform" veya "Biz" olarak anılacaktır) tarafından, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") ve ilgili global regülasyonlar kapsamında işlenmektedir.</p>
+
+            <h3 class="madde-baslik">2. Hangi Piksellerinizi (Verilerinizi) Topluyoruz?</h3>
+            <p>Siz platformda rakiplerinizi ezerken ve HE-Coin kasarken şu verileri güvence altına alıyoruz:</p>
+            <ul>
+                <li><b>Kimlik ve İletişim Verileri:</b> Efsanevi kullanıcı adınız, e-posta adresiniz ve şifreniz (Şifreleriniz hash'lenerek, bizim bile göremeyeceğimiz kriptolojik bir formatta saklanır).</li>
+                <li><b>Oyun ve Performans Verileri:</b> Çözdüğünüz testler, kazandığınız turnuvalar, Global Liderlik Tablosu skorlarınız ve AI Analizi için yaptığınız seçimler.</li>
+                <li><b>Finansal Veriler:</b> Cüzdanınızdaki 🪙 HE-Coin bakiyesi ve günlük operasyon/ödül geçmişiniz.</li>
+            </ul>
+
+            <h3 class="madde-baslik">3. Bu Verileri Neden İşliyoruz?</h3>
+            <p>Verilerinizi sadece sizin deneyiminizi şaha kaldırmak için kullanıyoruz:</p>
+            <ul>
+                <li>Sizi sistemde tanımak ve profil (Stüdyo) sayfanızı kesintisiz sunmak.</li>
+                <li>Oyun içi Yapay Zeka (AI) analiz motorumuzu çalıştırarak size karakter veya tercih analizleri çıkarmak.</li>
+                <li>Turnuvalardaki hileleri engellemek ve "Hız Şampiyonu" gibi rekabetçi modlarda adaleti sağlamak.</li>
+                <li>Siber saldırılara karşı kalkanlarımızı güncel tutmak.</li>
+            </ul>
+
+            <h3 class="madde-baslik">4. Verilerinizi Kimlerle Paylaşıyoruz?</h3>
+            <p>Verileriniz <b>asla</b> reklam şirketlerine veya yetkisiz veri tüccarlarına satılmaz. Sadece platformun kesintisiz çalışması için gerekli olan bulut sunucu sağlayıcıları (altyapı hizmetleri) ile güvenli ve şifreli bir şekilde barındırılır.</p>
+
+            <h3 class="madde-baslik">5. Patron Olarak Haklarınız Nelerdir?</h3>
+            <p>KVKK Madde 11 uyarınca şu haklara sahipsiniz:</p>
+            <ul>
+                <li>Hangi verilerinizin işlendiğini öğrenme.</li>
+                <li>Eksik veya yanlış verilerinizin (Örn: Kullanıcı adı) düzeltilmesini isteme.</li>
+                <li>"Tüm izimi silin!" diyerek hesabınızın ve verilerinizin tamamen yok edilmesini talep etme.</li>
+            </ul>
+
+            <p style="margin-top: 30px; text-align: center; color: #888; font-size: 13px;">
+                <i>Son Güncelleme: Tesisin Kurulduğu Tarih<br>
+                Hangieasy | Kodlayan: Vizyoner CTO Onur Çakal</i>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Arka plandaki Stealth Mode ayarını okuyup bu sayfaya da uygular
+        if(localStorage.getItem('stealthMode') === 'aktif') {
+            document.body.classList.add('stealth-mode');
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ oyun_basligi }} | Kim Daha Popüler?</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: #0b0c10; color: #ffffff; 
+            display: flex; flex-direction: column; align-items: center; 
+            min-height: 100vh; overflow-x: hidden; position: relative;
+        }
+        
+        /* 🌌 IŞILTILI RGB ARKAPLAN (Veri Mavisi ve Hype Yeşili) */
+        body::before, body::after {
+            content: ''; position: fixed; width: 50vw; height: 50vw;
+            border-radius: 50%; filter: blur(120px); z-index: -1;
+            animation: orbFloat 10s infinite alternate ease-in-out;
+        }
+        body::before { background: rgba(0, 242, 254, 0.15); top: -10%; left: -10%; } 
+        body::after { background: rgba(0, 176, 155, 0.15); bottom: -10%; right: -10%; animation-delay: -3s; }
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
+        }
+
+        /* 🏆 SKOR TABLOSU */
+        .skor-paneli {
+            position: fixed; top: 30px; z-index: 100;
+            background: rgba(20, 20, 30, 0.8); backdrop-filter: blur(10px);
+            border: 2px solid rgba(0, 242, 254, 0.3); padding: 10px 40px;
+            border-radius: 30px; box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+            font-size: 24px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;
+        }
+        #guncel-skor { color: #f39c12; font-size: 28px; }
+
+        /* 🎮 KAPIŞMA ALANI */
+        .oyun-alani {
+            display: flex; width: 100%; height: 100vh; position: relative;
+        }
+        
+        /* SOL VE SAĞ KARTLAR */
+        .kart {
+            flex: 1; position: relative; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            overflow: hidden; padding: 40px; transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .kart::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, rgba(11, 12, 16, 0.9) 0%, rgba(11, 12, 16, 0.4) 100%);
+            z-index: 1;
+        }
+        .kart img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+            filter: blur(2px) brightness(0.7); z-index: 0; transition: 0.5s;
+        }
+        .kart:hover img { filter: blur(0px) brightness(0.9); transform: scale(1.05); }
+
+        .icerik { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;}
+        
+        .baslik { font-size: 42px; font-weight: 900; text-transform: uppercase; text-shadow: 0 5px 15px rgba(0,0,0,0.8); margin-bottom: 20px;}
+        .alt-metin { font-size: 18px; color: #aaa; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;}
+        
+        /* 📈 NEON VERİ KUTUSU */
+        .veri-kutusu {
+            font-size: 64px; font-weight: 900; color: #00f2fe;
+            text-shadow: 0 0 30px rgba(0, 242, 254, 0.5); line-height: 1; margin-bottom: 20px;
+        }
+
+        /* ⚔️ ORTADAKİ VS ÇİZGİSİ VE ROZETİ */
+        .vs-ayrac {
+            position: absolute; left: 50%; top: 0; width: 4px; height: 100%;
+            background: rgba(255,255,255,0.1); transform: translateX(-50%); z-index: 10;
+        }
+        .vs-rozet {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 80px; height: 80px; background: #0b0c10; border: 4px solid #f39c12;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 30px; font-weight: 900; color: #f39c12; box-shadow: 0 0 30px rgba(243, 156, 18, 0.4);
+            z-index: 11;
+        }
+
+        /* 🟢🔴 AKSİYON BUTONLARI (Higher / Lower) */
+        .btn-grup { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; }
+        .btn-aksiyon {
+            padding: 18px 30px; border-radius: 30px; border: 3px solid transparent;
+            font-size: 20px; font-weight: 800; cursor: pointer; text-transform: uppercase;
+            transition: all 0.3s ease; display: flex; justify-content: space-between; align-items: center;
+            background: rgba(20, 20, 30, 0.8); backdrop-filter: blur(5px); color: #fff;
+        }
+        .btn-yuksek:hover { border-color: #00b09b; background: rgba(0, 176, 155, 0.2); box-shadow: 0 0 20px rgba(0, 176, 155, 0.4);}
+        .btn-dusuk:hover { border-color: #ff0055; background: rgba(255, 0, 85, 0.2); box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);}
+
+        /* Sonuç Renkleri */
+        .dogru { color: #00b09b !important; text-shadow: 0 0 30px rgba(0, 176, 155, 0.8) !important; }
+        .yanlis { color: #ff0055 !important; text-shadow: 0 0 30px rgba(255, 0, 85, 0.8) !important; }
+
+        /* Oyun Sonu Ekranı */
+        #oyun-sonu {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 12, 16, 0.95); z-index: 1000; display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+            backdrop-filter: blur(20px); text-align: center;
+        }
+        #oyun-sonu h2 { font-size: 50px; color: #ff0055; margin-bottom: 10px; font-weight: 900;}
+        #oyun-sonu p { font-size: 24px; color: #aaa; margin-bottom: 40px;}
+        .buton-mavi { padding: 15px 40px; font-size: 18px; font-weight: 800; background: linear-gradient(45deg, #00f2fe, #4facfe); color: white; border: none; border-radius: 15px; cursor: pointer; text-transform: uppercase; transition: 0.3s; text-decoration: none;}
+        .buton-mavi:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 242, 254, 0.4);}
+        /* 🪙 HE-COIN KAZANMA ANİMASYONU */
+        #coin-bildirim {
+            position: fixed; top: 20px; right: 20px; 
+            background: linear-gradient(45deg, #f1c40f, #f39c12); color: #000; 
+            padding: 15px 25px; border-radius: 50px; font-weight: 900; font-size: 18px;
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.6); z-index: 9999;
+            transform: translateX(150%); opacity: 0; 
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: flex; align-items: center; gap: 10px; border: 2px solid #fff;
+        }
+        .coin-goster { transform: translateX(0) !important; opacity: 1 !important; }
+    </style>
+</head>
+<body>
+<div id="coin-bildirim">🪙 <span>+10 HE-Coin Kazandın!</span></div>
+    <div class="skor-paneli">Skor: <span id="guncel-skor">0</span></div>
+
+    <div class="oyun-alani" id="sahne">
+        
+        <div class="kart" id="kart-sol">
+            <img id="img-sol" src="" alt="Sol Seçenek">
+            <div class="icerik">
+                <div class="baslik" id="isim-sol">Yükleniyor...</div>
+                <div class="alt-metin">Global Arama/Oy Hacmi</div>
+                <div class="veri-kutusu" id="veri-sol">0</div>
+            </div>
+        </div>
+
+        <div class="vs-ayrac"></div>
+        <div class="vs-rozet">VS</div>
+
+        <div class="kart" id="kart-sag">
+            <img id="img-sag" src="" alt="Sağ Seçenek">
+            <div class="icerik">
+                <div class="baslik" id="isim-sag">Yükleniyor...</div>
+                <div class="alt-metin">Global Arama/Oy Hacmi</div>
+                
+                <div id="aksiyon-alani" class="btn-grup">
+                    <button class="btn-aksiyon btn-yuksek" onclick="tahminYap('yuksek')">DAHA FAZLA <span>📈</span></button>
+                    <button class="btn-aksiyon btn-dusuk" onclick="tahminYap('dusuk')">DAHA AZ <span>📉</span></button>
+                </div>
+                
+                <div class="veri-kutusu" id="veri-sag" style="display: none;">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="oyun-sonu">
+        <h2>❌ OYUN BİTTİ</h2>
+        <p>Toplam Skorun: <span id="final-skor" style="color:#f39c12; font-weight:900;">0</span></p>
+        <div style="display: flex; gap: 15px;">
+            <button class="buton-mavi" onclick="location.reload()" style="background: #27ae60;">🔄 Tekrar Oyna</button>
+            <a href="/" class="buton-mavi" style="background: #333;">🏠 Ana Sayfa</a>
+        </div>
+    </div>
+
+    <script>
+        const OYUN_ID = "{{ aktif_oyun }}";
+        
+        let adaylar = [];
+        let aktifSol = null;
+        let aktifSag = null;
+        let skor = 0;
+        let islemde = false; // Spam tıklamayı önler
+
+        // 🧠 Zeki Skor Üretici
+        function skorUret(isim) {
+            let hash = 0;
+            for (let i = 0; i < isim.length; i++) {
+                hash = isim.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return (Math.abs(hash) % 890000) + 10000; // 10k ile 900k arası hacim
+        }
+
+        window.onload = () => {
+            fetch(`/api/sorular/${OYUN_ID}`)
+                .then(res => res.json())
+                .then(data => {
+                    // 🚀 ZIRH 1: Veri yoksa patlama
+                    if (!data || data.length === 0) {
+                        document.getElementById('aksiyon-alani').innerHTML = "<h3 style='color:white;'>Bu teste henüz kart eklenmemiş!</h3>";
+                        return;
+                    }
+
+                    data.forEach(soru => {
+                        // 🚀 KABLO TAMİRİ: API'den gelen verileri virgüllerden böl!
+                        let isimler = (soru.secenekler || "").split(',');
+                        let resimler = (soru.resim_url || "").split(',');
+
+                        let isim1 = isimler[0] ? isimler[0].trim() : "Bilinmeyen 1";
+                        let isim2 = isimler[1] ? isimler[1].trim() : "Bilinmeyen 2";
+                        
+                        let resim1 = resimler[0] ? resimler[0].trim() : "";
+                        let resim2 = resimler[1] ? resimler[1].trim() : resim1; // 2. resim yoksa 1.yi kopyala
+
+                        adaylar.push({ isim: isim1, resim: resim1, hacim: skorUret(isim1) });
+                        adaylar.push({ isim: isim2, resim: resim2, hacim: skorUret(isim2) });
+                    });
+                    
+                    // Havuzu karıştır
+                    adaylar = adaylar.sort(() => Math.random() - 0.5);
+                    oyunuBaslat();
+                })
+                .catch(err => console.error("Veri Çekme Hatası:", err));
+        };
+
+        function oyunuBaslat() {
+            if(adaylar.length < 2) { 
+                let aksiyon = document.getElementById('aksiyon-alani');
+                if(aksiyon) aksiyon.innerHTML = "<h3 style='color:white;'>Oyun için en az 2 kart lazım!</h3>"; 
+                return; 
+            }
+            aktifSol = adaylar.pop();
+            aktifSag = adaylar.pop();
+            sahneyiCiz();
+        }
+
+        function sahneyiCiz() {
+            // 🚀 ZIRH 2: Kırık resim ikonu engellendi, şık yedek resim eklendi
+            let imgSol = document.getElementById('img-sol');
+            if(imgSol) {
+                imgSol.src = aktifSol.resim;
+                imgSol.onerror = function() { this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'; };
+            }
+            document.getElementById('isim-sol').innerText = aktifSol.isim;
+            document.getElementById('veri-sol').innerText = aktifSol.hacim.toLocaleString();
+            
+            let imgSag = document.getElementById('img-sag');
+            if(imgSag) {
+                imgSag.src = aktifSag.resim;
+                imgSag.onerror = function() { this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'; };
+            }
+            document.getElementById('isim-sag').innerText = aktifSag.isim;
+            
+            let aksiyonAlani = document.getElementById('aksiyon-alani');
+            if(aksiyonAlani) aksiyonAlani.style.display = 'flex';
+            
+            let veriSag = document.getElementById('veri-sag');
+            if(veriSag) {
+                veriSag.style.display = 'none';
+                veriSag.className = 'veri-kutusu'; // Renkleri sıfırla
+                veriSag.innerText = aktifSag.hacim.toLocaleString();
+            }
+            islemde = false;
+        }
+
+        function tahminYap(secim) {
+            if(islemde) return;
+            islemde = true;
+
+            let solDeger = aktifSol.hacim;
+            let sagDeger = aktifSag.hacim;
+            let dogruCevap = sagDeger >= solDeger ? 'yuksek' : 'dusuk';
+
+            let aksiyonAlani = document.getElementById('aksiyon-alani');
+            if(aksiyonAlani) aksiyonAlani.style.display = 'none';
+            
+            let veriSag = document.getElementById('veri-sag');
+            if(veriSag) veriSag.style.display = 'block';
+
+            if(secim === dogruCevap) {
+                // DOĞRU BİLDİ!
+                if(veriSag) veriSag.classList.add('dogru');
+                skor++;
+                let guncelSkor = document.getElementById('guncel-skor');
+                if(guncelSkor) guncelSkor.innerText = skor;
+                
+                setTimeout(() => {
+                    if(adaylar.length > 0) {
+                        aktifSol = aktifSag; // Sağdaki kart sola geçer
+                        aktifSag = adaylar.pop(); // Yeni kart sağa gelir
+                        sahneyiCiz();
+                    } else {
+                        oyunBitti("🏆 HELAL OLSUN! Hepsini bildin.");
+                    }
+                }, 1500);
+
+            } else {
+                // YANLIŞ BİLDİ!
+                if(veriSag) veriSag.classList.add('yanlis');
+                setTimeout(() => {
+                    oyunBitti("❌ OYUN BİTTİ");
+                }, 1500);
+            }
+        }
+
+        function oyunBitti(mesaj) {
+            let ekran = document.getElementById('oyun-sonu');
+            if(ekran) {
+                ekran.style.display = 'flex';
+                let h2 = ekran.querySelector('h2');
+                if(h2) h2.innerText = mesaj;
+            }
+            
+            let finalSkor = document.getElementById('final-skor');
+            if(finalSkor) finalSkor.innerText = skor;
+            
+            fetch('/api/odul_al', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ miktar: 10 }) 
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    let bildirim = document.getElementById('coin-bildirim');
+                    if(bildirim) {
+                        bildirim.querySelector('span').innerText = `+${data.kazanc} HE-Coin Kazandın!`;
+                        bildirim.classList.add('coin-goster');
+                        setTimeout(() => bildirim.classList.remove('coin-goster'), 4000);
+                    }
+                }
+            }).catch(err => console.log("Coin API Hatası:", err));
+        }
+    </script>
+</body>
+</html>

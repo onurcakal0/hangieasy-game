@@ -4,31 +4,132 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ oyun_basligi }} | Kapışma</title>
+    
+    <meta property="og:title" content="{{ oyun.baslik }} | Hangieasy">
+    <meta property="og:description" content="{{ oyun.aciklama }}">
+    <meta property="og:image" content="{{ request.url_root }}{{ oyun.resim_url }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #0f0f13; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 40px;}
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         
-        .oyun-alani { width: 100%; max-width: 900px; text-align: center; }
-        .baslik h2 { color: #f39c12; font-size: 32px; margin-bottom: 5px; text-transform: uppercase;}
-        .skor-tahtasi { color: #aaa; font-size: 18px; margin-bottom: 40px; }
+        body { 
+            background-color: #0b0c10; color: #ffffff; 
+            display: flex; flex-direction: column; align-items: center; 
+            min-height: 100vh; padding: 50px 5%; overflow-x: hidden; position: relative;
+        }
         
-        .kapisma-alani { display: flex; justify-content: center; align-items: center; gap: 40px; position: relative;}
+        /* 🌌 IŞILTILI RGB ARKAPLAN (Rekabet Ateşi) */
+        body::before, body::after {
+            content: ''; position: fixed; width: 50vw; height: 50vw;
+            border-radius: 50%; filter: blur(120px); z-index: -1;
+            animation: orbFloat 10s infinite alternate ease-in-out;
+        }
+        body::before { background: rgba(243, 156, 18, 0.15); top: -10%; left: -10%; } /* Sarı */
+        body::after { background: rgba(255, 0, 85, 0.15); bottom: -10%; right: -10%; animation-delay: -3s; } /* Kırmızı */
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
+        }
         
-        .kart { flex: 1; background-color: #1a1a24; border: 3px solid #2c2c38; border-radius: 20px; overflow: hidden; cursor: pointer; transition: all 0.3s; padding-bottom: 20px;}
-        .kart:hover { transform: translateY(-10px); box-shadow: 0 15px 40px rgba(243, 156, 18, 0.3); border-color: #f39c12;}
-        .kart img { width: 100%; height: 400px; object-fit: cover; border-bottom: 3px solid #2c2c38;}
-        .kart h3 { margin-top: 20px; font-size: 24px; color: #fff;}
+        /* 🧊 CAM EFEKTLİ BAŞLIK */
+        .baslik { 
+            text-align: center; margin-bottom: 40px; 
+            background: rgba(20, 20, 30, 0.6); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05); padding: 25px 40px;
+            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%; max-width: 900px; margin-left: auto; margin-right: auto;
+        }
+        .baslik h2 { 
+            font-size: 36px; font-weight: 900;
+            background: linear-gradient(90deg, #f39c12, #ff0055); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .skor-tahtasi { color: #aaa; font-size: 18px; font-weight: 600; letter-spacing: 1px; }
+        
+        .oyun-alani { width: 100%; max-width: 1000px; text-align: center; z-index: 2; position: relative;}
+        .kapisma-alani { display: flex; justify-content: center; align-items: stretch; gap: 40px; position: relative;}
+        
+        /* 🎮 KAPIŞMA KARTLARI (Glassmorphism) */
+        .kart { 
+            flex: 1; background: rgba(25, 25, 35, 0.6); backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.05); border-radius: 20px; 
+            overflow: hidden; cursor: pointer; padding-bottom: 25px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+        .kart:hover { 
+            transform: translateY(-15px) scale(1.02); 
+            box-shadow: 0 20px 50px rgba(243, 156, 18, 0.3); 
+            border-color: #f39c12;
+        }
+        .kart img { 
+            width: 100%; height: 350px; object-fit: cover; 
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.5s ease;
+        }
+        .kart:hover img { transform: scale(1.05); }
+        .kart h3 { margin-top: 25px; font-size: 26px; font-weight: 800; color: #fff;}
 
-        .vs-rozet { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: #f39c12; color: #0f0f13; width: 70px; height: 70px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; font-weight: 900; box-shadow: 0 0 30px rgba(0,0,0,0.8); z-index: 10;}
+        /* ⚔️ NEON VS ROZETİ (Kalp Atışı Efekti) */
+        .vs-rozet { 
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); 
+            background: linear-gradient(135deg, #ff0055, #ff007a); color: #fff; 
+            width: 80px; height: 80px; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 32px; font-weight: 900; z-index: 10;
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.6);
+            border: 4px solid #0b0c10;
+            animation: pulseVS 2s infinite;
+        }
+        @keyframes pulseVS {
+            0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 30px rgba(255, 0, 85, 0.6); }
+            50% { transform: translate(-50%, -50%) scale(1.1); box-shadow: 0 0 50px rgba(255, 0, 85, 0.8); }
+            100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 30px rgba(255, 0, 85, 0.6); }
+        }
         
-        .secildi { border-color: #27ae60 !important; background-color: rgba(39, 174, 96, 0.2) !important;}
+        /* 🟢 SEÇİLEN KART EFEKTİ (Siber Yeşil) */
+        .secildi { 
+            border-color: #00b09b !important; 
+            background: rgba(0, 176, 155, 0.15) !important;
+            box-shadow: 0 0 40px rgba(0, 176, 155, 0.4) !important;
+            transform: scale(1.05) !important;
+        }
         
-        .buton-mavi { margin-top: 40px; padding:15px 30px; font-size:18px; font-weight:bold; background:#2980b9; color:white; border:none; border-radius:10px; cursor:pointer; transition: 0.3s; }
-        .buton-mavi:hover { background:#1f6391; }
+        /* Reklam Alanı */
+        .reklam-alani {
+            background: rgba(20, 20, 30, 0.5); backdrop-filter: blur(5px);
+            border: 1px dashed rgba(255, 255, 255, 0.2); color: #555;
+            text-align: center; display: flex; align-items: center; justify-content: center;
+            margin: 40px auto 0; border-radius: 12px; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .reklam-kare { width: 100%; max-width: 300px; height: 250px; }
+        
+        .buton-mavi { 
+            background: linear-gradient(45deg, #00f2fe, #4facfe); color: #fff;
+            border: none; padding: 15px 30px; border-radius: 12px; font-weight: 800; 
+            font-size: 16px; cursor: pointer; transition: 0.3s; text-transform: uppercase; margin-top: 30px;
+        }
+        .buton-mavi:hover { box-shadow: 0 10px 20px rgba(0, 242, 254, 0.4); transform: translateY(-3px);}
+        /* 🪙 HE-COIN KAZANMA ANİMASYONU */
+        #coin-bildirim {
+            position: fixed; top: 20px; right: 20px; 
+            background: linear-gradient(45deg, #f1c40f, #f39c12); color: #000; 
+            padding: 15px 25px; border-radius: 50px; font-weight: 900; font-size: 18px;
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.6); z-index: 9999;
+            transform: translateX(150%); opacity: 0; 
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: flex; align-items: center; gap: 10px; border: 2px solid #fff;
+        }
+        .coin-goster { transform: translateX(0) !important; opacity: 1 !important; }
     </style>
 </head>
 <body>
-
+<div id="coin-bildirim">🪙 <span>+10 HE-Coin Kazandın!</span></div>
     <div class="oyun-alani" id="oyun-kutusu">
         <div class="baslik">
             <h2>{{ oyun_basligi }}</h2>
@@ -36,124 +137,196 @@
         </div>
 
         <div class="kapisma-alani" id="kapisma-kutusu"></div>
+        
+        <div class="reklam-alani reklam-kare">
+            Google AdSense<br>Kare Reklam (300x250)
+        </div>
     </div>
+    <div id="ai-analiz-konteynir" style="max-width: 700px; margin: 30px auto; background: rgba(0, 242, 254, 0.05); border: 1px dashed #00f2fe; padding: 25px; border-radius: 20px; display: none;">
+            <h3 style="color: #00f2fe; font-size: 20px; margin-bottom: 15px; text-transform: uppercase;">🧠 Yapay Zeka Karakter Analizin</h3>
+            <p id="ai-analiz-metni" style="font-style: italic; color: #fff; font-size: 18px; line-height: 1.6;">Yapay zeka seçimlerini analiz ediyor...</p>
+        </div>
 
     <script>
         const OYUN_ID = "{{ aktif_oyun }}";
-        let adayHavuzu = []; // O anki turda yarışanlar
-        let sonrakiTur = []; // Kazananların beklediği yer
+        const AKTIF_DIL = "{{ aktif_dil }}"; 
+
+        // 🧠 O MU BU MU İÇİN ÇEVİRİ SÖZLÜĞÜ
+        const SOZLUK = {
+            'tr': {
+                'kalan': 'Kalan Eşleşme:',
+                'favorin': 'İşte Senin Favorin',
+                'paylas_metin': 'İki seçenek arasından nihai favorim {isim} oldu! 🔥 Senin favorin kim? Hemen seç: {link}',
+                'wp_btn': '💬 WhatsApp\'ta Meydan Oku',
+                'x_btn': '𝕏 X\'te Paylaş',
+                'anasayfa_btn': '🏠 Ana Sayfaya Dön'
+            },
+            'en': {
+                'kalan': 'Remaining Matches:',
+                'favorin': 'Here Is Your Favorite',
+                'paylas_metin': 'My ultimate favorite between the choices is {isim}! 🔥 Who is yours? Choose now: {link}',
+                'wp_btn': '💬 Challenge on WhatsApp',
+                'x_btn': '𝕏 Share on X',
+                'anasayfa_btn': '🏠 Back to Home'
+            }
+        };
+        const T = SOZLUK[AKTIF_DIL] || SOZLUK['tr']; // Aktif dil bulunamazsa Türkçe'ye geç
+
+        let adayHavuzu = []; 
+        let sonrakiTur = []; 
         let toplamMacSayisi = 0;
         let oynananMac = 0;
+        let yapayZekaSecimleri = []; // AI için seçimleri burada biriktireceğiz
 
         window.onload = () => {
             fetch(`/api/sorular/${OYUN_ID}`)
                 .then(res => res.json())
                 .then(data => {
-                    // 1. ADIM: Tüm resimleri (Seçenek 1 ve 2) tek bir havuza atıyoruz
-                    data.forEach(soru => {
-                        adayHavuzu.push({ isim: soru.secenekler[0], resim: soru.resim });
-                        adayHavuzu.push({ isim: soru.secenekler[1], resim: soru.resim_2 });
-                    });
+                    // 🚀 ZIRH 1: Veri yoksa ekranı kitleme, kibarca uyar
+                    if (!data || data.length === 0) {
+                        let kutu = document.getElementById('kapisma-kutusu');
+                        if(kutu) kutu.innerHTML = "<h3 style='color:white; text-align:center; width:100%;'>Bu teste henüz seçenek eklenmemiş!</h3>";
+                        return;
+                    }
 
-                    // Havuzu rastgele karıştır (Her seferinde farklı eşleşme olsun)
-                    adayHavuzu = adayHavuzu.sort(() => Math.random() - 0.5);
+                    // 🚀 KABLO TAMİRİ: API'den gelen virgüllü metinleri jilet gibi ikiye böl
+                    data.forEach(soru => {
+                        let isimler = (soru.secenekler || "").split(',');
+                        let resimler = (soru.resim_url || "").split(',');
+
+                        let isim1 = isimler[0] ? isimler[0].trim() : "Seçenek 1";
+                        let isim2 = isimler[1] ? isimler[1].trim() : "Seçenek 2";
+                        
+                        let resim1 = resimler[0] ? resimler[0].trim() : "";
+                        let resim2 = resimler[1] ? resimler[1].trim() : resim1; // 2. resim yoksa 1.yi kopyala
+
+                        adayHavuzu.push({ isim: isim1, resim: resim1 });
+                        adayHavuzu.push({ isim: isim2, resim: resim2 });
+                    });
                     
+                    adayHavuzu = adayHavuzu.sort(() => Math.random() - 0.5);
                     toplamMacSayisi = Math.floor(adayHavuzu.length / 2);
                     sahneyiKur();
-                });
+                })
+                .catch(err => console.error("Veri Çekme Hatası:", err));
         };
 
         function sahneyiKur() {
-            // Eğer havuzda hiç aday kalmadıysa (tur bittiyse)
             if (adayHavuzu.length <= 1) {
-                // Eğer 1 kişi arttıysa (tek sayıysa) onu direkt sonraki tura geçir (Bay geçer)
-                if (adayHavuzu.length === 1) {
-                    sonrakiTur.push(adayHavuzu.pop());
-                }
-
-                // Eğer sonraki turda da sadece 1 kişi kaldıysa, ŞAMPİYON BELLİ OLMUŞTUR!
+                if (adayHavuzu.length === 1) sonrakiTur.push(adayHavuzu.pop());
                 if (sonrakiTur.length === 1) {
                     sampiyonuGoster(sonrakiTur[0]);
                     return;
                 }
-
-                // Şampiyon belli değilse, yeni tura başla!
                 adayHavuzu = sonrakiTur.sort(() => Math.random() - 0.5);
                 sonrakiTur = [];
                 oynananMac = 0;
                 toplamMacSayisi = Math.floor(adayHavuzu.length / 2);
             }
 
-            // Havuzdan kapışacak 2 kişiyi çek
             let solAday = adayHavuzu.pop();
             let sagAday = adayHavuzu.pop();
             oynananMac++;
 
-            document.getElementById('tur-bilgisi').innerText = `Kalan Eşleşme: ${toplamMacSayisi - oynananMac + 1}`;
+            let turBilgi = document.getElementById('tur-bilgisi');
+            if(turBilgi) turBilgi.innerText = `${T.kalan} ${toplamMacSayisi - oynananMac + 1}`;
 
-            document.getElementById('kapisma-kutusu').innerHTML = `
-                <div class="kart secenek-kart" onclick="secimYap('${solAday.isim}', '${solAday.resim}', this)">
-                    <img src="${solAday.resim}">
-                    <h3>${solAday.isim}</h3>
-                </div>
-
-                <div class="vs-rozet">VS</div>
-
-                <div class="kart secenek-kart" onclick="secimYap('${sagAday.isim}', '${sagAday.resim}', this)">
-                    <img src="${sagAday.resim}">
-                    <h3>${sagAday.isim}</h3>
-                </div>
-            `;
+            // 🚀 ZIRH 2: Resim yüklenmezse sistemi çökertmek yerine kırık resim koruması koy (onerror)
+            let kapismaKutusu = document.getElementById('kapisma-kutusu');
+            if(kapismaKutusu) {
+                kapismaKutusu.innerHTML = `
+                    <div class="kart secenek-kart" onclick="secimYap('${solAday.isim.replace(/'/g, "\\'")}', '${solAday.resim}', this)">
+                        <img src="${solAday.resim}" onerror="this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'">
+                        <h3>${solAday.isim}</h3>
+                    </div>
+                    <div class="vs-rozet">VS</div>
+                    <div class="kart secenek-kart" onclick="secimYap('${sagAday.isim.replace(/'/g, "\\'")}', '${sagAday.resim}', this)">
+                        <img src="${sagAday.resim}" onerror="this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'">
+                        <h3>${sagAday.isim}</h3>
+                    </div>
+                `;
+            }
         }
 
         function secimYap(secilenIsim, secilenResim, secilenKart) {
             let tumKartlar = document.querySelectorAll('.secenek-kart');
-            tumKartlar.forEach(kart => kart.onclick = null); // İkinci tıklamayı engelle
-
-            // Seçilen kartı yeşil parlat
+            tumKartlar.forEach(kart => kart.onclick = null); // Tıklanmayı kilitle
             secilenKart.classList.add('secildi');
-
-            // Kazananı sonraki tura gönder
             sonrakiTur.push({ isim: secilenIsim, resim: secilenResim });
-
-            // Yarım saniye (500ms) bekle ve sıradaki maçı getir
-            setTimeout(() => {
-                sahneyiKur();
-            }, 500);
+            yapayZekaSecimleri.push(secilenIsim); 
+            
+            setTimeout(() => { sahneyiKur(); }, 500);
         }
     
         function sampiyonuGoster(sampiyon) {
-            document.getElementById('tur-bilgisi').style.display = 'none';
+            let turBilgi = document.getElementById('tur-bilgisi');
+            if(turBilgi) turBilgi.style.display = 'none';
 
-            // VİRAL BÜYÜME MOTORU
             let oyunLink = window.location.href;
-            let paylasimMetni = `İki seçenek arasından nihai favorim ${sampiyon.isim} oldu! 🔥 Senin favorin kim? Hemen seç: ${oyunLink}`;
+            let paylasimMetni = T.paylas_metin.replace('{isim}', sampiyon.isim).replace('{link}', oyunLink);
             let wpLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(paylasimMetni)}`;
             let xLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(paylasimMetni)}`;
 
-            document.getElementById('kapisma-kutusu').innerHTML = `
-                <div style="width: 100%; text-align: center; animation: 1s ease-out 0s 1 fadeIn;">
-                    <h2 style="color: #f39c12; font-size:40px; margin-bottom:30px;">👑 İŞTE SENİN FAVORİN 👑</h2>
-                    <div class="kart" style="max-width: 450px; margin: 0 auto; border-color: #f39c12; box-shadow: 0 15px 50px rgba(243, 156, 18, 0.4); cursor: default;">
-                        <img src="${sampiyon.resim}" style="height: 400px; border-color: #f39c12;">
-                        <h3 style="font-size: 32px; color: #f39c12; padding: 20px 0;">${sampiyon.isim}</h3>
+            let kapismaKutusu = document.getElementById('kapisma-kutusu');
+            if(kapismaKutusu) {
+                kapismaKutusu.innerHTML = `
+                    <div style="width: 100%; text-align: center; animation: 1s ease-out 0s 1 fadeIn;">
+                        <h2 style="background: linear-gradient(90deg, #f39c12, #ff0055); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size:40px; margin-bottom:30px; font-weight: 900; text-transform: uppercase;">👑 ${T.favorin} 👑</h2>
+                        
+                        <div class="kart" style="max-width: 450px; margin: 0 auto; border-color: #f39c12; box-shadow: 0 20px 50px rgba(243, 156, 18, 0.4); cursor: default; transform: scale(1.05);">
+                            <img src="${sampiyon.resim}" onerror="this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'" style="height: 400px; border-bottom-color: #f39c12;">
+                            <h3 style="font-size: 32px; color: #f39c12; padding: 20px 0;">${sampiyon.isim}</h3>
+                        </div>
+                        
+                        <div style="margin-top: 40px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                            <a href="${wpLink}" target="_blank" style="background: linear-gradient(45deg, #25D366, #128C7E); color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; font-weight: 800; display: flex; align-items: center; transition: 0.3s; box-shadow: 0 10px 20px rgba(37, 211, 102, 0.4);">
+                                ${T.wp_btn}
+                            </a>
+                            <a href="${xLink}" target="_blank" style="background: linear-gradient(45deg, #0f0f13, #1a1a24); border: 1px solid #333; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; font-weight: 800; display: flex; align-items: center; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                                ${T.x_btn}
+                            </a>
+                        </div>
+                        <button class="buton-mavi" style="margin-top:20px;" onclick="location.href='/'">${T.anasayfa_btn}</button>
                     </div>
-                    
-                    <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                        <a href="${wpLink}" target="_blank" style="background-color: #25D366; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 16px; display: flex; align-items: center; transition: 0.3s; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);">
-                            💬 WhatsApp'ta Meydan Oku
-                        </a>
-                        <a href="${xLink}" target="_blank" style="background-color: #0f0f13; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 16px; display: flex; align-items: center; border: 2px solid #333; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
-                            𝕏 X'te Paylaş
-                        </a>
-                    </div>
+                `;
+            }
 
-                    <button class="buton-mavi" style="margin-top: 30px;" onclick="location.href='/'">Ana Sayfaya Dön</button>
-                </div>
-            `;
+            // 🧠 AI ANALİZİ ÇAĞIR
+            fetch('/api/ai_analiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ secimler: yapayZekaSecimleri, oyun_basligi: "{{ oyun_basligi }}" })
+            })
+            .then(res => res.json())
+            .then(data => {
+                let aiKutu = document.getElementById('ai-analiz-konteynir');
+                if(aiKutu) {
+                    aiKutu.style.display = 'block';
+                    let aiMetin = document.getElementById('ai-analiz-metni');
+                    if(aiMetin) aiMetin.innerText = data.analiz;
+                }
+            })
+            .catch(err => console.log("AI API Hatası:", err));
+            
+            // 🪙 HE-COIN KAZANMA TETİKLEYİCİSİ
+            fetch('/api/odul_al', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ miktar: 10 }) 
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    let bildirim = document.getElementById('coin-bildirim');
+                    if(bildirim) {
+                        let span = bildirim.querySelector('span');
+                        if(span) span.innerText = `+${data.kazanc} HE-Coin Kazandın!`;
+                        bildirim.classList.add('coin-goster');
+                        setTimeout(() => bildirim.classList.remove('coin-goster'), 4000);
+                    }
+                }
+            }).catch(err => console.log("Coin API Hatası:", err));
         }
-
- 
-
-    </script> </body>
+    </script>
+</body>
 </html>

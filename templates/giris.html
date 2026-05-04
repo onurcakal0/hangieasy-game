@@ -2,27 +2,127 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>QuizHub | Giriş Yap</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangieasy | Sisteme Giriş</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    
     <style>
-        body { background-color: #0f0f13; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .form-kutusu { background-color: #1a1a24; padding: 40px; border-radius: 15px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .form-kutusu h2 { color: #f39c12; margin-bottom: 20px; }
-        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: none; background-color: #2c2c38; color: white; outline: none; box-sizing: border-box;}
-        button { width: 100%; padding: 15px; background-color: #f39c12; color: #0f0f13; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background-color: #e67e22; }
-        a { color: #27ae60; text-decoration: none; font-size: 14px; display: block; margin-top: 15px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: #0b0c10; 
+            color: white; 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; overflow: hidden; position: relative;
+        }
+        
+        /* 🌌 IŞILTILI RGB ARKAPLAN */
+        body::before, body::after {
+            content: ''; position: fixed; width: 50vw; height: 50vw;
+            border-radius: 50%; filter: blur(120px); z-index: -1;
+            animation: orbFloat 12s infinite alternate ease-in-out;
+        }
+        body::before { background: rgba(243, 156, 18, 0.15); top: -10%; left: -10%; } 
+        body::after { background: rgba(255, 0, 122, 0.12); bottom: -10%; right: -10%; animation-delay: -4s; } 
+        
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 60px) scale(1.15); }
+        }
+
+        /* 🧊 CAM EFEKTLİ FORM KUTUSU */
+        .form-kutusu { 
+            background: rgba(20, 20, 30, 0.6); 
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 50px 40px; 
+            border-radius: 20px; 
+            width: 100%; max-width: 420px; 
+            text-align: center; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 20px rgba(243, 156, 18, 0.1); 
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo { 
+            font-size: 36px; font-weight: 800; 
+            background: linear-gradient(90deg, #f39c12, #ff007a); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            margin-bottom: 5px; display: inline-block; letter-spacing: 1px;
+        }
+        .form-kutusu p { color: #888; font-size: 14px; margin-bottom: 30px; letter-spacing: 0.5px;}
+
+        /* 🚨 HATA KUTUSU (YENİ) */
+        .hata-mesaji {
+            background: rgba(231, 76, 60, 0.15);
+            border: 1px solid #e74c3c;
+            color: #ffcccc;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        input { 
+            width: 100%; padding: 16px 20px; margin-bottom: 20px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            background-color: rgba(0, 0, 0, 0.4); 
+            color: white; outline: none; box-sizing: border-box;
+            font-size: 15px; transition: all 0.3s ease;
+        }
+        input:focus { 
+            border-color: #f39c12; 
+            box-shadow: 0 0 15px rgba(243, 156, 18, 0.3); 
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+        input::placeholder { color: #666; }
+
+        button { 
+            width: 100%; padding: 16px; 
+            background: linear-gradient(45deg, #f39c12, #e67e22, #ff007a);
+            background-size: 200% 200%;
+            color: #fff; border: none; border-radius: 12px; 
+            font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; transition: all 0.4s ease;
+            margin-top: 10px;
+        }
+        button:hover { 
+            background-position: 100% 0;
+            box-shadow: 0 8px 25px rgba(243, 156, 18, 0.5); 
+            transform: translateY(-2px);
+        }
+
+        .alt-linkler { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
+        a { color: #00f2fe; text-decoration: none; font-size: 14px; font-weight: 600; transition: 0.3s; }
+        a:hover { color: #fff; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); }
+        .ana-sayfa-btn { color: #666; font-weight: 400; font-size: 13px; }
+        .ana-sayfa-btn:hover { color: #fff; text-shadow: none; }
     </style>
 </head>
 <body>
     <div class="form-kutusu">
-        <h2>Sisteme Giriş Yap</h2>
+        <div class="logo">HangiEasy</div>
+        <p>Sisteme Giriş Yap ve Oynamaya Başla</p>
+        
+        <!-- 🚀 EĞER PYTHON'DAN HATA GELİRSE BURADA ŞIK BİR ŞEKİLDE GÖSTERECEK -->
+        {% if hata %}
+        <div class="hata-mesaji">⚠️ {{ hata }}</div>
+        {% endif %}
+        
         <form method="POST">
             <input type="text" name="kullanici_adi" placeholder="Kullanıcı Adı" required>
             <input type="password" name="sifre" placeholder="Şifre" required>
-            <button type="submit">Giriş Yap</button>
+            <button type="submit">GİRİŞ YAP ➔</button>
         </form>
-        <a href="/kayit">Hesabın yok mu? Yeni kayıt oluştur</a>
-        <a href="/" style="color:#aaa;">Ana Sayfaya Dön</a>
+        
+        <div class="alt-linkler">
+            <a href="/kayit">Hesabın yok mu? Yeni VIP Kayıt Oluştur</a>
+            <a href="/" class="ana-sayfa-btn">← Ana Sayfaya Dön</a>
+        </div>
     </div>
 </body>
 </html>

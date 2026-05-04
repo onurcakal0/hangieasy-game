@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ oyun_basligi }} | Bütçe Savaşı PRO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #0b0c10; color: #ffffff; min-height: 100vh; padding-bottom: 50px; }
+        
+        .butce-panosu {
+            position: sticky; top: 0; background: rgba(11, 12, 16, 0.98); backdrop-filter: blur(15px);
+            padding: 20px; text-align: center; border-bottom: 3px solid #2ecc71; z-index: 100;
+            display: flex; justify-content: center; align-items: center; gap: 20px;
+        }
+        .butce-deger { font-size: 48px; font-weight: 900; color: #2ecc71; text-shadow: 0 0 20px rgba(46, 204, 113, 0.5); }
+        .hata { color: #e74c3c !important; animation: sarsinti 0.3s; }
+
+        @keyframes sarsinti { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
+
+        .kategori-konteynir { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        .kategori-baslik { font-size: 32px; font-weight: 900; color: #f39c12; margin-bottom: 25px; text-transform: uppercase; text-align: center; letter-spacing: 2px;}
+
+        .fiyat-grubu { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 20px; 
+            padding: 15px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 15px;
+        }
+
+        .kart {
+            background: rgba(25, 25, 35, 0.8); border: 2px solid rgba(255,255,255,0.1); border-radius: 12px;
+            overflow: hidden; cursor: pointer; transition: 0.3s; position: relative;
+        }
+        .kart:hover { transform: scale(1.03); border-color: #2ecc71; }
+        .kart img { width: 100%; height: 160px; object-fit: cover; }
+        .kart-icerik { padding: 10px; text-align: center; }
+        .kart-isim { font-size: 14px; font-weight: 800; color: #fff; }
+        
+        .fiyat-etiketi {
+            position: absolute; top: 8px; left: 8px; background: #2ecc71; color: #000;
+            padding: 2px 10px; border-radius: 10px; font-weight: 900; font-size: 14px;
+        }
+
+        .secili { border: 3px solid #f39c12 !important; box-shadow: 0 0 25px rgba(243, 156, 18, 0.4); }
+        .secili .fiyat-etiketi { background: #f39c12; color: #fff; }
+
+        .btn-onay {
+            display: block; width: 300px; margin: 40px auto; padding: 20px;
+            background: linear-gradient(45deg, #2ecc71, #27ae60); color: #fff;
+            border: none; border-radius: 50px; font-weight: 900; font-size: 20px; cursor: pointer;
+            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.4); transition: 0.3s;
+        }
+        .btn-onay:hover { transform: scale(1.05); }
+
+        /* FİNAL EKRANI TASARIMI */
+        #final-ekrani { display: none; text-align: center; padding: 50px 20px; animation: fadeIn 0.5s;}
+        @keyframes fadeIn { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
+        
+        .final-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; max-width: 900px; margin: 40px auto; }
+        .final-kart { 
+            background: rgba(25, 25, 35, 0.9); border: 2px solid #2ecc71; 
+            border-radius: 12px; padding: 15px; width: 160px; text-align: center;
+            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.2);
+        }
+        .final-kart img { width: 100%; height: 110px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;}
+        .final-kart h4 { font-size: 13px; color: #fff; font-weight: 800; margin-top: 5px;}
+        .final-fiyat { color: #2ecc71; font-weight: 900; font-size: 18px;}
+
+        .aksiyon-butonlari { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 30px;}
+        .btn-wp { background: #25D366; color: white; padding: 15px 30px; border-radius: 12px; border: none; font-size: 18px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4); transition:0.3s;}
+        .btn-wp:hover { transform: translateY(-3px); }
+        .btn-tekrar { background: #333; color: white; padding: 15px 30px; border-radius: 12px; border: none; font-size: 18px; font-weight: 800; cursor: pointer; transition:0.3s;}
+        .btn-tekrar:hover { background: #444; }
+        /* 🪙 HE-COIN KAZANMA ANİMASYONU */
+        #coin-bildirim {
+            position: fixed; top: 20px; right: 20px; 
+            background: linear-gradient(45deg, #f1c40f, #f39c12); color: #000; 
+            padding: 15px 25px; border-radius: 50px; font-weight: 900; font-size: 18px;
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.6); z-index: 9999;
+            transform: translateX(150%); opacity: 0; 
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: flex; align-items: center; gap: 10px; border: 2px solid #fff;
+        }
+        .coin-goster { transform: translateX(0) !important; opacity: 1 !important; }
+
+    </style>
+</head>
+<body>
+<div id="coin-bildirim">🪙 <span>+10 HE-Coin Kazandın!</span></div>
+    <div id="oyun-kapsayici">
+        <div class="butce-panosu">
+            <span style="font-weight: 800; color: #aaa;">KALAN:</span>
+            <span class="butce-deger" id="butce-ekrani">$15</span>
+        </div>
+
+        <div id="ana-ekran"></div>
+        <button class="btn-onay" id="btn-final" style="display:none;" onclick="finalGoster()">KADROYU ONAYLA</button>
+    </div>
+
+    <div id="final-ekrani">
+        <h1 style="color: #2ecc71; font-size: 45px; font-weight: 900; text-transform: uppercase;">🔥 İŞTE RÜYA SEPETİN</h1>
+        <p style="color: #aaa; font-size: 20px; margin-top: 10px;">Kalan Bütçen: <span id="final-butce" style="color: #2ecc71; font-weight: 900; font-size: 24px;"></span></p>
+        
+        <div class="final-grid" id="final-liste">
+            </div>
+
+        <div class="aksiyon-butonlari">
+            <button class="btn-wp" onclick="whatsappPaylas()">📲 WhatsApp'ta Paylaş</button>
+            <button class="btn-tekrar" onclick="location.reload()">🔄 Yeniden Oyna</button>
+            <a href="/" style="background: #f39c12; color: white; padding: 15px 30px; border-radius: 12px; border: none; font-size: 18px; font-weight: 800; text-decoration: none; box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4);">🏠 Ana Sayfa</a>
+        </div>
+    </div>
+    <div id="ai-analiz-konteynir" style="max-width: 700px; margin: 30px auto; background: rgba(0, 242, 254, 0.05); border: 1px dashed #00f2fe; padding: 25px; border-radius: 20px; display: none;">
+            <h3 style="color: #00f2fe; font-size: 20px; margin-bottom: 15px; text-transform: uppercase;">🧠 Yapay Zeka Analizi</h3>
+            <p id="ai-analiz-metni" style="font-style: italic; color: #fff; font-size: 18px; line-height: 1.6;"></p>
+        </div>
+
+    <script>
+        const OYUN_ID = "{{ aktif_oyun }}";
+        let BAKIYE = 15;
+        let secilenler = {}; 
+        let veriler = {};
+
+        window.onload = () => {
+            fetch(`/api/sorular/${OYUN_ID}`)
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(s => {
+                        // 🚀 KABLO TAMİRİ: Virgüllü gelen veriyi böl ve doğru etiketle oku!
+                        let secenekler_dizisi = (s.secenekler || "").split(',');
+                        
+                        let isim = secenekler_dizisi[0] ? secenekler_dizisi[0].trim() : "İsimsiz";
+                        let kat = secenekler_dizisi[1] ? secenekler_dizisi[1].trim() : "Genel Kategori";
+                        let fiyat = parseInt(s.dogru_cevap) || 1; // Fiyat okunamazsa çökmesin, 1$ yapsın
+                        let resim_linki = s.resim_url; // API'den gelen doğru isim: resim_url
+                        
+                        if(!veriler[kat]) veriler[kat] = { 5:[], 3:[], 1:[] };
+                        
+                        // Fiyat 5, 3 veya 1 ise listeye ekle
+                        if(veriler[kat][fiyat]) {
+                            veriler[kat][fiyat].push({isim: isim, resim: resim_linki, fiyat: fiyat});
+                        }
+                    });
+                    ekraniCiz();
+                })
+                .catch(err => console.error("Veri Çekme Hatası:", err));
+        };
+
+        function ekraniCiz() {
+            const ana = document.getElementById('ana-ekran');
+            ana.innerHTML = '';
+            
+            for(let [kat, gruplar] of Object.entries(veriler)) {
+                let katHtml = `<div class="kategori-konteynir"><div class="kategori-baslik">${kat}</div>`;
+                
+                [5, 3, 1].forEach(fiyat => {
+                    if(gruplar[fiyat].length > 0) {
+                        katHtml += `<div class="fiyat-grubu">`;
+                        
+                        gruplar[fiyat].forEach((oge, index) => {
+                            let guvenliKat = kat.replace(/[^a-zA-Z0-9]/g, '');
+                            let id = `k_${guvenliKat}_${fiyat}_${index}`;
+                            let guvenliIsim = oge.isim.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                            let guvenliKatAdi = kat.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                            
+                            // DİKKAT: Artık resmi de hafızaya kaydetmek için fonksiyona gönderiyoruz!
+                            katHtml += `
+                                <div class="kart" id="${id}" onclick="secimYap('${guvenliKatAdi}', '${guvenliIsim}', ${oge.fiyat}, '${oge.resim}', '${id}')">
+                                    <div class="fiyat-etiketi">$${oge.fiyat}</div>
+                                    <img src="${oge.resim}">
+                                    <div class="kart-icerik"><div class="kart-isim">${oge.isim}</div></div>
+                                </div>`;
+                        });
+                        katHtml += `</div>`;
+                    }
+                });
+                katHtml += `</div>`;
+                ana.innerHTML += katHtml;
+            }
+        }
+
+        // Seçim fonksiyonuna "resim" parametresi eklendi
+        function secimYap(kat, isim, fiyat, resim, id) {
+            let kart = document.getElementById(id);
+
+            if(secilenler[id]) {
+                BAKIYE += fiyat;
+                delete secilenler[id];
+                kart.classList.remove('secili');
+            } else {
+                if(BAKIYE - fiyat < 0) return sars();
+                BAKIYE -= fiyat;
+                // Resmi de hafızaya atıyoruz ki final ekranında çizdirelim
+                secilenler[id] = {isim: isim, fiyat: fiyat, resim: resim};
+                kart.classList.add('secili');
+            }
+            
+            document.getElementById('butce-ekrani').innerText = `$${BAKIYE}`;
+            
+            let bitis_butonu = document.getElementById('btn-final');
+            if(Object.keys(secilenler).length > 0) {
+                bitis_butonu.style.display = 'block';
+            } else {
+                bitis_butonu.style.display = 'none';
+            }
+        }
+
+        function sars() {
+            let e = document.getElementById('butce-ekrani');
+            e.classList.add('hata');
+            setTimeout(() => e.classList.remove('hata'), 300);
+        }
+
+        // 🔥 FİNAL EKRANI MOTORU
+        // 🔥 FİNAL EKRANI MOTORU
+        function finalGoster() {
+            // Oyun alanını komple gizle
+            document.getElementById('oyun-kapsayici').style.display = 'none';
+            
+            // Final ekranını göster
+            let finalEkran = document.getElementById('final-ekrani');
+            finalEkran.style.display = 'block';
+            
+            // Bütçeyi yaz
+            document.getElementById('final-butce').innerText = `$${BAKIYE}`;
+            
+            // Kartları çiz
+            let liste = document.getElementById('final-liste');
+            liste.innerHTML = ''; 
+            
+            for (let key in secilenler) {
+                let secim = secilenler[key];
+                liste.innerHTML += `
+                    <div class="final-kart">
+                        <img src="${secim.resim}" alt="${secim.isim}">
+                        <div class="final-fiyat">$${secim.fiyat}</div>
+                        <h4>${secim.isim}</h4>
+                    </div>
+                `;
+            }
+            let isimListesi = [];
+            for (let key in secilenler) { isimListesi.push(secilenler[key].isim); }
+
+            // 🧠 AI ANALİZİ ÇAĞIR
+            fetch('/api/ai_analiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ secimler: isimListesi, oyun_basligi: "{{ oyun_basligi }}" })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('ai-analiz-konteynir').style.display = 'block';
+                document.getElementById('ai-analiz-metni').innerText = data.analiz;
+            });
+            // 🪙 HE-COIN KAZANMA TETİKLEYİCİSİ (YENİ EKLENEN KISIM)
+            // Sadece giriş yapmış kullanıcılar coin kazanabilir, API bunu arkada kontrol eder.
+            fetch('/api/odul_al', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ miktar: 15 }) // Bütçe savaşı zor mod, 15 Coin verelim!
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    let bildirim = document.getElementById('coin-bildirim');
+                    bildirim.querySelector('span').innerText = `+${data.kazanc} HE-Coin Kazandın!`;
+                    bildirim.classList.add('coin-goster');
+                    
+                    // 4 saniye sonra bildirimi geri gizle
+                    setTimeout(() => { 
+                        bildirim.classList.remove('coin-goster'); 
+                    }, 4000);
+                }
+            })
+            .catch(err => console.log("Coin API Hatası:", err));
+        }
+
+        // 📲 WHATSAPP PAYLAŞIM MOTORU
+        function whatsappPaylas() {
+            let mesaj = "🔥 Hangieasy'de 15$ bütçeyle kurduğum Efsane Kadro:\n\n";
+            for (let key in secilenler) {
+                mesaj += `• ${secilenler[key].isim} ($${secilenler[key].fiyat})\n`;
+            }
+            mesaj += `\n💰 Kalan Bütçem: $${BAKIYE}\n\nHadi sen de kendi kadronu kur: ${window.location.href}`;
+            
+            let wpLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(mesaj)}`;
+            window.open(wpLink, '_blank');
+        }
+    </script>
+</body>
+</html>

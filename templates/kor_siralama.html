@@ -4,43 +4,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ oyun_basligi }} | Kör Sıralama</title>
+    
+    <meta property="og:title" content="{{ oyun.baslik }} | Hangieasy Blind Ranking">
+    <meta property="og:description" content="{{ oyun.aciklama }}">
+    <meta property="og:image" content="{{ request.url_root }}{{ oyun.resim_url }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #0f0f13; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 40px;}
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         
-        .baslik h2 { color: #f39c12; font-size: 32px; margin-bottom: 5px; text-transform: uppercase; text-align: center;}
-        .alt-bilgi { color: #aaa; font-size: 16px; margin-bottom: 40px; text-align: center; }
+        body { 
+            background-color: #0b0c10; color: #ffffff; 
+            display: flex; flex-direction: column; align-items: center; 
+            min-height: 100vh; padding: 50px 5%; position: relative; overflow-x: hidden;
+        }
         
-        /* SOL VE SAĞ KISIMLARI AYIRAN ANA KUTU */
-        .oyun-alani { display: flex; gap: 50px; width: 100%; max-width: 1000px; justify-content: center; flex-wrap: wrap;}
+        /* 🌌 IŞILTILI RGB ARKAPLAN (Gerilim Sarısı) */
+        body::before, body::after {
+            content: ''; position: fixed; width: 50vw; height: 50vw;
+            border-radius: 50%; filter: blur(120px); z-index: -1;
+            animation: orbFloat 10s infinite alternate ease-in-out;
+        }
+        body::before { background: rgba(243, 156, 18, 0.15); top: -10%; left: -10%; } 
+        body::after { background: rgba(255, 0, 85, 0.1); bottom: -10%; right: -10%; animation-delay: -3s; }
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
+        }
         
-        /* SOL TARAF: O ANKİ GİZEMLİ ÖĞE */
-        .gizemli-oge { flex: 1; min-width: 300px; max-width: 400px; text-align: center;}
-        .gizemli-oge h3 { font-size: 24px; color: #fff; margin-bottom: 15px;}
-        .resim-kutusu { background-color: #1a1a24; border: 3px solid #f39c12; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(243, 156, 18, 0.3); height: 400px;}
-        .resim-kutusu img { width: 100%; height: 100%; object-fit: cover; }
+        /* 🧊 CAM EFEKTLİ BAŞLIK */
+        .baslik { 
+            text-align: center; margin-bottom: 40px; 
+            background: rgba(20, 20, 30, 0.6); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05); padding: 25px 40px;
+            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%; max-width: 1000px;
+        }
+        .baslik h2 { 
+            font-size: 36px; font-weight: 900;
+            background: linear-gradient(90deg, #f39c12, #f1c40f); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .alt-bilgi { color: #aaa; font-size: 16px; font-weight: 600; letter-spacing: 1px; }
         
-        /* SAĞ TARAF: SIRALAMA LİSTESİ */
-        .siralama-listesi { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 10px;}
-        .siralama-slotu { display: flex; align-items: center; background-color: #1a1a24; border: 2px solid #2c2c38; border-radius: 12px; overflow: hidden; height: 60px; transition: 0.3s;}
-        .sira-no { background-color: #f39c12; color: #0f0f13; font-weight: 900; font-size: 24px; width: 60px; height: 100%; display: flex; justify-content: center; align-items: center;}
+        /* OYUN ALANI */
+        .oyun-alani { 
+            display: flex; gap: 40px; width: 100%; max-width: 1100px; 
+            justify-content: center; flex-wrap: wrap; align-items: flex-start;
+        }
         
-        .slot-icerik { flex: 1; padding: 0 15px; display: flex; align-items: center; justify-content: space-between;}
-        .slot-isim { font-size: 18px; font-weight: bold; color: #fff;}
-        .yerlestir-btn { background-color: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s;}
-        .yerlestir-btn:hover { background-color: #2ecc71;}
+        /* SOL: GİZEMLİ ÖĞE KUTUSU (Cyber-Glow) */
+        .gizemli-oge { 
+            flex: 1; min-width: 320px; max-width: 450px; text-align: center;
+            background: rgba(25, 25, 35, 0.6); backdrop-filter: blur(10px);
+            padding: 30px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            position: sticky; top: 40px; /* Ekranda kayarken sabit kalır */
+        }
+        .gizemli-oge h3 { font-size: 26px; color: #fff; margin-bottom: 20px; font-weight: 800;}
+        .resim-kutusu { 
+            background-color: #111; border: 3px solid #f39c12; border-radius: 15px; 
+            overflow: hidden; box-shadow: 0 0 25px rgba(243, 156, 18, 0.4); 
+            height: 350px; position: relative;
+        }
+        .resim-kutusu img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s ease; }
+        .resim-kutusu:hover img { transform: scale(1.05); }
         
-        .dolu-slot { border-color: #27ae60; background-color: rgba(39, 174, 96, 0.1);}
-        .dolu-slot .sira-no { background-color: #27ae60; color: white;}
+        /* SAĞ: SIRALAMA LİSTESİ */
+        .siralama-listesi { flex: 1.5; min-width: 350px; display: flex; flex-direction: column; gap: 12px;}
         
-        .buton-mavi { margin-top: 40px; padding:15px 30px; font-size:18px; font-weight:bold; background:#2980b9; color:white; border:none; border-radius:10px; cursor:pointer; }
+        /* 🎮 SLOT TASARIMLARI (Glassmorphism) */
+        .siralama-slotu { 
+            display: flex; align-items: center; 
+            background: rgba(25, 25, 35, 0.8); backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 12px; overflow: hidden; height: 70px; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .siralama-slotu:hover { transform: translateX(10px); border-color: rgba(243, 156, 18, 0.5); }
+        
+        .sira-no { 
+            background: linear-gradient(135deg, #f39c12, #e67e22); color: #000; 
+            font-weight: 900; font-size: 26px; width: 70px; height: 100%; 
+            display: flex; justify-content: center; align-items: center;
+        }
+        
+        .slot-icerik { flex: 1; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;}
+        .slot-isim { font-size: 18px; font-weight: 600; color: #aaa; letter-spacing: 0.5px;}
+        
+        /* Seç Butonu */
+        .yerlestir-btn { 
+            background: transparent; color: #f39c12; border: 2px solid #f39c12; 
+            padding: 8px 20px; border-radius: 8px; font-weight: 800; 
+            cursor: pointer; transition: all 0.3s ease; text-transform: uppercase;
+        }
+        .yerlestir-btn:hover { background: #f39c12; color: #000; box-shadow: 0 0 15px rgba(243, 156, 18, 0.5);}
+        
+        /* 🟢 DOLU SLOT (Neon Yeşil) */
+        .dolu-slot { 
+            border-color: #00b09b; background: rgba(0, 176, 155, 0.1); 
+            box-shadow: 0 0 15px rgba(0, 176, 155, 0.2);
+            transform: scale(1.02);
+        }
+        .dolu-slot:hover { transform: scale(1.02) translateX(0); border-color: #00b09b; } /* Hover iptal */
+        .dolu-slot .sira-no { background: linear-gradient(135deg, #00b09b, #96c93d); color: white;}
+        .dolu-slot .slot-isim { color: #fff; font-weight: 800;}
+        
+        /* Reklam ve Paylaşım Butonları */
+        .reklam-alani {
+            background: rgba(20, 20, 30, 0.5); backdrop-filter: blur(5px);
+            border: 1px dashed rgba(255, 255, 255, 0.2); color: #555;
+            text-align: center; display: flex; align-items: center; justify-content: center;
+            margin: 40px auto 0; border-radius: 12px; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .reklam-kare { width: 100%; max-width: 300px; height: 250px; }
+        
+        .buton-mavi { 
+            background: linear-gradient(45deg, #00f2fe, #4facfe); color: #fff;
+            border: none; padding: 15px 30px; border-radius: 12px; font-weight: 800; 
+            font-size: 16px; cursor: pointer; transition: 0.3s; text-transform: uppercase;
+        }
+        .buton-mavi:hover { box-shadow: 0 10px 20px rgba(0, 242, 254, 0.4); transform: translateY(-3px);}
+        /* 🪙 HE-COIN KAZANMA ANİMASYONU */
+        #coin-bildirim {
+            position: fixed; top: 20px; right: 20px; 
+            background: linear-gradient(45deg, #f1c40f, #f39c12); color: #000; 
+            padding: 15px 25px; border-radius: 50px; font-weight: 900; font-size: 18px;
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.6); z-index: 9999;
+            transform: translateX(150%); opacity: 0; 
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: flex; align-items: center; gap: 10px; border: 2px solid #fff;
+        }
+        .coin-goster { transform: translateX(0) !important; opacity: 1 !important; }
     </style>
 </head>
 <body>
-
+<div id="coin-bildirim">🪙 <span>+10 HE-Coin Kazandın!</span></div>
     <div class="baslik">
-        <h2>{{ oyun_basligi }}</h2>
-        <div class="alt-bilgi">Sonraki resmi bilmiyorsun. Sıralamanı yap ve kaderine razı ol!</div>
+        <h2 id="oyun-ana-baslik">{{ oyun_basligi }}</h2>
+        <div class="alt-bilgi" id="oyun-alt-bilgi">Sonraki öğeyi bilmiyorsun. Sıralamanı yap ve kaderine razı ol!</div>
     </div>
 
     <div class="oyun-alani" id="ana-sahne">
@@ -48,6 +154,10 @@
             <h3 id="aktif-isim">Yükleniyor...</h3>
             <div class="resim-kutusu">
                 <img id="aktif-resim" src="" alt="Gizemli Öğe">
+            </div>
+            
+            <div class="reklam-alani reklam-kare" style="margin-top: 20px; height: 150px;">
+                AdSense Alanı
             </div>
         </div>
 
@@ -57,109 +167,174 @@
 
     <script>
         const OYUN_ID = "{{ aktif_oyun }}";
-        let sorular = [];
-        let mevcutSoruIndex = 0;
-        let siralamaDizisi = []; // Kullanıcının yaptığı sıralamayı tutar
+        const AKTIF_DIL = "{{ aktif_dil }}"; 
+
+        const SOZLUK = {
+            'tr': {
+                'alt_bilgi': 'Sonraki öğeyi bilmiyorsun. Sıralamanı yap ve kaderine razı ol!',
+                'yukleniyor': 'Sistem Hazırlanıyor...',
+                'sec': 'SEÇ',
+                'bos_slot': '---',
+                'liste_hazir': 'KUSURSUZ LİSTEN HAZIR!',
+                'paylas_metin': 'Kusursuz Kör Sıralama listemi yaptım! 😎 Sen listeni nasıl dizeceksin? Cesaretin varsa oyna: {link}',
+                'wp_btn': '💬 WhatsApp\'ta Paylaş',
+                'x_btn': '𝕏 X\'te Paylaş',
+                'anasayfa_btn': '🏠 Ana Sayfaya Dön'
+            },
+            'en': {
+                'alt_bilgi': 'You don\'t know the next item. Rank it and accept your fate!',
+                'yukleniyor': 'System Preparing...',
+                'sec': 'PLACE',
+                'bos_slot': '---',
+                'liste_hazir': 'YOUR FLAWLESS LIST IS READY!',
+                'paylas_metin': 'I made my flawless Blind Ranking list! 😎 How will you rank yours? Play if you dare: {link}',
+                'wp_btn': '💬 Share on WhatsApp',
+                'x_btn': '𝕏 Share on X',
+                'anasayfa_btn': '🏠 Back to Home'
+            }
+        };
+        const T = SOZLUK[AKTIF_DIL] || SOZLUK['tr']; // Aktif dil bulunamazsa Türkçe'ye geç
+
+        // Çevirileri HTML'e Bas
+        let altBilgi = document.getElementById('oyun-alt-bilgi');
+        if(altBilgi) altBilgi.innerText = T.alt_bilgi;
+        
+        let aktifIsim = document.getElementById('aktif-isim');
+        if(aktifIsim) aktifIsim.innerText = T.yukleniyor;
+
+        // 🧠 OYUN MOTORU
+        let adayHavuzu = [];
+        let aktifIndex = 0;
+        let maxSlot = 10; 
+        let yerlesenSayisi = 0;
 
         window.onload = () => {
             fetch(`/api/sorular/${OYUN_ID}`)
                 .then(res => res.json())
                 .then(data => {
-                    // Heyecan yaratmak için diziyi rastgele karıştırıyoruz!
-                    sorular = data.sort(() => Math.random() - 0.5);
+                    // 🚀 ZIRH 1: Veri yoksa patlama
+                    if (!data || data.length === 0) {
+                        document.getElementById('ana-sahne').innerHTML = "<h3 style='color:white; text-align:center; width:100%;'>Teste henüz veri girilmemiş!</h3>";
+                        return;
+                    }
+
+                    // 🚀 KABLO TAMİRİ: Kör sıralamada her satır bir seçenektir.
+                    data.forEach(soru => {
+                        let isim = soru.secenekler ? soru.secenekler.trim() : "Bilinmeyen";
+                        let resim = (soru.resim_url || "").split(',')[0]; // URL boşsa patlama
+                        adayHavuzu.push({ isim: isim, resim: resim });
+                    });
                     
-                    // Soru sayısı kadar boş slot oluştur (Örn: 5 soru varsa 5 slot)
-                    siralamaDizisi = new Array(sorular.length).fill(null);
-                    
-                    slotlariCiz();
-                    soruyuEkranaBas();
-                });
+                    // Havuzu karıştır ve en fazla 10 tane seç (Kör Sıralama kuralı)
+                    adayHavuzu = adayHavuzu.sort(() => Math.random() - 0.5);
+                    maxSlot = Math.min(10, adayHavuzu.length);
+                    adayHavuzu = adayHavuzu.slice(0, maxSlot);
+
+                    sahneyiKur();
+                    siradakiOgeyiGetir();
+                })
+                .catch(err => console.error("Veri Çekme Hatası:", err));
         };
 
-        function soruyuEkranaBas() {
-            // Eğer eklenecek öğe kalmadıysa bitir
-            if (mevcutSoruIndex >= sorular.length) {
+        function sahneyiKur() {
+            const kutu = document.getElementById('siralama-kutusu');
+            if(!kutu) return;
+            kutu.innerHTML = '';
+            for(let i = 1; i <= maxSlot; i++) {
+                kutu.innerHTML += `
+                    <div class="siralama-slotu" id="slot-${i}">
+                        <div class="sira-no">#${i}</div>
+                        <div class="slot-icerik">
+                            <span class="slot-isim" id="slot-isim-${i}">${T.bos_slot}</span>
+                            <button class="yerlestir-btn" onclick="yerlestir(${i})">${T.sec}</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function siradakiOgeyiGetir() {
+            if(aktifIndex >= maxSlot || yerlesenSayisi >= maxSlot) {
                 oyunuBitir();
                 return;
             }
-
-            let aktifOge = sorular[mevcutSoruIndex];
-            // Biz app.py'de secenekler kısmına sadece ismi kaydetmiştik, onu alıyoruz (Dizi olarak geliyor)
-            document.getElementById('aktif-isim').innerText = aktifOge.secenekler[0];
-            document.getElementById('aktif-resim').src = aktifOge.resim;
-        }
-
-        function slotlariCiz() {
-            let kutu = document.getElementById('siralama-kutusu');
-            kutu.innerHTML = '';
-
-            for (let i = 0; i < siralamaDizisi.length; i++) {
-                let slotDiv = document.createElement('div');
-                
-                // Eğer slot doluysa yeşil tasarım yap ve ismi yaz
-                if (siralamaDizisi[i] !== null) {
-                    slotDiv.className = 'siralama-slotu dolu-slot';
-                    slotDiv.innerHTML = `
-                        <div class="sira-no">${i + 1}</div>
-                        <div class="slot-icerik">
-                            <span class="slot-isim">${siralamaDizisi[i]}</span>
-                        </div>
-                    `;
-                } 
-                // Eğer slot boşsa "Buraya Koy" butonu çıkar
-                else {
-                    slotDiv.className = 'siralama-slotu';
-                    slotDiv.innerHTML = `
-                        <div class="sira-no">${i + 1}</div>
-                        <div class="slot-icerik">
-                            <span class="slot-isim" style="color:#555;">Boş...</span>
-                            <button class="yerlestir-btn" onclick="slotaYerlestir(${i})">Bunu ${i + 1}. Yap</button>
-                        </div>
-                    `;
-                }
-                kutu.appendChild(slotDiv);
+            let siradaki = adayHavuzu[aktifIndex];
+            
+            let aktifIsimElem = document.getElementById('aktif-isim');
+            if(aktifIsimElem) aktifIsimElem.innerText = siradaki.isim;
+            
+            let aktifResimElem = document.getElementById('aktif-resim');
+            // 🚀 ZIRH 2: Kırık resim koruması
+            if(aktifResimElem) {
+                aktifResimElem.src = siradaki.resim;
+                aktifResimElem.onerror = function() { this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'; };
             }
         }
 
-        function slotaYerlestir(index) {
-            let aktifOge = sorular[mevcutSoruIndex];
-            
-            // O slotu doldur
-            siralamaDizisi[index] = aktifOge.secenekler[0];
-            
-            // Sonraki öğeye geç
-            mevcutSoruIndex++;
-            
-            // Ekranı güncelle
-            slotlariCiz();
-            soruyuEkranaBas();
+        function yerlestir(slotNumarasi) {
+            let slotDiv = document.getElementById(`slot-${slotNumarasi}`);
+            let isimSpan = document.getElementById(`slot-isim-${slotNumarasi}`);
+            let buton = slotDiv.querySelector('.yerlestir-btn');
+
+            if(slotDiv) slotDiv.classList.add('dolu-slot');
+            if(buton) buton.style.display = 'none';
+            if(isimSpan) isimSpan.innerText = adayHavuzu[aktifIndex].isim;
+
+            aktifIndex++;
+            yerlesenSayisi++;
+            siradakiOgeyiGetir();
         }
 
         function oyunuBitir() {
-            document.querySelector('.gizemli-oge').style.display = 'none';
-            document.getElementById('ana-sahne').style.justifyContent = 'center';
-            document.getElementById('siralama-kutusu').style.maxWidth = '500px';
+            let gizemli = document.querySelector('.gizemli-oge');
+            if(gizemli) gizemli.style.display = 'none';
             
-            // VİRAL BÜYÜME MOTORU
+            let anaSahne = document.getElementById('ana-sahne');
+            if(anaSahne) anaSahne.style.justifyContent = 'center';
+            
+            let siralamaKutusu = document.getElementById('siralama-kutusu');
+            if(siralamaKutusu) siralamaKutusu.style.maxWidth = '600px';
+            
             let oyunLink = window.location.href;
-            let paylasimMetni = `Kusursuz Kör Sıralama listemi yaptım! 😎 Sen listeni nasıl dizeceksin? Cesaretin varsa oyna: ${oyunLink}`;
+            let paylasimMetni = T.paylas_metin.replace('{link}', oyunLink);
             let wpLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(paylasimMetni)}`;
             let xLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(paylasimMetni)}`;
 
-            document.querySelector('.baslik').innerHTML = `
-                <h2 style="color: #27ae60; font-size:40px;">KUSURSUZ LİSTEN HAZIR!</h2>
-                
-                <div style="margin-top: 20px; margin-bottom: 20px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="${wpLink}" target="_blank" style="background-color: #25D366; color: white; padding: 12px 20px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 16px; display: flex; align-items: center; transition: 0.3s; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);">
-                        💬 WhatsApp'ta Paylaş
-                    </a>
-                    <a href="${xLink}" target="_blank" style="background-color: #0f0f13; color: white; padding: 12px 20px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 16px; display: flex; align-items: center; border: 2px solid #333; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
-                        𝕏 X'te Paylaş
-                    </a>
-                </div>
+            let baslik = document.querySelector('.baslik');
+            if(baslik) {
+                baslik.innerHTML = `
+                    <h2 style="background: linear-gradient(90deg, #00b09b, #96c93d); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${T.liste_hazir}</h2>
+                    
+                    <div style="margin-top: 30px; margin-bottom: 20px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <a href="${wpLink}" target="_blank" style="background: linear-gradient(45deg, #25D366, #128C7E); color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; font-weight: 800; display: flex; align-items: center; transition: 0.3s; box-shadow: 0 10px 20px rgba(37, 211, 102, 0.4);">
+                            ${T.wp_btn}
+                        </a>
+                        <a href="${xLink}" target="_blank" style="background: linear-gradient(45deg, #0f0f13, #1a1a24); border: 1px solid #333; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; font-weight: 800; display: flex; align-items: center; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                            ${T.x_btn}
+                        </a>
+                    </div>
 
-                <button class="buton-mavi" style="margin-top:0; margin-bottom:30px;" onclick="location.href='/'">Ana Sayfaya Dön ve Başka Test Çöz</button>
-            `;
+                    <button class="buton-mavi" style="margin-top:20px;" onclick="location.href='/'">${T.anasayfa_btn}</button>
+                `;
+            }
+            
+            // 🪙 HE-COIN KAZANMA TETİKLEYİCİSİ
+            fetch('/api/odul_al', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ miktar: 10 }) 
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    let bildirim = document.getElementById('coin-bildirim');
+                    if(bildirim) {
+                        bildirim.querySelector('span').innerText = `+${data.kazanc} HE-Coin Kazandın!`;
+                        bildirim.classList.add('coin-goster');
+                        setTimeout(() => bildirim.classList.remove('coin-goster'), 4000);
+                    }
+                }
+            }).catch(err => console.log("Coin API Hatası:", err));
         }
     </script>
 </body>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ oyun_basligi }} | Piksel Avcısı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #0b0c10; color: #ffffff; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; }
+        
+        body::before { content: ''; position: fixed; top: -20%; left: -10%; width: 50vw; height: 50vw; background: rgba(0, 242, 254, 0.15); border-radius: 50%; filter: blur(120px); z-index: -1; }
+
+        .ust-panel { width: 100%; max-width: 800px; padding: 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(20,20,30,0.8); border-bottom: 2px solid #00f2fe; border-radius: 0 0 20px 20px; margin-bottom: 30px;}
+        .skor-tablosu { font-size: 24px; font-weight: 900; color: #f39c12; text-shadow: 0 0 15px rgba(243,156,18,0.5);}
+        .soru-sayaci { font-size: 20px; font-weight: 800; color: #aaa; }
+
+        .oyun-alani { text-align: center; width: 100%; max-width: 800px; padding: 0 20px; }
+        
+        /* 📸 BULANIK RESİM KUTUSU */
+        .resim-kapsayici { 
+            width: 100%; max-width: 450px; aspect-ratio: 1/1; margin: 0 auto; 
+            border-radius: 20px; border: 4px solid #00f2fe; overflow: hidden; 
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.3); position: relative; background: #000;
+        }
+        .bulanik-resim { width: 100%; height: 100%; object-fit: cover; filter: blur(40px); transform: scale(1.1); transition: filter 0.5s ease; }
+        
+        /* ZAMAN VE NETLEŞME BARI */
+        .zaman-bar-kapsayici { width: 100%; max-width: 450px; height: 10px; background: #222; border-radius: 10px; margin: 20px auto; overflow: hidden; border: 1px solid #444;}
+        .zaman-bar { height: 100%; width: 100%; background: linear-gradient(90deg, #ff0055, #f39c12, #00b09b); transform-origin: left; transition: width 0.5s linear; }
+
+        /* 🔘 SEÇENEKLER */
+        .secenekler-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
+        .btn-secenek { 
+            background: rgba(25,25,35,0.8); border: 2px solid #333; padding: 20px 10px; 
+            color: white; font-size: 16px; font-weight: 800; border-radius: 12px; 
+            cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-secenek:hover { background: rgba(0, 242, 254, 0.1); border-color: #00f2fe; transform: translateY(-3px);}
+        .dogru { background: #2ecc71 !important; border-color: #2ecc71 !important; color: #000 !important; box-shadow: 0 0 20px rgba(46,204,113,0.5);}
+        .yanlis { background: #e74c3c !important; border-color: #e74c3c !important; color: #fff !important; box-shadow: 0 0 20px rgba(231,76,60,0.5);}
+
+        /* FİNAL EKRANI */
+        #final-ekrani { display: none; text-align: center; margin-top: 50px; animation: fadeIn 0.5s;}
+        @keyframes fadeIn { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
+        .final-skor { font-size: 80px; font-weight: 900; color: #00f2fe; text-shadow: 0 0 30px rgba(0,242,254,0.5); line-height: 1;}
+        .btn-wp { background: #25D366; color: white; padding: 15px 30px; border-radius: 12px; border: none; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 30px;}
+        /* 🪙 HE-COIN KAZANMA ANİMASYONU */
+        #coin-bildirim {
+            position: fixed; top: 20px; right: 20px; 
+            background: linear-gradient(45deg, #f1c40f, #f39c12); color: #000; 
+            padding: 15px 25px; border-radius: 50px; font-weight: 900; font-size: 18px;
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.6); z-index: 9999;
+            transform: translateX(150%); opacity: 0; 
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: flex; align-items: center; gap: 10px; border: 2px solid #fff;
+        }
+        .coin-goster { transform: translateX(0) !important; opacity: 1 !important; }
+    </style>
+</head>
+<body>
+<div id="coin-bildirim">🪙 <span>+10 HE-Coin Kazandın!</span></div>
+    <div class="ust-panel" id="oyun-paneli">
+        <div class="soru-sayaci">Soru: <span id="soru-no" style="color: #fff;">1</span>/<span id="toplam-soru">0</span></div>
+        <div class="skor-tablosu">Skor: <span id="skor-deger">0</span></div>
+    </div>
+
+    <div class="oyun-alani" id="oyun-kapsayici">
+        <div class="resim-kapsayici">
+            <img src="" id="oyun-resmi" class="bulanik-resim">
+        </div>
+        
+        <div class="zaman-bar-kapsayici">
+            <div class="zaman-bar" id="zaman-cubugu"></div>
+        </div>
+
+        <div class="secenekler-grid" id="secenekler-alani">
+            </div>
+    </div>
+
+    <div id="final-ekrani">
+        <h2 style="color:#aaa; font-size:24px; text-transform:uppercase;">Av Taraması Tamamlandı</h2>
+        <div class="final-skor" id="final-skor-yazi">0</div>
+        <p style="color:#f39c12; font-weight:800; font-size:18px; margin-top:10px;">Puan</p>
+        
+        <button class="btn-wp" onclick="whatsappPaylas()">📲 Skorunu Hava Atarak Paylaş</button>
+        <br><br>
+        <a href="/" style="color: #fff; text-decoration: none; font-weight: 600; border-bottom: 2px solid #00f2fe; padding-bottom: 5px;">Ana Sayfaya Dön</a>
+    </div>
+
+    <script>
+        const OYUN_ID = "{{ aktif_oyun }}";
+        let SORULAR = [];
+        let aktifSoruIndex = 0;
+        let toplamSkor = 0;
+        
+        // Oyun Motoru Değişkenleri
+        let bulaniklikSeviyesi = 40; // Max blur (başlangıç)
+        let kalanZamanYuzdesi = 100;
+        let oyunTimer;
+        let resimTamamenNetMi = false;
+        let cevapVerildiMi = false;
+
+        window.onload = () => {
+            fetch(`/api/sorular/${OYUN_ID}`)
+                .then(res => res.json())
+                .then(data => {
+                    // 🚀 ZIRH 1: Veri yoksa sistemi dondurma, uyarı ver
+                    if (!data || data.length === 0) {
+                        let alan = document.getElementById('secenekler-alani');
+                        if(alan) alan.innerHTML = "<h3 style='color:white; width:100%; text-align:center;'>Teste henüz soru eklenmemiş patron!</h3>";
+                        return;
+                    }
+                    SORULAR = data;
+                    let toplamSoru = document.getElementById('toplam-soru');
+                    if(toplamSoru) toplamSoru.innerText = SORULAR.length;
+                    soruyuHazirla();
+                })
+                .catch(err => console.error("Veri Çekme Hatası:", err));
+        };
+
+        function soruyuHazirla() {
+            if(aktifSoruIndex >= SORULAR.length) return oyunuBitir();
+
+            let soru = SORULAR[aktifSoruIndex];
+            let soruNo = document.getElementById('soru-no');
+            if(soruNo) soruNo.innerText = aktifSoruIndex + 1;
+            
+            // 🚀 ZIRH 2 & KABLO TAMİRİ: Resim URL'si düzeltildi ve kırık resim koruması eklendi
+            let resimImg = document.getElementById('oyun-resmi');
+            if(resimImg) {
+                resimImg.src = (soru.resim_url || "").split(',')[0];
+                resimImg.onerror = function() { this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'; };
+                
+                bulaniklikSeviyesi = 40;
+                kalanZamanYuzdesi = 100;
+                resimImg.style.filter = `blur(${bulaniklikSeviyesi}px)`;
+            }
+            
+            resimTamamenNetMi = false;
+            cevapVerildiMi = false;
+
+            // Şıkları çiz
+            let seceneklerAlani = document.getElementById('secenekler-alani');
+            if(seceneklerAlani) seceneklerAlani.innerHTML = '';
+            
+            // 🚀 KABLO TAMİRİ: Seçenekleri virgüllerden böl ve karıştır
+            let seceneklerDizisi = (soru.secenekler || "").split(',');
+            let karisikSecenekler = [...seceneklerDizisi].sort(() => Math.random() - 0.5);
+            
+            karisikSecenekler.forEach(secenek => {
+                let temizSecenek = secenek.trim();
+                if(temizSecenek) {
+                    let guvenliSecenek = temizSecenek.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    if(seceneklerAlani) {
+                        seceneklerAlani.innerHTML += `<button class="btn-secenek" onclick="cevapKontrol(this, '${guvenliSecenek}')">${temizSecenek}</button>`;
+                    }
+                }
+            });
+
+            // Motoru çalıştır
+            zamanlayiciBaslat();
+        }
+
+        function zamanlayiciBaslat() {
+            clearInterval(oyunTimer);
+            let resimImg = document.getElementById('oyun-resmi');
+            let zamanCubugu = document.getElementById('zaman-cubugu');
+
+            oyunTimer = setInterval(() => {
+                if(kalanZamanYuzdesi <= 0) {
+                    clearInterval(oyunTimer);
+                    sureBitti();
+                    return;
+                }
+
+                // Her 0.1 saniyede bulanıklık azalır, zaman azalır
+                kalanZamanYuzdesi -= 1; 
+                bulaniklikSeviyesi = (kalanZamanYuzdesi / 100) * 40;
+                
+                if(resimImg) resimImg.style.filter = `blur(${bulaniklikSeviyesi}px)`;
+                if(zamanCubugu) zamanCubugu.style.width = `${kalanZamanYuzdesi}%`;
+
+            }, 100);
+        }
+
+        function cevapKontrol(buton, secilenCevap) {
+            if(cevapVerildiMi) return; 
+            cevapVerildiMi = true;
+            clearInterval(oyunTimer);
+
+            // 🚀 ZIRH 3: Boş cevap koruması
+            let dogruCevap = (SORULAR[aktifSoruIndex].dogru_cevap || "").trim();
+            
+            // Resmi anında netleştir
+            let resimImg = document.getElementById('oyun-resmi');
+            if(resimImg) resimImg.style.filter = "blur(0px)";
+
+            if(secilenCevap === dogruCevap) {
+                buton.classList.add('dogru');
+                let kazanilanPuan = Math.ceil(kalanZamanYuzdesi * 10); 
+                toplamSkor += kazanilanPuan;
+                let skorDeger = document.getElementById('skor-deger');
+                if(skorDeger) skorDeger.innerText = toplamSkor;
+            } else {
+                buton.classList.add('yanlis');
+                let butonlar = document.querySelectorAll('.btn-secenek');
+                butonlar.forEach(b => { if(b.innerText === dogruCevap) b.classList.add('dogru'); });
+            }
+
+            setTimeout(() => {
+                aktifSoruIndex++;
+                soruyuHazirla();
+            }, 2000);
+        }
+
+        function sureBitti() {
+            cevapVerildiMi = true;
+            let resimImg = document.getElementById('oyun-resmi');
+            if(resimImg) resimImg.style.filter = "blur(0px)"; 
+            
+            let dogruCevap = (SORULAR[aktifSoruIndex].dogru_cevap || "").trim();
+            let butonlar = document.querySelectorAll('.btn-secenek');
+            butonlar.forEach(b => { if(b.innerText === dogruCevap) b.classList.add('dogru'); }); 
+
+            setTimeout(() => {
+                aktifSoruIndex++;
+                soruyuHazirla();
+            }, 2000);
+        }
+
+        function oyunuBitir() {
+            let paneli = document.getElementById('oyun-paneli');
+            if(paneli) paneli.style.display = 'none';
+            let kapsayici = document.getElementById('oyun-kapsayici');
+            if(kapsayici) kapsayici.style.display = 'none';
+            let finalEkran = document.getElementById('final-ekrani');
+            if(finalEkran) finalEkran.style.display = 'block';
+            let finalSkorYazi = document.getElementById('final-skor-yazi');
+            if(finalSkorYazi) finalSkorYazi.innerText = toplamSkor;
+            
+            // 🪙 HE-COIN KAZANMA TETİKLEYİCİSİ
+            fetch('/api/odul_al', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ miktar: 10 }) 
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    let bildirim = document.getElementById('coin-bildirim');
+                    if(bildirim) {
+                        let span = bildirim.querySelector('span');
+                        if(span) span.innerText = `+${data.kazanc} HE-Coin Kazandın!`;
+                        bildirim.classList.add('coin-goster');
+                        setTimeout(() => bildirim.classList.remove('coin-goster'), 4000);
+                    }
+                }
+            }).catch(err => console.log("Coin API Hatası:", err));
+        }
+
+        function whatsappPaylas() {
+            let mesaj = `🕵️ Piksel Avcısı'nda ${toplamSkor} Puan Yaptım! Gözlerine güveniyorsan rekorumu kır!\n\nOyna: ${window.location.href}`;
+            let wpLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(mesaj)}`;
+            window.open(wpLink, '_blank');
+        }
+    </script>
+</body>
+</html>

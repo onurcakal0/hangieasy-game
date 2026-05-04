@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanrı Modu | Onur Çakal A.Ş.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #050505; color: #fff; padding: 40px 5%; }
+        
+        .baslik { font-size: 36px; font-weight: 900; color: #f1c40f; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .baslik span { color: #fff; font-size: 16px; font-weight: 400; letter-spacing: 1px; float: right; margin-top: 15px;}
+
+        .istatistik-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .istatistik-kutu { background: #111; border: 1px solid #f1c40f; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(241,196,15,0.1); }
+        .istatistik-deger { font-size: 48px; font-weight: 900; color: #f1c40f; }
+        .istatistik-isim { font-size: 14px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
+
+        .tablo-baslik { font-size: 24px; font-weight: 800; margin-bottom: 15px; color: #fff; }
+        table { width: 100%; border-collapse: collapse; background: #111; border-radius: 10px; overflow: hidden; margin-bottom: 50px; }
+        th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid #222; }
+        th { background: #f1c40f; color: #000; font-weight: 800; text-transform: uppercase; font-size: 12px; }
+        tr:hover { background: #1a1a1a; }
+        
+        .coin-rozet { background: rgba(241,196,15,0.2); color: #f1c40f; padding: 5px 10px; border-radius: 8px; font-weight: 800; font-size: 14px; }
+        .ban-btn { background: #e74c3c; color: #fff; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 800; font-size: 12px; }
+        .ban-btn:hover { background: #c0392b; }
+    </style>
+</head>
+<body>
+
+    <div class="baslik">
+        👑 CEO Kontrol Paneli
+        <span>Sistem Durumu: 🟢 Çevrimiçi</span>
+    </div>
+
+    <div class="istatistik-grid">
+        <div class="istatistik-kutu">
+            <div class="istatistik-deger">{{ tk }}</div>
+            <div class="istatistik-isim">Toplam Kayıtlı Kullanıcı</div>
+        </div>
+        <div class="istatistik-kutu">
+            <div class="istatistik-deger">{{ tt }}</div>
+            <div class="istatistik-isim">Yüklenen Toplam Test</div>
+        </div>
+        <div class="istatistik-kutu">
+            <div class="istatistik-deger" style="color: #2ecc71;">Aktif</div>
+            <div class="istatistik-isim">Supabase Bulut Motoru</div>
+        </div>
+    </div>
+
+    <div class="tablo-baslik">👥 Kullanıcı Veritabanı (Zenginlik Sıralaması)</div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Kullanıcı Adı</th>
+                <th>Cüzdan Bakiyesi</th>
+                <th>Kayıt Tarihi</th>
+                <th>Aksiyon</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for k in kullanicilar %}
+            <tr>
+                <td style="color: #666;">#{{ k.id }}</td>
+                <td style="font-weight: 800;">{{ k.kullanici_adi }}</td>
+                <td><span class="coin-rozet">{{ k.he_coin }} 🪙</span></td>
+                <td style="color: #aaa; font-size: 14px;">Aktif</td>
+                <td>
+                    <button class="ban-btn" onclick="alert('Henüz banlama motoru bağlanmadı, ama şimdilik korkutucu duruyor 😎')">SİL / BANLA</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="tablo-baslik">🎮 Yüklenen Son Testler</div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Test Başlığı</th>
+                <th>Kategori</th>
+                <th>Oyun Modu</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for o in oyunlar %}
+            <tr>
+                <td style="color: #666;">#{{ o.id }}</td>
+                <td style="font-weight: 600;">{{ o.baslik }}</td>
+                <td style="color: #00f2fe;">{{ o.kategori }}</td>
+                <td style="color: #f39c12; text-transform: uppercase; font-size: 12px; font-weight: 800;">{{ o.oyun_modu }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="/" style="color: #aaa; text-decoration: none; font-size: 14px;">⬅ Hangieasy Vitrinine Dön</a>
+
+</body>
+</html>

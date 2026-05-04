@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎥 YAYINCI KONTROL PANELİ | Hangieasy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #050505; color: #ffffff; min-height: 100vh; padding: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at top center, #086972 0%, #050505 60%); z-index: -1; opacity: 0.5;}
+
+        /* ÜST PANEL: YAYIN KODU */
+        .header-kutu { text-align: center; margin-bottom: 30px; background: rgba(20,20,30,0.8); padding: 20px 40px; border-radius: 20px; border: 2px solid #17b978; box-shadow: 0 0 30px rgba(23,185,120,0.3); }
+        .yayin-kodu { font-size: 60px; font-weight: 900; letter-spacing: 10px; color: #17b978; text-shadow: 0 0 20px rgba(23,185,120,0.8); }
+        .yayin-uyari { font-size: 16px; color: #aaa; font-weight: 600; text-transform: uppercase; }
+
+        /* ANA IZGARA: KUMANDA VE LİDERLİK TABLOSU */
+        .kontrol-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; width: 100%; max-width: 1200px; }
+
+        /* KUMANDA PANELİ */
+        .kumanda-paneli { background: rgba(25,25,35,0.9); padding: 30px; border-radius: 20px; border: 1px solid #333; text-align: center; }
+        .oyun-baslik { font-size: 24px; color: #00f2fe; margin-bottom: 20px; text-transform: uppercase; }
+        
+        .aksiyon-btn { width: 100%; padding: 20px; font-size: 20px; font-weight: 900; color: #fff; border: none; border-radius: 15px; cursor: pointer; text-transform: uppercase; transition: 0.3s; margin-bottom: 15px; }
+        .btn-baslat { background: linear-gradient(45deg, #17b978, #086972); box-shadow: 0 10px 20px rgba(23,185,120,0.4); }
+        .btn-baslat:hover { transform: scale(1.02); box-shadow: 0 10px 40px rgba(23,185,120,0.6); }
+        
+        .btn-ileri { background: linear-gradient(45deg, #f39c12, #e67e22); box-shadow: 0 10px 20px rgba(243,156,18,0.4); display: none; }
+        .btn-ileri:hover { transform: scale(1.02); box-shadow: 0 10px 40px rgba(243,156,18,0.6); }
+
+        .btn-bitir { background: transparent; border: 2px solid #ff0055; color: #ff0055; display: none; }
+        .btn-bitir:hover { background: #ff0055; color: #fff; }
+
+        /* LİDERLİK TABLOSU (LEADERBOARD) */
+        .liderlik-tablosu { background: rgba(25,25,35,0.9); padding: 30px; border-radius: 20px; border: 1px solid #333; height: 500px; overflow-y: auto; }
+        .tablo-baslik { font-size: 20px; font-weight: 800; color: #f39c12; margin-bottom: 20px; display: flex; justify-content: space-between; border-bottom: 1px solid #444; padding-bottom: 10px;}
+        
+        .izleyici-kart { display: flex; justify-content: space-between; background: #111; padding: 15px 20px; margin-bottom: 10px; border-radius: 10px; font-weight: 800; border-left: 4px solid #333; transition: 0.3s; }
+        .izleyici-kart.top1 { border-left-color: #f1c40f; background: rgba(241,196,15,0.1); }
+        .izleyici-kart.top2 { border-left-color: #bdc3c7; background: rgba(189,195,199,0.1); }
+        .izleyici-kart.top3 { border-left-color: #cd7f32; background: rgba(205,127,50,0.1); }
+        
+        .izleyici-isim { color: #fff; }
+        .izleyici-puan { color: #00f2fe; }
+
+        /* KANALLAR İÇİN GÜZEL SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #111; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f2fe; }
+    </style>
+</head>
+<body>
+
+    <div class="header-kutu">
+        <div class="yayin-uyari">🔴 İzleyicilerin Katılması İçin Kodu Ekrana Yansıt</div>
+        <div class="yayin-kodu" id="yayin-kodu-metni">{{ yayin_kodu }}</div>
+        <div style="margin-top: 10px; color: #00f2fe; font-weight: 800;">Toplam Katılımcı: <span id="kisi-sayisi">0</span></div>
+    </div>
+
+    <div class="kontrol-grid">
+        <!-- SOL: KUMANDA PANELİ -->
+        <div class="kumanda-paneli">
+            <h2 class="oyun-baslik">🎮 {{ oyun.baslik }}</h2>
+            <p style="color: #aaa; margin-bottom: 30px; font-size: 14px;">İzleyiciler toplandığında şovu başlat. Kontrol tamamen sende patron!</p>
+
+            <button class="aksiyon-btn btn-baslat" id="btn-baslat" onclick="yayiniBaslat()">🚀 Şovu Başlat</button>
+            <button class="aksiyon-btn btn-ileri" id="btn-ileri" onclick="siradakiSoru()">⏭️ Sıradaki Soruya Geç</button>
+            <button class="aksiyon-btn btn-bitir" id="btn-bitir" onclick="yayiniBitir()">🛑 Yayını Sonlandır</button>
+        </div>
+
+        <!-- SAĞ: CANLI LİDERLİK TABLOSU -->
+        <div class="liderlik-tablosu">
+            <div class="tablo-baslik">
+                <span>🏆 Canlı Sıralama</span>
+                <span>Puan</span>
+            </div>
+            <div id="izleyici-listesi">
+                <div style="text-align: center; color: #555; margin-top: 50px;">Henüz kimse katılmadı...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        const YAYIN_KODU = "{{ yayin_kodu }}";
+
+        // Odaya Yayıncı Olarak Bağlan
+        socket.on('connect', () => {
+            socket.emit('yayina_katil', { yayin_kodu: YAYIN_KODU });
+        });
+
+        // Lobi Güncellendikçe veya Biri Puan Aldıkça Tabloyu Yeniden Çiz
+        function tabloyuCiz(skorlar) {
+            let listeDiv = document.getElementById('izleyici-listesi');
+            
+            // Skorları büyükten küçüğe sırala (Zeka burada çalışıyor!)
+            let siraliDizi = Object.entries(skorlar).sort((a, b) => b[1] - a[1]);
+            
+            document.getElementById('kisi-sayisi').innerText = siraliDizi.length;
+
+            if(siraliDizi.length === 0) {
+                listeDiv.innerHTML = '<div style="text-align: center; color: #555; margin-top: 50px;">Henüz kimse katılmadı...</div>';
+                return;
+            }
+
+            listeDiv.innerHTML = '';
+            siraliDizi.forEach((kisi, index) => {
+                let isim = kisi[0];
+                let puan = kisi[1];
+                let sinif = "";
+                
+                // İlk 3'e özel altın/gümüş/bronz efektleri
+                if(index === 0) sinif = "top1";
+                else if(index === 1) sinif = "top2";
+                else if(index === 2) sinif = "top3";
+
+                listeDiv.innerHTML += `
+                    <div class="izleyici-kart ${sinif}">
+                        <div class="izleyici-isim">#${index + 1} ${isim}</div>
+                        <div class="izleyici-puan">${puan} Puan</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Socket Dinleyicileri
+        socket.on('izleyici_listesi_guncelle', tabloyuCiz);
+        socket.on('canli_skor_guncelle', tabloyuCiz);
+
+        // --- YAYINCI KOMUTLARI ---
+        function yayiniBaslat() {
+            document.getElementById('btn-baslat').style.display = 'none';
+            document.getElementById('btn-ileri').style.display = 'block';
+            document.getElementById('btn-bitir').style.display = 'block';
+            
+            // Tüm izleyicilere 'Başla' emrini gönder!
+            socket.emit('yayin_hareketi', { yayin_kodu: YAYIN_KODU, aksiyon: 'baslat' });
+        }
+
+        function siradakiSoru() {
+            // Tüm izleyicilere 'Sonraki Soruya Geç' emrini gönder!
+            socket.emit('yayin_hareketi', { yayin_kodu: YAYIN_KODU, aksiyon: 'siradaki_soru' });
+        }
+
+        function yayiniBitir() {
+            if(confirm("Yayını bitirmek istediğine emin misin patron?")) {
+                socket.emit('yayin_hareketi', { yayin_kodu: YAYIN_KODU, aksiyon: 'bitir' });
+                window.location.href = "/";
+            }
+        }
+    </script>
+</body>
+</html>

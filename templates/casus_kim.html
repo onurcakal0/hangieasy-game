@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ oyun_basligi }} | Casus Kim?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #0b0c10; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden;}
+        
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #2a0810 0%, #0b0c10 80%); z-index: -1; }
+
+        .ust-panel { width: 100%; max-width: 900px; padding: 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(20,20,30,0.8); border-bottom: 2px solid #ff0055; border-radius: 0 0 20px 20px; margin-bottom: 30px;}
+        .skor-tablosu { font-size: 24px; font-weight: 900; color: #ff0055; text-shadow: 0 0 15px rgba(255,0,85,0.5);}
+        .can-tablosu { font-size: 20px; font-weight: 800; color: #fff; }
+
+        .oyun-alani { text-align: center; width: 100%; max-width: 900px; padding: 0 20px; }
+        .hedef-soru { font-size: 28px; font-weight: 900; margin-bottom: 20px; color: #fff; text-transform: uppercase; letter-spacing: 2px;}
+
+        /* ZAMAN BARI */
+        .zaman-bar-kapsayici { width: 100%; height: 12px; background: #222; border-radius: 10px; margin-bottom: 30px; overflow: hidden; border: 1px solid #444; position: relative;}
+        .zaman-bar { height: 100%; width: 100%; background: linear-gradient(90deg, #2ecc71, #f39c12, #ff0055); transform-origin: left; transition: width 0.1s linear; }
+
+        /* 📸 4'LÜ GRID (CASUSLAR) */
+        .grid-4lu { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .kart { 
+            background: rgba(25,25,35,0.8); border: 3px solid rgba(255,255,255,0.1); border-radius: 15px; 
+            overflow: hidden; cursor: pointer; transition: 0.2s; position: relative;
+        }
+        .kart:hover { transform: scale(1.05); border-color: #ff0055; box-shadow: 0 10px 30px rgba(255,0,85,0.4); z-index: 10;}
+        .kart img { width: 100%; height: 250px; object-fit: cover; }
+        .kart-isim { padding: 15px; font-size: 18px; font-weight: 800; background: #000; color: #fff; text-transform: uppercase;}
+        
+        .dogru-secim { border-color: #2ecc71 !important; box-shadow: 0 0 30px rgba(46,204,113,0.6) !important; transform: scale(1.05); z-index: 20;}
+        .yanlis-secim { border-color: #ff0055 !important; filter: grayscale(100%); opacity: 0.5;}
+
+        /* FİNAL EKRANI */
+        #final-ekrani { display: none; text-align: center; margin-top: 50px; animation: fadeIn 0.5s;}
+        @keyframes fadeIn { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
+        .final-skor { font-size: 80px; font-weight: 900; color: #ff0055; text-shadow: 0 0 30px rgba(255,0,85,0.5); line-height: 1;}
+        .btn-wp { background: #25D366; color: white; padding: 15px 30px; border-radius: 12px; border: none; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 30px; transition: 0.3s;}
+        .btn-wp:hover { transform: translateY(-3px);}
+        /* 🪙 HE-COIN KAZANMA ANİMASYONU */
+        #coin-bildirim {
+            position: fixed; top: 20px; right: 20px; 
+            background: linear-gradient(45deg, #f1c40f, #f39c12); color: #000; 
+            padding: 15px 25px; border-radius: 50px; font-weight: 900; font-size: 18px;
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.6); z-index: 9999;
+            transform: translateX(150%); opacity: 0; 
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: flex; align-items: center; gap: 10px; border: 2px solid #fff;
+        }
+        .coin-goster { transform: translateX(0) !important; opacity: 1 !important; }
+    </style>
+</head>
+<body>
+<div id="coin-bildirim">🪙 <span>+10 HE-Coin Kazandın!</span></div>
+    <div class="ust-panel" id="oyun-paneli">
+        <div class="can-tablosu">Kalan Hak: <span id="can-deger" style="color: #2ecc71;">❤️❤️❤️</span></div>
+        <div class="skor-tablosu">Skor: <span id="skor-deger">0</span></div>
+    </div>
+
+    <div class="oyun-alani" id="oyun-kapsayici">
+        <div class="hedef-soru">🕵️ Aralarına sızan casusu bul!</div>
+        
+        <div class="zaman-bar-kapsayici">
+            <div class="zaman-bar" id="zaman-cubugu"></div>
+        </div>
+
+        <div class="grid-4lu" id="kartlar-alani">
+            </div>
+    </div>
+
+    <div id="final-ekrani">
+        <h2 style="color:#aaa; font-size:24px; text-transform:uppercase;">Operasyon Sona Erdi</h2>
+        <div class="final-skor" id="final-skor-yazi">0</div>
+        <p style="color:#fff; font-weight:800; font-size:18px; margin-top:10px;">Casus Avcısı Puanı</p>
+        
+        <button class="btn-wp" onclick="whatsappPaylas()">📲 Rekorunu WhatsApp'ta Paylaş</button>
+        <br><br>
+        <button onclick="location.reload()" style="background:#333; color:#fff; border:none; padding:15px 30px; border-radius:12px; font-weight:800; cursor:pointer; margin-right:10px;">🔄 Yeniden Oyna</button>
+        <a href="/" style="display:inline-block; padding:15px 30px; background:#f39c12; color:#fff; text-decoration:none; font-weight:800; border-radius:12px;">🏠 Ana Sayfa</a>
+    </div>
+
+    <script>
+        const OYUN_ID = "{{ aktif_oyun }}";
+        let SORULAR = [];
+        let aktifSoruIndex = 0;
+        let toplamSkor = 0;
+        let can = 3;
+        
+        let kalanZaman = 100;
+        let oyunTimer;
+        let kilitli = false; // Çift tıklamayı önler
+
+        window.onload = () => {
+            fetch(`/api/sorular/${OYUN_ID}`)
+                .then(res => res.json())
+                .then(data => {
+                    // 🚀 ZIRH 1: Eğer oyun boşsa sistemi kilitli ekranda bırakma!
+                    if (!data || data.length === 0) {
+                        document.getElementById('kartlar-alani').innerHTML = "<h3 style='color:white; text-align:center; width:100%;'>Bu teste henüz soru eklenmemiş patron!</h3>";
+                        return;
+                    }
+                    SORULAR = data;
+                    soruyuHazirla();
+                })
+                .catch(err => console.error("Veri Çekme Hatası:", err));
+        };
+
+        function soruyuHazirla() {
+            if(aktifSoruIndex >= SORULAR.length || can <= 0) return oyunuBitir();
+
+            let soru = SORULAR[aktifSoruIndex];
+            kilitli = false;
+            kalanZaman = 100;
+
+            // 🚀 ZIRH 2: API'den gelen verileri güvene al (Null koruması)
+            let resimler = (soru.resim_url || "").split(','); 
+            let isimler = (soru.secenekler || "").split(','); 
+
+            // 4'lü kart array'i oluştur ve KARIŞTIR
+            let kartObjeleri = [];
+            for(let i=0; i<4; i++) {
+                kartObjeleri.push({ 
+                    resim: resimler[i] ? resimler[i].trim() : "", 
+                    isim: isimler[i] ? isimler[i].trim() : "Gizemli Kişi" 
+                });
+            }
+            kartObjeleri.sort(() => Math.random() - 0.5);
+
+            let alan = document.getElementById('kartlar-alani');
+            alan.innerHTML = '';
+            
+            kartObjeleri.forEach(kart => {
+                let id_ismi = kart.isim.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                // 🚀 ZIRH 3: onerror ile kırık resim gelirse otomatik "Resim Bulunamadı" görseli bas!
+                alan.innerHTML += `
+                    <div class="kart" onclick="cevapKontrol(this, '${id_ismi}')">
+                        <img src="${kart.resim}" onerror="this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'">
+                        <div class="kart-isim">${kart.isim}</div>
+                    </div>`;
+            });
+
+            zamanlayiciBaslat();
+        }
+
+        function zamanlayiciBaslat() {
+            clearInterval(oyunTimer);
+            let bar = document.getElementById('zaman-cubugu');
+            if(bar) bar.style.width = '100%';
+
+            oyunTimer = setInterval(() => {
+                if(kalanZaman <= 0) {
+                    clearInterval(oyunTimer);
+                    yanlisCevap(null); 
+                    return;
+                }
+                kalanZaman -= 1; 
+                if(bar) bar.style.width = `${kalanZaman}%`;
+            }, 100); 
+        }
+
+        function cevapKontrol(secilenKart, secilenIsim) {
+            if(kilitli) return;
+            kilitli = true;
+            clearInterval(oyunTimer);
+
+            // 🚀 ZIRH 4: Doğru cevap veritabanında boş olsa bile çökmez!
+            let dogruCevap = (SORULAR[aktifSoruIndex].dogru_cevap || "").trim();
+
+            if(secilenIsim === dogruCevap) {
+                secilenKart.classList.add('dogru-secim');
+                toplamSkor += (kalanZaman * 10); 
+                document.getElementById('skor-deger').innerText = toplamSkor;
+                gecisYap();
+            } else {
+                secilenKart.classList.add('yanlis-secim');
+                yanlisCevap(dogruCevap);
+            }
+        }
+
+        function yanlisCevap(dogruCevap) {
+            kilitli = true;
+            can -= 1;
+            let canAlan = document.getElementById('can-deger');
+            if(canAlan) canAlan.innerText = "❤️".repeat(can) + "🖤".repeat(3-can);
+            
+            if(dogruCevap) {
+                let kartlar = document.querySelectorAll('.kart');
+                kartlar.forEach(k => {
+                    let kartIsmiAlan = k.querySelector('.kart-isim');
+                    if(kartIsmiAlan && kartIsmiAlan.innerText === dogruCevap) {
+                        k.classList.add('dogru-secim');
+                    }
+                });
+            }
+
+            document.body.style.animation = "sarsinti 0.3s";
+            setTimeout(() => document.body.style.animation = "", 300);
+
+            if(can <= 0) {
+                setTimeout(oyunuBitir, 1500);
+            } else {
+                gecisYap();
+            }
+        }
+
+        function gecisYap() {
+            setTimeout(() => {
+                aktifSoruIndex++;
+                soruyuHazirla();
+            }, 1500);
+        }
+
+        function oyunuBitir() {
+            clearInterval(oyunTimer);
+            document.getElementById('oyun-paneli').style.display = 'none';
+            document.getElementById('oyun-kapsayici').style.display = 'none';
+            
+            let finalEkrani = document.getElementById('final-ekrani');
+            if(finalEkrani) finalEkrani.style.display = 'block';
+            
+            let finalSkor = document.getElementById('final-skor-yazi');
+            if(finalSkor) finalSkor.innerText = toplamSkor;
+            
+            fetch('/api/odul_al', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ miktar: 10 }) 
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    let bildirim = document.getElementById('coin-bildirim');
+                    if(bildirim) {
+                        bildirim.querySelector('span').innerText = `+${data.kazanc} HE-Coin Kazandın!`;
+                        bildirim.classList.add('coin-goster');
+                        setTimeout(() => bildirim.classList.remove('coin-goster'), 4000);
+                    }
+                }
+            }).catch(err => console.log("Coin API Hatası:", err));
+        }
+
+        function whatsappPaylas() {
+            let mesaj = `🕵️ Casus Kim? oyununda ${toplamSkor} Puan yaptım!\nÇok zekiysen casusları benden hızlı bul!\n\nOyna: ${window.location.href}`;
+            let wpLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(mesaj)}`;
+            window.open(wpLink, '_blank');
+        }
+    </script>
+</body>
+</html>

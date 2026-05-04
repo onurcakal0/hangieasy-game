@@ -23,9 +23,153 @@
 
     <script>
         const OYUN_ID = "{{ aktif_oyun }}";
-        console.log("Python'dan gelen oyun ID'si:", OYUN_ID); // Test için konsola yazdıralım
+        console.log("Python'dan gelen oyun ID'si:", OYUN_ID); 
+
+        let SORULAR = [];
+        let aktifIndex = 0;
+        let skor = 0;
+        let kilitli = false;
+        let yapayZekaSecimleri = []; // 🧠 AI analizi için cevapları tutuyoruz
+
+        window.onload = () => {
+            fetch(`/api/sorular/${OYUN_ID}`)
+                .then(res => res.json())
+                .then(data => {
+                    // 🚀 ZIRH 1: Veri gelmezse çökme
+                    if (!data || data.length === 0) {
+                        let butonKutusu = document.getElementById('buton-kutusu');
+                        if(butonKutusu) butonKutusu.innerHTML = "<h3 style='color:white; text-align:center;'>Bu teste henüz soru eklenmemiş patron!</h3>";
+                        return;
+                    }
+                    SORULAR = data;
+                    soruyuGetir();
+                })
+                .catch(err => console.error("Veri Çekme Hatası:", err));
+        };
+
+        function soruyuGetir() {
+            if (aktifIndex >= SORULAR.length) return oyunuBitir();
+
+            kilitli = false;
+            let soru = SORULAR[aktifIndex];
+            
+            // 🚀 KABLO TAMİRİ: resim_url kullan ve kırık resim koruması ekle
+            let resimUrl = (soru.resim_url || "").split(',')[0];
+            let resimElem = document.getElementById('soru-resmi');
+            
+            if(resimUrl && resimUrl.trim() !== "") {
+                if(resimElem) {
+                    resimElem.src = resimUrl;
+                    resimElem.style.display = 'block';
+                    resimElem.onerror = function() { this.src='https://via.placeholder.com/400x200/151520/FFFFFF?text=Resim+Yok'; };
+                }
+            } else {
+                if(resimElem) resimElem.style.display = 'none'; // Soru resmi yoksa kutuyu gizle, sadece yazı kalsın
+            }
+
+            let butonKutusu = document.getElementById('buton-kutusu');
+            if(butonKutusu) butonKutusu.innerHTML = '';
+
+            // 🚀 KABLO TAMİRİ: Seçenekleri virgülle böl ve karıştır
+            let seceneklerDizisi = (soru.secenekler || "").split(',');
+            let karisik = [...seceneklerDizisi].sort(() => Math.random() - 0.5);
+
+            karisik.forEach(sec => {
+                let s = sec.trim();
+                if(s) {
+                    let guvenliS = s.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    if(butonKutusu) {
+                        butonKutusu.innerHTML += `<button class="btn-secenek" onclick="cevapKontrol(this, '${guvenliS}')">${s}</button>`;
+                    }
+                }
+            });
+        }
+
+        function cevapKontrol(buton, secim) {
+            if(kilitli) return;
+            kilitli = true;
+
+            yapayZekaSecimleri.push(secim);
+            let dogruCevap = (SORULAR[aktifIndex].dogru_cevap || "").trim();
+
+            if (secim === dogruCevap) {
+                buton.classList.add('dogru');
+                skor += 10; // Soru başı 10 puan
+                let skorAlan = document.getElementById('skor');
+                if(skorAlan) skorAlan.innerText = skor;
+            } else {
+                buton.classList.add('yanlis');
+                // Doğruyu bul ve yeşil yak
+                let butonlar = document.querySelectorAll('.btn-secenek');
+                butonlar.forEach(b => {
+                    if(b.innerText === dogruCevap) b.classList.add('dogru');
+                });
+            }
+
+            setTimeout(() => {
+                aktifIndex++;
+                soruyuGetir();
+            }, 1500);
+        }
+
+        function oyunuBitir() {
+            let oyunKutusu = document.querySelector('.oyun-kutusu');
+            
+            if(oyunKutusu) {
+                oyunKutusu.innerHTML = `
+                    <div style="text-align: center; padding: 20px; animation: 1s ease-out 0s 1 fadeIn;">
+                        <h2 style="color: #00f2fe; font-size: 36px; margin-bottom: 20px; font-weight: 900;">🎉 TEST BİTTİ! 🎉</h2>
+                        <div style="font-size: 60px; font-weight: 900; color: #facc15; margin-bottom: 20px; text-shadow: 0 0 20px rgba(250,204,21,0.5);">
+                            ${skor} PUAN
+                        </div>
+                        
+                        <div id="ai-analiz-konteynir" style="display:none; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-bottom: 30px; border: 1px solid rgba(0,242,254,0.3);">
+                            <h4 style="color: #00f2fe; margin-bottom: 10px; font-weight: 800;">🤖 AI Analizi</h4>
+                            <p id="ai-analiz-metni" style="color: #aaa; font-size: 14px; line-height: 1.6;"></p>
+                        </div>
+
+                        <button class="btn-secenek" style="background: #00f2fe; color: black; border:none; box-shadow: 0 0 15px rgba(0,242,254,0.5);" onclick="location.href='/'">🏠 ANA SAYFAYA DÖN</button>
+                    </div>
+                `;
+            }
+
+            // 🧠 AI ANALİZİ ÇAĞIR
+            fetch('/api/ai_analiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ secimler: yapayZekaSecimleri, oyun_basligi: "{{ oyun_basligi }}" })
+            })
+            .then(res => res.json())
+            .then(data => {
+                let aiKonteynir = document.getElementById('ai-analiz-konteynir');
+                if(aiKonteynir) aiKonteynir.style.display = 'block';
+                let aiMetni = document.getElementById('ai-analiz-metni');
+                if(aiMetni) aiMetni.innerText = data.analiz;
+            }).catch(err => console.log("AI API Hatası:", err));
+
+            // 🪙 KURŞUN GEÇİRMEZ COİN ALICI
+            fetch('/api/odul_al', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ miktar: 10 }) 
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    // Sayfanın üstünde coin bildirimi yeri varsa (profildeki gibi) oraya basıyoruz
+                    let bildirim = document.getElementById('coin-bildirim');
+                    if(bildirim) {
+                        let span = bildirim.querySelector('span');
+                        if(span) span.innerText = \`+\${data.kazanc} HE-Coin Kazandın!\`;
+                        bildirim.classList.add('coin-goster');
+                        setTimeout(() => bildirim.classList.remove('coin-goster'), 4000);
+                    } else {
+                        // Bildirim balonu yoksa tarayıcı uyarı versin ki oyuncu coini aldığını bilsin!
+                        console.log('+' + data.kazanc + ' HE-Coin Kasaya Eklendi!'); 
+                    }
+                }
+            }).catch(err => console.log("Coin API Hatası:", err));
+        }
     </script>
-    
-    <script src="{{ url_for('static', filename='js/script.js') }}?v=3"></script>
 </body>
 </html>

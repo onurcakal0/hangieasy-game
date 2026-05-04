@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veri & Gizlilik Politikası | Hangieasy</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: #0b0c10; color: #ffffff; 
+            overflow-x: hidden; position: relative; min-height: 100vh;
+        }
+        
+        /* 🌌 IŞILTILI RGB ARKAPLAN */
+        body::before, body::after {
+            content: ''; position: fixed; width: 50vw; height: 50vw;
+            border-radius: 50%; filter: blur(120px); z-index: -1;
+            animation: orbFloat 15s infinite alternate ease-in-out;
+        }
+        body::before { background: rgba(0, 242, 254, 0.15); top: -10%; left: -10%; }
+        body::after { background: rgba(139, 92, 246, 0.15); bottom: -10%; right: -10%; animation-delay: -5s; }
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 100px) scale(1.2); }
+        }
+
+        /* ---------------- NAVBAR ---------------- */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 5%; background: rgba(15, 15, 20, 0.8);
+            backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+        
+        .logo { 
+            font-size: 26px; font-weight: 800; 
+            background: linear-gradient(90deg, #f39c12, #ff007a); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none; letter-spacing: 1px;
+        }
+
+        .btn-geri {
+            background: rgba(0, 242, 254, 0.1); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3);
+            padding: 8px 20px; border-radius: 30px; text-decoration: none; font-weight: 800;
+            font-size: 13px; transition: 0.3s; text-transform: uppercase;
+        }
+        .btn-geri:hover { background: #00f2fe; color: #000; box-shadow: 0 0 15px rgba(0, 242, 254, 0.5); }
+
+        /* ---------------- HUKUKİ METİN KUTUSU ---------------- */
+        .icerik-kapsayici {
+            max-width: 900px; margin: 50px auto; padding: 0 20px;
+        }
+
+        .baslik-alani { text-align: center; margin-bottom: 40px; }
+        .baslik-alani h1 { font-size: 36px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; color: #fff;}
+        .baslik-alani p { color: #8B5CF6; font-size: 14px; font-weight: 600; letter-spacing: 1px;}
+
+        .cam-pano {
+            background: rgba(25, 25, 35, 0.6); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px;
+            padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            line-height: 1.8; color: #ccc; font-size: 15px;
+        }
+
+        .madde-baslik {
+            color: #8B5CF6; font-size: 18px; font-weight: 800; margin-top: 35px; margin-bottom: 15px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .madde-baslik::before {
+            content: '🔒'; font-size: 18px;
+        }
+
+        .cam-pano p { margin-bottom: 15px; }
+        .cam-pano ul { margin-left: 20px; margin-bottom: 15px; }
+        .cam-pano li { margin-bottom: 8px; }
+        
+        .guvenlik-kutu {
+            background: rgba(139, 92, 246, 0.1); border-left: 4px solid #8B5CF6;
+            padding: 15px 20px; border-radius: 0 10px 10px 0; margin: 25px 0;
+            color: #fff; font-weight: 600;
+        }
+
+        /* 🥷 STEALTH MODE UYUMU */
+        body.stealth-mode { background-color: #050505; }
+        body.stealth-mode::before, body.stealth-mode::after { display: none; }
+        body.stealth-mode .navbar { background: rgba(10, 10, 10, 0.9); border-bottom: 1px solid #222; }
+        body.stealth-mode .logo { background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; text-shadow: none; }
+        body.stealth-mode .cam-pano { background: #0a0a0c; border-color: #1a1a1a; box-shadow: none; color: #999;}
+        body.stealth-mode .baslik-alani p { color: #888; }
+        body.stealth-mode .madde-baslik { color: #fff; }
+        body.stealth-mode .guvenlik-kutu { background: #111; border-color: #8B5CF6; color: #ccc;}
+        body.stealth-mode .btn-geri { border-color: #333; color: #fff; background: transparent; }
+        body.stealth-mode .btn-geri:hover { background: #fff; color: #000; box-shadow: none;}
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="logo">HangiEasy</a>
+        <a href="/" class="btn-geri">🏠 Merkeze Dön</a>
+    </nav>
+
+    <div class="icerik-kapsayici">
+        <div class="baslik-alani">
+            <h1>Veri & Gizlilik Politikası</h1>
+            <p>SİBER GÜVENLİK VE ÇEREZ (COOKIE) PROTOKOLLERİ</p>
+        </div>
+
+        <div class="cam-pano">
+            <p>Sevgili Kullanıcı,</p>
+            <p>İnternetin vahşi batısında güvenli bir liman arıyorsan doğru yerdesin. <b>Hangieasy</b> ve çatı şirketimiz <b>Onur Çakal A.Ş.</b>, senin verilerini dev teknoloji şirketlerine peşkeş çekmek için değil, sana sadece en kusursuz ve kişiselleştirilmiş oyun deneyimini sunmak için kullanır.</p>
+
+            <div class="guvenlik-kutu">
+                Sunucularımızdaki her bir veri paketi, gelişmiş şifreleme algoritmalarıyla korunur. Biz senin dijital korumanız!
+            </div>
+
+            <h3 class="madde-baslik">1. Çerez (Cookie) Kullanımı ve İzleme</h3>
+            <p>Hangieasy, daha iyi bir hız ve deneyim sunmak için dijital çerezler kullanır:</p>
+            <ul>
+                <li><b>Zorunlu Çerezler:</b> Oturumunu açık tutmak ve hesabına başkasının sızmasını engellemek için mecburidir. ("Hayalet Avcısı" sistemimiz bu çerezlerle çalışır).</li>
+                <li><b>Performans Çerezleri:</b> Oyunların ne kadar hızlı yüklendiğini, hangi testlerin daha çok trend olduğunu analiz etmemizi sağlar.</li>
+                <li>Bu sitede seni internetin geri kalanında takip eden o sinir bozucu, "hedefli reklam" çerezlerine yer yoktur!</li>
+            </ul>
+
+            <h3 class="madde-baslik">2. Veri Saklama Süresi (Dijital Ömür)</h3>
+            <p>Verilerin, platformda aktif olduğun sürece güvende tutulur.</p>
+            <ul>
+                <li>Eğer hesabını silme kararı alırsan, veritabanımızdaki profilin, HE-Coin bakiyen ve çözdüğün test geçmişin 30 günlük "Soğuma Süresi"nin ardından kalıcı olarak <b>geri döndürülemez</b> şekilde silinir.</li>
+                <li>Ancak senin oluşturduğun ve Global Liderlik Tablosu'na giren efsanevi testler, adınla (veya anonim olarak) platformun vizyonuna katkı sağlaması için arşivde tutulabilir.</li>
+            </ul>
+
+            <h3 class="madde-baslik">3. 3. Parti Servisler ve Entegrasyonlar</h3>
+            <p>Hangieasy, sistemin yükünü hafifletmek için güvenilir altyapı sağlayıcıları (örn. Supabase, AWS veya Vercel) kullanabilir. Bu şirketler, verilerinize erişme veya kendi amaçları için kullanma hakkına kesinlikle sahip değildir. Aradaki köprü, uçtan uca şifrelidir.</p>
+
+            <h3 class="madde-baslik">4. Bize Ulaşın</h3>
+            <p>Siber güvenlikle ilgili bir açık bulduğunu düşünüyorsan veya verilerinle ilgili bir sorunun varsa, direkt olarak geliştirici ekibimizle ve CTO'muzla iletişime geçebilirsin. Güvenlik raporlamaları, sistemimiz tarafından öncelikli olarak değerlendirilir.</p>
+
+            <p style="margin-top: 30px; text-align: center; color: #888; font-size: 13px;">
+                <i>Güvenlik Mührü Tarihi: Tesisin Kurulduğu Tarih<br>
+                Hangieasy Siber Güvenlik Departmanı</i>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        if(localStorage.getItem('stealthMode') === 'aktif') {
+            document.body.classList.add('stealth-mode');
+        }
+    </script>
+
+</body>
+</html>

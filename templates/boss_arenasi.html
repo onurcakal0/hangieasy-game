@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haftalık Boss Arenası | Hangieasy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #050000; color: #ffffff; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; }
+        
+        /* Cehennem Ateşi Arkaplanı */
+        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at top center, #5a0000 0%, #050000 80%); z-index: -1; animation: ates 5s infinite alternate; }
+        @keyframes ates { 0% { opacity: 0.8; } 100% { opacity: 1; } }
+
+        .navbar { width: 100%; display: flex; justify-content: space-between; padding: 20px 5%; background: rgba(20, 0, 0, 0.8); border-bottom: 1px solid rgba(255, 0, 0, 0.2); }
+        .logo { font-size: 28px; font-weight: 900; color: #ff3333; text-decoration: none; text-shadow: 0 0 15px rgba(255,0,0,0.5); }
+
+        .arena-kutu { text-align: center; margin-top: 50px; max-width: 800px; padding: 40px; background: rgba(10, 0, 0, 0.9); border: 2px solid #ff0000; border-radius: 20px; box-shadow: 0 0 50px rgba(255,0,0,0.3); position: relative; overflow: hidden; }
+        
+        .boss-ikon { font-size: 100px; line-height: 1; margin-bottom: 20px; filter: drop-shadow(0 0 20px #ff0000); animation: salla 2s infinite; }
+        @keyframes salla { 0% { transform: rotate(-5deg) scale(1); } 50% { transform: rotate(5deg) scale(1.1); } 100% { transform: rotate(-5deg) scale(1); } }
+
+        .baslik { font-size: 48px; font-weight: 900; color: #fff; text-transform: uppercase; margin-bottom: 10px; text-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+        .alt-baslik { font-size: 18px; color: #ff6666; margin-bottom: 30px; font-weight: 600; }
+
+        .havuz-kutu { background: linear-gradient(45deg, #f39c12, #e67e22); padding: 20px; border-radius: 15px; display: inline-block; margin-bottom: 40px; border: 2px solid #fff; box-shadow: 0 10px 30px rgba(243,156,18,0.5); }
+        .havuz-baslik { font-size: 14px; color: #000; font-weight: 800; text-transform: uppercase; }
+        .havuz-odul { font-size: 40px; font-weight: 900; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+
+        .sayac { font-size: 36px; font-weight: 900; color: #fff; margin-bottom: 30px; letter-spacing: 5px; background: rgba(0,0,0,0.5); padding: 10px 30px; border-radius: 10px; border: 1px dashed #ff0000; display: inline-block;}
+
+        .giris-btn { background: #ff0000; color: #fff; padding: 20px 40px; font-size: 24px; font-weight: 900; border: none; border-radius: 15px; cursor: pointer; text-transform: uppercase; transition: 0.3s; box-shadow: 0 10px 30px rgba(255,0,0,0.5); display: flex; align-items: center; gap: 10px; margin: 0 auto; }
+        .giris-btn:hover { background: #cc0000; transform: scale(1.05); box-shadow: 0 10px 50px rgba(255,0,0,0.8); }
+        
+        .ucret { font-size: 14px; color: #aaa; margin-top: 15px; }
+
+        /* Bildirim */
+        #toast { position: fixed; bottom: 30px; background: #2ecc71; color: #000; padding: 15px 30px; border-radius: 10px; font-weight: 900; transform: translateY(150px); transition: 0.4s; }
+        .goster { transform: translateY(0) !important; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="logo">HangiEasy</a>
+        <div style="background: rgba(0,0,0,0.5); border: 1px solid #ff0000; padding: 8px 20px; border-radius: 20px; color: #ff3333; font-weight: 900;">
+            Bakiye: <span id="bakiye">{{ bakiye }}</span> 🪙
+        </div>
+    </nav>
+
+    <div class="arena-kutu">
+        <div class="boss-ikon">👹</div>
+        <div class="baslik">Haftalık Boss Uyanıyor</div>
+        <div class="alt-baslik">50 Zorlu Soru. 1 Can. Kazanan Hepsini Alır.</div>
+
+        <div class="havuz-kutu">
+            <div class="havuz-baslik">💰 BİRİKEN BÜYÜK ÖDÜL HAVUZU</div>
+            <div class="havuz-odul">50.000 HE-Coin</div>
+        </div>
+
+        <div>
+            <div style="color: #ff3333; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;">Kapıların Açılmasına:</div>
+            <div class="sayac" id="gerisayim">48:12:05</div>
+        </div>
+
+        <button class="giris-btn" onclick="biletiAl()" id="bilet-btn">
+            ⚔️ ARENAYA GİRİŞ BİLETİ AL
+        </button>
+        <div class="ucret">Giriş Ücreti: 250 HE-Coin (Bakiyenden düşülür)</div>
+    </div>
+
+    <div id="toast">✅ Bilet Alındı! Kan banyosuna hazır ol.</div>
+
+    <script>
+        function biletiAl() {
+            let btn = document.getElementById('bilet-btn');
+            btn.innerText = "İşleniyor...";
+            btn.disabled = true;
+
+            fetch('/api/boss_giris', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    document.getElementById('bakiye').innerText = data.yeni_bakiye;
+                    btn.innerHTML = "✅ BİLET ONAYLANDI";
+                    btn.style.background = "#2ecc71";
+                    btn.style.boxShadow = "0 10px 30px rgba(46,204,113,0.5)";
+                    
+                    let toast = document.getElementById('toast');
+                    toast.classList.add('goster');
+                    setTimeout(() => toast.classList.remove('goster'), 3000);
+                } else {
+                    alert(data.mesaj); // Parası yetmezse uyarır!
+                    btn.innerHTML = "⚔️ ARENAYA GİRİŞ BİLETİ AL";
+                    btn.disabled = false;
+                }
+            });
+        }
+
+        // Ufak bir görsel geri sayım hilesi
+        setInterval(() => {
+            let s = document.getElementById('gerisayim');
+            let parts = s.innerText.split(':');
+            let h = parseInt(parts[0]), m = parseInt(parts[1]), sec = parseInt(parts[2]);
+            sec--;
+            if(sec < 0) { sec = 59; m--; }
+            if(m < 0) { m = 59; h--; }
+            s.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
+        }, 1000);
+    </script>
+</body>
+</html>

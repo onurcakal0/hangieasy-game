@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Mağaza | Onur Çakal A.Ş.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #080A10; color: #fff; min-height: 100vh; overflow-x: hidden; }
+        
+        /* Üst Menü */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 30px 5%; background: rgba(8, 10, 16, 0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .logo { font-size: 24px; font-weight: 900; letter-spacing: 1px; color: #fff; }
+        .logo span { color: #8B5CF6; }
+        .cuzdan { background: rgba(250, 204, 21, 0.1); border: 1px solid rgba(250, 204, 21, 0.3); padding: 10px 20px; border-radius: 50px; font-weight: 700; color: #facc15; display: flex; align-items: center; gap: 8px; }
+        
+        /* Konteyner ve Başlıklar */
+        .container { max-width: 1200px; margin: 0 auto; padding: 50px 20px; }
+        .kategori-baslik { font-size: 28px; font-weight: 900; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 15px; }
+        .kategori-baslik::after { content: ""; height: 2px; flex: 1; background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent); }
+
+        /* Kart Grid Sistemi */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-bottom: 60px; }
+        
+        /* Standart Paket Kartı */
+        .kart { background: #131722; border-radius: 20px; padding: 30px 20px; text-align: center; position: relative; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }
+        .kart:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.2); }
+        
+        /* Özel Kart Stilleri */
+        .kart.populer { border-color: #8B5CF6; background: linear-gradient(180deg, rgba(139, 92, 246, 0.05) 0%, #131722 100%); }
+        .kart.populer:hover { box-shadow: 0 15px 40px rgba(139, 92, 246, 0.2); }
+        .kart.vip { border-color: #facc15; background: linear-gradient(180deg, rgba(250, 204, 21, 0.05) 0%, #131722 100%); }
+        .kart.vip:hover { box-shadow: 0 15px 40px rgba(250, 204, 21, 0.2); }
+        
+        /* Bilet Kart Stili */
+        .kart.bilet { background: repeating-linear-gradient(45deg, #131722, #131722 10px, #1a1f2e 10px, #1a1f2e 20px); border: 2px dashed #3B82F6; border-radius: 15px; }
+        .kart.bilet:hover { box-shadow: 0 15px 40px rgba(59, 130, 246, 0.2); }
+
+        /* Rozetler */
+        .rozet { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); padding: 5px 15px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+        .rozet.purple { background: #8B5CF6; color: white; box-shadow: 0 0 15px rgba(139, 92, 246, 0.5); }
+        .rozet.gold { background: #facc15; color: black; box-shadow: 0 0 15px rgba(250, 204, 21, 0.5); }
+        .rozet.blue { background: #3B82F6; color: white; }
+
+        /* Yazı ve Butonlar */
+        .isim { color: #94a3b8; font-size: 14px; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .miktar { font-size: 38px; font-weight: 900; color: #fff; margin-bottom: 5px; }
+        .fiyat { color: #64748b; font-size: 16px; margin-bottom: 25px; font-weight: 500; }
+        
+        .btn { display: block; width: 100%; padding: 14px 0; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 15px; transition: 0.3s; }
+        .btn.standart { background: #1e293b; color: #fff; }
+        .btn.standart:hover { background: #334155; }
+        .btn.purple { background: #8B5CF6; color: #fff; }
+        .btn.purple:hover { background: #7c3aed; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
+        .btn.gold { background: #facc15; color: #000; }
+        .btn.gold:hover { background: #eab308; box-shadow: 0 0 20px rgba(250, 204, 21, 0.4); }
+        .btn.blue { background: #3B82F6; color: #fff; }
+        .btn.blue:hover { background: #2563eb; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+
+        .geri-btn { color: #64748b; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; margin-top: 20px; transition: 0.2s; }
+        .geri-btn:hover { color: #fff; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="logo">Hangieasy<span>.</span> Store</div>
+        <div class="cuzdan">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 18V6"></path></svg>
+            {{ bakiye }} HE-Coin
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <!-- BİLETLER BÖLÜMÜ -->
+        <div class="kategori-baslik">🎫 Turnuva Biletleri</div>
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+            
+            <div class="kart bilet">
+                <div class="rozet blue">Tek Giriş</div>
+                <div class="isim">Boss Arenası Bileti</div>
+                <div class="miktar">250 🪙</div>
+                <div class="fiyat">25.00 TL</div>
+                <a href="/odeme-baslat/boss_bilet" class="btn blue">Bileti Al</a>
+            </div>
+
+            <div class="kart bilet" style="border-color: #8B5CF6;">
+                <div class="rozet purple">Avantajlı</div>
+                <div class="isim">Sezonluk Pass (5 Giriş)</div>
+                <div class="miktar">1.250 🪙</div>
+                <div class="fiyat">100.00 TL</div>
+                <a href="/odeme-baslat/turnuva_pass" class="btn purple">Pass Satın Al</a>
+            </div>
+
+        </div>
+
+        <!-- COIN PAKETLERİ BÖLÜMÜ -->
+        <div class="kategori-baslik">💎 HE-Coin Paketleri</div>
+        <div class="grid">
+            
+            <div class="kart">
+                <div class="isim">Stajyer</div>
+                <div class="miktar">100 🪙</div>
+                <div class="fiyat">15.00 TL</div>
+                <a href="/odeme-baslat/stajyer" class="btn standart">Satın Al</a>
+            </div>
+
+            <div class="kart">
+                <div class="isim">Başlangıç</div>
+                <div class="miktar">500 🪙</div>
+                <div class="fiyat">50.00 TL</div>
+                <a href="/odeme-baslat/baslangic" class="btn standart">Satın Al</a>
+            </div>
+
+            <div class="kart populer">
+                <div class="rozet purple">En Çok Satan</div>
+                <div class="isim">Profesyonel</div>
+                <div class="miktar" style="color: #8B5CF6;">2.500 🪙</div>
+                <div class="fiyat">150.00 TL</div>
+                <a href="/odeme-baslat/pro" class="btn purple">Satın Al</a>
+            </div>
+
+            <div class="kart">
+                <div class="isim">Mega Paket</div>
+                <div class="miktar">5.000 🪙</div>
+                <div class="fiyat">250.00 TL</div>
+                <a href="/odeme-baslat/mega" class="btn standart">Satın Al</a>
+            </div>
+
+            <div class="kart vip">
+                <div class="rozet gold">Sınırsız Güç</div>
+                <div class="isim">CEO Özel</div>
+                <div class="miktar" style="color: #facc15;">10.000 🪙</div>
+                <div class="fiyat">450.00 TL</div>
+                <a href="/odeme-baslat/ceo" class="btn gold">Hemen Yükle</a>
+            </div>
+
+        </div>
+        <!-- KOZMETİK BÖLÜMÜ -->
+        <div class="kategori-baslik" style="margin-top: 50px;">🎨 Profil Kozmetikleri</div>
+        <div class="grid">
+            
+            <div class="kart" style="border-color: #00f2fe; background: rgba(0, 242, 254, 0.05);">
+                <div class="isim" style="color: #00f2fe;">Neon Siber Çerçeve</div>
+                <div class="miktar">500 🪙</div>
+                <p style="font-size: 11px; color: #94a3b8; margin-bottom: 20px;">Siberpunk rüzgarını profilinde estir.</p>
+                <button onclick="cerceveAl('neon_siber')" class="btn" style="background: rgba(0, 242, 254, 0.2); color: #00f2fe; border: 1px solid #00f2fe; width: 100%;">Satın Al</button>
+            </div>
+
+            <div class="kart" style="border-color: #ff0055; background: rgba(255, 0, 85, 0.05);">
+                <div class="rozet purple" style="background: #ff0055;">Popüler</div>
+                <div class="isim" style="color: #ff0055;">Kızıl Ejder Çerçeve</div>
+                <div class="miktar">1.000 🪙</div>
+                <p style="font-size: 11px; color: #94a3b8; margin-bottom: 20px;">Rakiplerine korku salan agresif aura.</p>
+                <button onclick="cerceveAl('kizil_ejder')" class="btn" style="background: rgba(255, 0, 85, 0.2); color: #ff0055; border: 1px solid #ff0055; width: 100%;">Satın Al</button>
+            </div>
+
+            <div class="kart" style="border-color: #facc15; background: rgba(250, 204, 21, 0.05);">
+                <div class="rozet gold">VIP PRESTİJ</div>
+                <div class="isim" style="color: #facc15;">Altın CEO Çerçeve</div>
+                <div class="miktar">2.500 🪙</div>
+                <p style="font-size: 11px; color: #94a3b8; margin-bottom: 20px;">Zenginliğin ve gücün mutlak simgesi.</p>
+                <button onclick="cerceveAl('altin_ceo')" class="btn gold" style="width: 100%;">Hemen Al</button>
+            </div>
+
+        </div>
+
+        <!-- SAYFANIN EN ALTINA KOYALANACAK JAVASCRIPT -->
+        <script>
+            function cerceveAl(cerceve_id) {
+                if(confirm("Bu çerçeveyi almak istediğine emin misin?")) {
+                    fetch('/api/cerceve_al/' + cerceve_id, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.status === 'success') {
+                            alert("Kozmetik başarıyla satın alındı! Profilini kontrol et.");
+                            location.reload();
+                        } else if(data.status === 'yetersiz') {
+                            alert("Bakiye Yetersiz! Önce HE-Coin satın almalısın.");
+                        } else {
+                            alert("Bir hata oluştu patron!");
+                        }
+                    });
+                }
+            }
+        </script>
+
+        <a href="/" class="geri-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Ana Sayfaya Dön
+        </a>
+    </div>
+
+</body>
+</html>
