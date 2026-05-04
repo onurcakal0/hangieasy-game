@@ -4,71 +4,265 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HangiEasy | Efsane Başlıyor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            /* LOGO RENKLERİNİ BURADAN DEĞİŞTİREBİLİRSİN PATRON */
+            --primary: #00f0ff; 
+            --secondary: #7000ff;
+            --bg-color: #07090f;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            background-color: #0d1117;
+            background-color: var(--bg-color);
             color: #ffffff;
-            font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Arka Plan Efektleri */
+        .glow-circle {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            opacity: 0.15;
+            top: -200px;
+            left: -200px;
+            z-index: -1;
+            filter: blur(80px);
+        }
+
+        .glow-circle-2 {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            opacity: 0.15;
+            bottom: -100px;
+            right: -100px;
+            z-index: -1;
+            filter: blur(80px);
+        }
+
+        /* İlk Ekran - Hero Section */
+        section.hero {
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
+            text-align: center;
+            position: relative;
         }
-        h1 {
-            font-size: 4rem;
+
+        h1.brand {
+            font-size: 5rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
-            letter-spacing: 3px;
             text-transform: uppercase;
         }
-        p {
-            font-size: 1.3rem;
+
+        .motto {
+            font-size: 1.5rem;
             color: #8b949e;
-            margin-bottom: 50px;
+            font-weight: 300;
+            margin-bottom: 60px;
+            letter-spacing: 1px;
         }
-        .countdown {
+
+        .countdown-container {
             display: flex;
-            gap: 20px;
+            gap: 25px;
+            z-index: 10;
         }
+
         .time-box {
-            background: #161b22;
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid #30363d;
-            text-align: center;
-            min-width: 90px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            padding: 30px 20px;
+            border-radius: 20px;
+            min-width: 120px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: transform 0.3s ease;
         }
+
+        .time-box:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
         .time-box span {
             display: block;
-            font-size: 3rem;
-            font-weight: bold;
-            color: #58a6ff;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
         }
+
         .time-box .label {
             font-size: 1rem;
             color: #8b949e;
             text-transform: uppercase;
-            margin-top: 8px;
+            margin-top: 10px;
+            letter-spacing: 2px;
+            font-weight: 400;
+        }
+
+        /* Kaydır İkonu */
+        .scroll-down {
+            position: absolute;
+            bottom: 40px;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+            text-decoration: none;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .scroll-down svg {
+            width: 24px;
+            height: 24px;
+            margin-top: 10px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-7px); }
+        }
+
+        /* İkinci Ekran - Biz Kimiz */
+        section.about {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .about-content {
+            max-width: 800px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            padding: 60px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .about-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #a3a3a3;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .founder-link {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
             letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(112, 0, 255, 0.4);
+        }
+
+        .founder-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(0, 240, 255, 0.6);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1.brand { font-size: 3rem; }
+            .countdown-container { flex-wrap: wrap; justify-content: center; gap: 15px; }
+            .time-box { min-width: 100px; padding: 20px 15px; }
+            .time-box span { font-size: 2.5rem; }
+            .about-content { padding: 40px 20px; }
+            h2 { font-size: 2.2rem; }
         }
     </style>
 </head>
 <body>
-    <h1>HANGIEASY</h1>
-    <p>Büyük lansmana hazırlanıyoruz. Beklemede kalın...</p>
-    
-    <div class="countdown">
-        <div class="time-box"><span id="days">00</span><div class="label">Gün</div></div>
-        <div class="time-box"><span id="hours">00</span><div class="label">Saat</div></div>
-        <div class="time-box"><span id="minutes">00</span><div class="label">Dakika</div></div>
-        <div class="time-box"><span id="seconds">00</span><div class="label">Saniye</div></div>
-    </div>
+
+    <div class="glow-circle"></div>
+    <div class="glow-circle-2"></div>
+
+    <section class="hero">
+        <h1 class="brand">HANGIEASY</h1>
+        <p class="motto">Oyunun Kurallarını Yeniden Yazıyoruz.</p>
+        
+        <div class="countdown-container">
+            <div class="time-box"><span id="days">00</span><div class="label">Gün</div></div>
+            <div class="time-box"><span id="hours">00</span><div class="label">Saat</div></div>
+            <div class="time-box"><span id="minutes">00</span><div class="label">Dakika</div></div>
+            <div class="time-box"><span id="seconds">00</span><div class="label">Saniye</div></div>
+        </div>
+
+        <a href="#about" class="scroll-down">
+            BİZ KİMİZ?
+            <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </a>
+    </section>
+
+    <section id="about" class="about">
+        <div class="about-content">
+            <h2>Biz Kimiz?</h2>
+            <p class="about-text">
+                Sınırları reddeden, sıradanlığı bozan ve dijital dünyada yeni bir standart belirleyen bir ekibiz. 
+                HangiEasy sadece bir platform değil; teknolojiyle harmanlanmış bir vizyonun, yeni nesil bir deneyimin başlangıç noktasıdır. 
+                Geleceği inşa etmeye hazırlanıyoruz. Beklentilerin ötesine geçmeye hazır olun.
+            </p>
+            <a href="https://onurcakal.com" target="_blank" class="founder-link">
+                Kurucu & CTO: Mustafa Onur Çakal
+            </a>
+        </div>
+    </section>
 
     <script>
-        // Lansman tarihini buradan değiştirebilirsin
+        // Lansman Tarihi
         const countDownDate = new Date("May 10, 2026 20:00:00").getTime();
 
         const x = setInterval(function() {
@@ -87,7 +281,7 @@
 
             if (distance < 0) {
                 clearInterval(x);
-                document.querySelector(".countdown").innerHTML = "Vakit Geldi! Sistem Aktif.";
+                document.querySelector(".countdown-container").innerHTML = "<h2>Vakit Geldi! Sistem Aktif.</h2>";
             }
         }, 1000);
     </script>
