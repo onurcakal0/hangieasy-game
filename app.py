@@ -372,7 +372,7 @@ def coming_soon():
 @app.route('/gizli-test-odasi')
 def index():
     # Burada senin eski ana sayfanı çalıştıran kodlar duracak
-    return render_template('index.html')
+    return render_template('dashboard.html')
 @app.route('/test-olustur', methods=['GET', 'POST'])
 def test_olustur():
     kadi = session.get('kullanici_adi')
