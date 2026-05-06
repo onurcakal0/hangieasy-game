@@ -123,6 +123,31 @@ class Istatistik(db.Model):
 with app.app_context():
     db.create_all()
 
+    # --- GÜVENLİ MIGRATION: Eksik kolonları PostgreSQL'e ekle ---
+    # db.create_all() mevcut tablolara yeni kolon EKLEMEZ.
+    # Bu blok her deploy'da çalışır, IF NOT EXISTS sayesinde güvenlidir.
+    from sqlalchemy import text
+    migrasyonlar = [
+        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS boss_bileti_alindi BOOLEAN DEFAULT FALSE",
+        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS onayli_mi BOOLEAN DEFAULT FALSE",
+        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS profil_resmi VARCHAR(300)",
+        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS rutbe VARCHAR(50) DEFAULT 'Stajyer'",
+        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS referans_kodu VARCHAR(10)",
+        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS cozulen_test_sayisi INTEGER DEFAULT 0",
+        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS profil_cercevesi VARCHAR(50) DEFAULT 'standart'",
+        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS son_gorev_tarihi VARCHAR(20) DEFAULT ''",
+        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS gunluk_test_sayaci INTEGER DEFAULT 0",
+        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS gunluk_odul_alindi BOOLEAN DEFAULT FALSE",
+    ]
+    with db.engine.connect() as conn:
+        for sql in migrasyonlar:
+            try:
+                conn.execute(text(sql))
+            except Exception as mig_err:
+                print(f"Migration atlandı (zaten var): {mig_err}")
+        conn.commit()
+    print("✅ Migration tamamlandı.")
+
 # --- GLOBAL VERİLER ---
 SOZLUK = {
     'tr': {
