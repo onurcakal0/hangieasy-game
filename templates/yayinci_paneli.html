@@ -8,148 +8,356 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: #050505; color: #ffffff; min-height: 100vh; padding: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
-        
-        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at top center, #086972 0%, #050505 60%); z-index: -1; opacity: 0.5;}
+        body {
+            background-color: #050505; color: #ffffff; min-height: 100vh;
+            padding: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden;
+        }
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at top center, #086972 0%, #050505 60%);
+            z-index: -1; opacity: 0.5;
+        }
 
-        /* ÜST PANEL: YAYIN KODU */
-        .header-kutu { text-align: center; margin-bottom: 30px; background: rgba(20,20,30,0.8); padding: 20px 40px; border-radius: 20px; border: 2px solid #17b978; box-shadow: 0 0 30px rgba(23,185,120,0.3); }
-        .yayin-kodu { font-size: 60px; font-weight: 900; letter-spacing: 10px; color: #17b978; text-shadow: 0 0 20px rgba(23,185,120,0.8); }
+        /* ── ÜST PANEL ── */
+        .header-kutu {
+            text-align: center; margin-bottom: 30px;
+            background: rgba(20,20,30,0.8); padding: 20px 40px;
+            border-radius: 20px; border: 2px solid #17b978;
+            box-shadow: 0 0 30px rgba(23,185,120,0.3); width: 100%; max-width: 1200px;
+        }
+        .yayin-kodu {
+            font-size: 60px; font-weight: 900; letter-spacing: 10px;
+            color: #17b978; text-shadow: 0 0 20px rgba(23,185,120,0.8);
+        }
         .yayin-uyari { font-size: 16px; color: #aaa; font-weight: 600; text-transform: uppercase; }
+        .kisi-sayisi { margin-top: 10px; color: #00f2fe; font-weight: 800; font-size: 18px; }
 
-        /* ANA IZGARA: KUMANDA VE LİDERLİK TABLOSU */
-        .kontrol-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; width: 100%; max-width: 1200px; }
+        /* ── ANA IZGARA ── */
+        .kontrol-grid {
+            display: grid; grid-template-columns: 380px 1fr; gap: 25px;
+            width: 100%; max-width: 1200px;
+        }
 
-        /* KUMANDA PANELİ */
-        .kumanda-paneli { background: rgba(25,25,35,0.9); padding: 30px; border-radius: 20px; border: 1px solid #333; text-align: center; }
-        .oyun-baslik { font-size: 24px; color: #00f2fe; margin-bottom: 20px; text-transform: uppercase; }
-        
-        .aksiyon-btn { width: 100%; padding: 20px; font-size: 20px; font-weight: 900; color: #fff; border: none; border-radius: 15px; cursor: pointer; text-transform: uppercase; transition: 0.3s; margin-bottom: 15px; }
-        .btn-baslat { background: linear-gradient(45deg, #17b978, #086972); box-shadow: 0 10px 20px rgba(23,185,120,0.4); }
-        .btn-baslat:hover { transform: scale(1.02); box-shadow: 0 10px 40px rgba(23,185,120,0.6); }
-        
-        .btn-ileri { background: linear-gradient(45deg, #f39c12, #e67e22); box-shadow: 0 10px 20px rgba(243,156,18,0.4); display: none; }
-        .btn-ileri:hover { transform: scale(1.02); box-shadow: 0 10px 40px rgba(243,156,18,0.6); }
+        /* ── KUMANDA PANELİ ── */
+        .kumanda-paneli {
+            background: rgba(25,25,35,0.9); padding: 30px;
+            border-radius: 20px; border: 1px solid #333; text-align: center;
+        }
+        .oyun-baslik { font-size: 22px; color: #00f2fe; margin-bottom: 8px; text-transform: uppercase; font-weight: 800; }
+        .oyun-mod-rozet {
+            display: inline-block; padding: 5px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 800; text-transform: uppercase; margin-bottom: 20px;
+            background: rgba(23,185,120,0.2); color: #17b978; border: 1px solid #17b978;
+        }
+        .soru-onizleme {
+            background: rgba(0,0,0,0.5); border-radius: 12px; padding: 15px;
+            margin-bottom: 20px; min-height: 60px; display: none;
+        }
+        .soru-onizleme-baslik { color: #aaa; font-size: 11px; text-transform: uppercase; margin-bottom: 8px; }
+        .soru-onizleme-icerik { color: #fff; font-size: 14px; font-weight: 600; }
 
-        .btn-bitir { background: transparent; border: 2px solid #ff0055; color: #ff0055; display: none; }
-        .btn-bitir:hover { background: #ff0055; color: #fff; }
+        .aksiyon-btn {
+            width: 100%; padding: 18px; font-size: 18px; font-weight: 900;
+            color: #fff; border: none; border-radius: 15px; cursor: pointer;
+            text-transform: uppercase; transition: 0.3s; margin-bottom: 12px;
+        }
+        .btn-baslat { background: linear-gradient(45deg,#17b978,#086972); box-shadow: 0 8px 20px rgba(23,185,120,0.4); }
+        .btn-baslat:hover { transform: scale(1.02); box-shadow: 0 8px 40px rgba(23,185,120,0.6); }
+        .btn-ileri  { background: linear-gradient(45deg,#f39c12,#e67e22); box-shadow: 0 8px 20px rgba(243,156,18,0.4); display: none; }
+        .btn-ileri:hover  { transform: scale(1.02); box-shadow: 0 8px 40px rgba(243,156,18,0.6); }
+        .btn-bitir  { background: transparent; border: 2px solid #ff0055; color: #ff0055; display: none; }
+        .btn-bitir:hover  { background: #ff0055; color: #fff; }
 
-        /* LİDERLİK TABLOSU (LEADERBOARD) */
-        .liderlik-tablosu { background: rgba(25,25,35,0.9); padding: 30px; border-radius: 20px; border: 1px solid #333; height: 500px; overflow-y: auto; }
-        .tablo-baslik { font-size: 20px; font-weight: 800; color: #f39c12; margin-bottom: 20px; display: flex; justify-content: space-between; border-bottom: 1px solid #444; padding-bottom: 10px;}
-        
-        .izleyici-kart { display: flex; justify-content: space-between; background: #111; padding: 15px 20px; margin-bottom: 10px; border-radius: 10px; font-weight: 800; border-left: 4px solid #333; transition: 0.3s; }
+        .ilerleme-bar-wrap {
+            margin-bottom: 15px; display: none;
+        }
+        .ilerleme-bar-metin { font-size: 12px; color: #aaa; margin-bottom: 6px; font-weight: 600; }
+        .ilerleme-bar {
+            width: 100%; height: 6px; background: #333; border-radius: 3px; overflow: hidden;
+        }
+        .ilerleme-bar-ic {
+            height: 100%; background: linear-gradient(90deg, #17b978, #00f2fe);
+            border-radius: 3px; transition: width 0.4s ease;
+        }
+
+        /* ── SAĞ PANEL (İZLEYİCİ LİDERLİK / OY TABLOSU) ── */
+        .sag-panel {
+            display: grid; grid-template-rows: auto 1fr; gap: 20px;
+        }
+
+        /* KAPIŞMA OY TABLOSU (omu_bumu / turnuva) */
+        .oy-tablosu {
+            background: rgba(25,25,35,0.9); padding: 25px;
+            border-radius: 20px; border: 1px solid #333;
+        }
+        .tablo-baslik {
+            font-size: 18px; font-weight: 800; color: #f39c12;
+            margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px;
+            display: flex; justify-content: space-between;
+        }
+        .kapişma-toplam {
+            display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px;
+            align-items: center; text-align: center;
+        }
+        .kapısma-secenek {
+            background: #111; border-radius: 12px; padding: 15px 10px;
+            border: 2px solid #333; transition: 0.3s;
+        }
+        .kapısma-secenek.lider { border-color: #17b978; background: rgba(23,185,120,0.1); }
+        .kapısma-secenek-isim { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+        .kapısma-secenek-oy { font-size: 32px; font-weight: 900; color: #00f2fe; }
+        .kapısma-secenek-oran { font-size: 12px; color: #aaa; margin-top: 4px; }
+        .kapisma-vs-badge {
+            font-size: 20px; font-weight: 900; color: #ff0055;
+            width: 45px; height: 45px; border-radius: 50%;
+            background: rgba(255,0,85,0.1); border: 2px solid #ff0055;
+            display: flex; justify-content: center; align-items: center; margin: 0 auto;
+        }
+
+        /* LİDERLİK TABLOSU */
+        .liderlik-tablosu {
+            background: rgba(25,25,35,0.9); padding: 25px;
+            border-radius: 20px; border: 1px solid #333; overflow-y: auto; max-height: 450px;
+        }
+        .izleyici-kart {
+            display: flex; justify-content: space-between;
+            background: #111; padding: 12px 18px; margin-bottom: 8px;
+            border-radius: 10px; font-weight: 800; border-left: 4px solid #333; transition: 0.3s;
+        }
         .izleyici-kart.top1 { border-left-color: #f1c40f; background: rgba(241,196,15,0.1); }
         .izleyici-kart.top2 { border-left-color: #bdc3c7; background: rgba(189,195,199,0.1); }
         .izleyici-kart.top3 { border-left-color: #cd7f32; background: rgba(205,127,50,0.1); }
-        
         .izleyici-isim { color: #fff; }
         .izleyici-puan { color: #00f2fe; }
 
-        /* KANALLAR İÇİN GÜZEL SCROLLBAR */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #111; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111; border-radius: 6px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 6px; }
         ::-webkit-scrollbar-thumb:hover { background: #00f2fe; }
+
+        @media (max-width: 900px) {
+            .kontrol-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- ÜST PANEL -->
     <div class="header-kutu">
         <div class="yayin-uyari">🔴 İzleyicilerin Katılması İçin Kodu Ekrana Yansıt</div>
-        <div class="yayin-kodu" id="yayin-kodu-metni">{{ yayin_kodu }}</div>
-        <div style="margin-top: 10px; color: #00f2fe; font-weight: 800;">Toplam Katılımcı: <span id="kisi-sayisi">0</span></div>
+        <div class="yayin-kodu">{{ yayin_kodu }}</div>
+        <div class="kisi-sayisi">Toplam Katılımcı: <span id="kisi-sayisi">0</span></div>
     </div>
 
     <div class="kontrol-grid">
+
         <!-- SOL: KUMANDA PANELİ -->
         <div class="kumanda-paneli">
-            <h2 class="oyun-baslik">🎮 {{ oyun.baslik }}</h2>
-            <p style="color: #aaa; margin-bottom: 30px; font-size: 14px;">İzleyiciler toplandığında şovu başlat. Kontrol tamamen sende patron!</p>
+            <div class="oyun-baslik">🎮 {{ oyun.baslik }}</div>
+            <div class="oyun-mod-rozet">{{ oyun.oyun_modu }}</div>
 
+            <!-- Soru önizlemesi (baslat sonrası görünür) -->
+            <div class="soru-onizleme" id="soru-onizleme">
+                <div class="soru-onizleme-baslik">Aktif Soru</div>
+                <div class="soru-onizleme-icerik" id="soru-onizleme-icerik">—</div>
+            </div>
+
+            <!-- İlerleme barı -->
+            <div class="ilerleme-bar-wrap" id="ilerleme-wrap">
+                <div class="ilerleme-bar-metin" id="ilerleme-metin">Soru 1 / ?</div>
+                <div class="ilerleme-bar">
+                    <div class="ilerleme-bar-ic" id="ilerleme-ic" style="width:0%"></div>
+                </div>
+            </div>
+
+            <p style="color:#aaa; margin-bottom:20px; font-size:13px;">
+                İzleyiciler toplandığında şovu başlat. Kontrol tamamen sende patron!
+            </p>
             <button class="aksiyon-btn btn-baslat" id="btn-baslat" onclick="yayiniBaslat()">🚀 Şovu Başlat</button>
-            <button class="aksiyon-btn btn-ileri" id="btn-ileri" onclick="siradakiSoru()">⏭️ Sıradaki Soruya Geç</button>
-            <button class="aksiyon-btn btn-bitir" id="btn-bitir" onclick="yayiniBitir()">🛑 Yayını Sonlandır</button>
+            <button class="aksiyon-btn btn-ileri"  id="btn-ileri"  onclick="siradakiSoru()">⏭️ Sıradaki Soruya Geç</button>
+            <button class="aksiyon-btn btn-bitir"  id="btn-bitir"  onclick="yayiniBitir()">🛑 Yayını Sonlandır</button>
         </div>
 
-        <!-- SAĞ: CANLI LİDERLİK TABLOSU -->
-        <div class="liderlik-tablosu">
-            <div class="tablo-baslik">
-                <span>🏆 Canlı Sıralama</span>
-                <span>Puan</span>
+        <!-- SAĞ PANEL -->
+        <div class="sag-panel">
+
+            <!-- Kapışma oy tablosu (omu_bumu/turnuva) -->
+            <div class="oy-tablosu" id="oy-tablosu" style="display:none;">
+                <div class="tablo-baslik">
+                    <span>🗳️ Anlık Oylar</span>
+                    <span id="toplam-oy-label">Toplam: 0 oy</span>
+                </div>
+                <div class="kapışma-toplam">
+                    <div class="kapısma-secenek" id="kart-sol-panel">
+                        <div class="kapısma-secenek-isim" id="panel-isim1">—</div>
+                        <div class="kapısma-secenek-oy"   id="panel-oy1">0</div>
+                        <div class="kapısma-secenek-oran" id="panel-oran1">%0</div>
+                    </div>
+                    <div><div class="kapisma-vs-badge">VS</div></div>
+                    <div class="kapısma-secenek" id="kart-sag-panel">
+                        <div class="kapısma-secenek-isim" id="panel-isim2">—</div>
+                        <div class="kapısma-secenek-oy"   id="panel-oy2">0</div>
+                        <div class="kapısma-secenek-oran" id="panel-oran2">%0</div>
+                    </div>
+                </div>
             </div>
-            <div id="izleyici-listesi">
-                <div style="text-align: center; color: #555; margin-top: 50px;">Henüz kimse katılmadı...</div>
+
+            <!-- Liderlik tablosu -->
+            <div class="liderlik-tablosu">
+                <div class="tablo-baslik">
+                    <span>🏆 Canlı Sıralama</span>
+                    <span>Puan</span>
+                </div>
+                <div id="izleyici-listesi">
+                    <div style="text-align:center; color:#555; margin-top:40px;">Henüz kimse katılmadı...</div>
+                </div>
             </div>
+
         </div>
     </div>
 
     <script>
-        const socket = io();
+        const socket     = io();
         const YAYIN_KODU = "{{ yayin_kodu }}";
+        const OYUN_MODU  = "{{ oyun.oyun_modu }}";
+        const OYUN_ID    = "{{ oyun.id }}";
 
-        // Odaya Yayıncı Olarak Bağlan
+        const KAPISMA_MODLARI = ['omu_bumu', 'turnuva'];
+        const isKapisma = KAPISMA_MODLARI.includes(OYUN_MODU);
+
+        let SORULAR       = [];
+        let aktifIndex    = 0;
+        let kapismaOylari = {};   // { "Seçenek Adı": oy_sayisi }
+
+        // Soruları önceden çek
+        fetch(`/api/sorular/${OYUN_ID}`)
+            .then(r => r.json())
+            .then(data => { SORULAR = data; });
+
+        // Odaya yayıncı olarak bağlan
         socket.on('connect', () => {
             socket.emit('yayina_katil', { yayin_kodu: YAYIN_KODU });
         });
 
-        // Lobi Güncellendikçe veya Biri Puan Aldıkça Tabloyu Yeniden Çiz
+        // ── Liderlik tablosunu çiz ──
         function tabloyuCiz(skorlar) {
-            let listeDiv = document.getElementById('izleyici-listesi');
-            
-            // Skorları büyükten küçüğe sırala (Zeka burada çalışıyor!)
-            let siraliDizi = Object.entries(skorlar).sort((a, b) => b[1] - a[1]);
-            
-            document.getElementById('kisi-sayisi').innerText = siraliDizi.length;
+            const listeDiv  = document.getElementById('izleyici-listesi');
+            const sirali    = Object.entries(skorlar).sort((a,b) => b[1]-a[1]);
+            document.getElementById('kisi-sayisi').innerText = sirali.length;
 
-            if(siraliDizi.length === 0) {
-                listeDiv.innerHTML = '<div style="text-align: center; color: #555; margin-top: 50px;">Henüz kimse katılmadı...</div>';
+            if (sirali.length === 0) {
+                listeDiv.innerHTML = '<div style="text-align:center;color:#555;margin-top:40px;">Henüz kimse katılmadı...</div>';
                 return;
             }
-
             listeDiv.innerHTML = '';
-            siraliDizi.forEach((kisi, index) => {
-                let isim = kisi[0];
-                let puan = kisi[1];
-                let sinif = "";
-                
-                // İlk 3'e özel altın/gümüş/bronz efektleri
-                if(index === 0) sinif = "top1";
-                else if(index === 1) sinif = "top2";
-                else if(index === 2) sinif = "top3";
-
+            sirali.forEach(([isim, puan], i) => {
+                const sinif = i===0?'top1':i===1?'top2':i===2?'top3':'';
                 listeDiv.innerHTML += `
                     <div class="izleyici-kart ${sinif}">
-                        <div class="izleyici-isim">#${index + 1} ${isim}</div>
-                        <div class="izleyici-puan">${puan} Puan</div>
-                    </div>
-                `;
+                        <div class="izleyici-isim">#${i+1} ${isim}</div>
+                        <div class="izleyici-puan">${puan} ${isKapisma ? 'oy' : 'puan'}</div>
+                    </div>`;
             });
         }
 
-        // Socket Dinleyicileri
-        socket.on('izleyici_listesi_guncelle', tabloyuCiz);
-        socket.on('canli_skor_guncelle', tabloyuCiz);
+        // ── Kapışma oy panelini güncelle ──
+        function oyPaneliniGuncelle() {
+            if (!isKapisma) return;
+            const soru = SORULAR[aktifIndex];
+            if (!soru) return;
 
-        // --- YAYINCI KOMUTLARI ---
+            const isimler = (soru.secenekler || '').split(',');
+            const isim1   = (isimler[0] || 'Seçenek 1').trim();
+            const isim2   = (isimler[1] || 'Seçenek 2').trim();
+
+            document.getElementById('panel-isim1').innerText = isim1;
+            document.getElementById('panel-isim2').innerText = isim2;
+
+            const oy1     = kapismaOylari[isim1] || 0;
+            const oy2     = kapismaOylari[isim2] || 0;
+            const toplam  = oy1 + oy2;
+
+            document.getElementById('panel-oy1').innerText   = oy1;
+            document.getElementById('panel-oy2').innerText   = oy2;
+            document.getElementById('panel-oran1').innerText = toplam ? `%${Math.round(oy1/toplam*100)}` : '%0';
+            document.getElementById('panel-oran2').innerText = toplam ? `%${Math.round(oy2/toplam*100)}` : '%0';
+            document.getElementById('toplam-oy-label').innerText = `Toplam: ${toplam} oy`;
+
+            // Öndeki kartta lider efekti
+            document.getElementById('kart-sol-panel').classList.toggle('lider', oy1 >= oy2 && oy1 > 0);
+            document.getElementById('kart-sag-panel').classList.toggle('lider', oy2 >  oy1);
+        }
+
+        // ── Soru önizleme ──
+        function soruOnizle(index) {
+            if (!SORULAR[index]) return;
+            const soru = SORULAR[index];
+            const wrap = document.getElementById('soru-onizleme');
+            const ic   = document.getElementById('soru-onizleme-icerik');
+            const secenek = (soru.secenekler || '').split(',').map(s=>s.trim()).join(' vs ');
+            ic.innerText = secenek || '(seçenek yok)';
+            wrap.style.display = 'block';
+
+            // İlerleme
+            const ilerlemeWrap = document.getElementById('ilerleme-wrap');
+            ilerlemeWrap.style.display = 'block';
+            document.getElementById('ilerleme-metin').innerText = `Soru ${index+1} / ${SORULAR.length}`;
+            document.getElementById('ilerleme-ic').style.width = `${((index+1)/SORULAR.length)*100}%`;
+
+            if (isKapisma) {
+                document.getElementById('oy-tablosu').style.display = 'block';
+                oyPaneliniGuncelle();
+            }
+        }
+
+        // ── Socket dinleyicileri ──
+        socket.on('izleyici_listesi_guncelle', tabloyuCiz);
+        socket.on('canli_skor_guncelle', data => {
+            tabloyuCiz(data);
+
+            // Kapışma modunda oy sayımı: puan=oy_sayisi, secim=seçilen isim
+            // Bu event yalnızca puan gönderir; oy sayımı için ayrı event
+        });
+
+        // Kapışma oy event'i
+        socket.on('kapisma_oy', data => {
+            const secim = data.secim;
+            if (!secim) return;
+            kapismaOylari[secim] = (kapismaOylari[secim] || 0) + 1;
+            oyPaneliniGuncelle();
+        });
+
+        // ── YAYINCI KOMUTLARI ──
         function yayiniBaslat() {
             document.getElementById('btn-baslat').style.display = 'none';
-            document.getElementById('btn-ileri').style.display = 'block';
-            document.getElementById('btn-bitir').style.display = 'block';
-            
-            // Tüm izleyicilere 'Başla' emrini gönder!
+            document.getElementById('btn-ileri').style.display  = 'block';
+            document.getElementById('btn-bitir').style.display  = 'block';
+
+            aktifIndex    = 0;
+            kapismaOylari = {};
+            soruOnizle(0);
+
             socket.emit('yayin_hareketi', { yayin_kodu: YAYIN_KODU, aksiyon: 'baslat' });
         }
 
         function siradakiSoru() {
-            // Tüm izleyicilere 'Sonraki Soruya Geç' emrini gönder!
+            aktifIndex++;
+            kapismaOylari = {};  // Yeni soru için oyları sıfırla
+
+            if (aktifIndex >= SORULAR.length) {
+                // Sorular bitti, yayını bitir
+                yayiniBitir();
+                return;
+            }
+            soruOnizle(aktifIndex);
             socket.emit('yayin_hareketi', { yayin_kodu: YAYIN_KODU, aksiyon: 'siradaki_soru' });
         }
 
         function yayiniBitir() {
-            if(confirm("Yayını bitirmek istediğine emin misin patron?")) {
+            if (confirm('Yayını bitirmek istediğine emin misin patron?')) {
                 socket.emit('yayin_hareketi', { yayin_kodu: YAYIN_KODU, aksiyon: 'bitir' });
-                window.location.href = "/";
+                window.location.href = '/dashboard';
             }
         }
     </script>

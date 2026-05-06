@@ -392,7 +392,8 @@
                             data-link-tek="{{ url_for('oyun_sayfasi', oyun_id=oyun.id) }}"
                             data-link-vs="{{ url_for('duello_kur', oyun_id=oyun.id) }}"
                             data-link-yayin="{{ url_for('yayin_baslat', oyun_id=oyun.id) }}"
-                            onclick="modalAc(this)">İncele ➔</button>
+                            data-oyun-modu="{{ oyun.oyun_modu }}"
+                            onclick="modalAc(this)">İncele →</button>
                     </div>
                 </div>
                 {% endfor %}
@@ -420,6 +421,7 @@
                  data-link-tek="{{ url_for('oyun_sayfasi', oyun_id=oyun.id) }}"
                  data-link-vs="{{ url_for('duello_kur', oyun_id=oyun.id) }}"
                  data-link-yayin="{{ url_for('yayin_baslat', oyun_id=oyun.id) }}"
+                 data-oyun-modu="{{ oyun.oyun_modu }}"
                  onclick="modalAc(this)">
                  
                 <img src="{{ oyun.resim_url }}" alt="Oyun Resmi" class="oyun-resmi">
@@ -549,12 +551,18 @@
             document.getElementById('modal-baslik').innerText = element.getAttribute('data-baslik');
             document.getElementById('modal-aciklama').innerText = element.getAttribute('data-aciklama');
             document.getElementById('modal-resim').src = element.getAttribute('data-resim');
-            document.getElementById('modal-yazar').innerText = "👤 Üretici: " + element.getAttribute('data-yazar');
-            document.getElementById('modal-tarih').innerText = "📅 " + element.getAttribute('data-tarih');
+            document.getElementById('modal-yazar').innerText = '👤 Üretici: ' + element.getAttribute('data-yazar');
+            document.getElementById('modal-tarih').innerText = '📅 ' + element.getAttribute('data-tarih');
             
             document.getElementById('modal-btn-tek').href = element.getAttribute('data-link-tek');
             document.getElementById('modal-btn-vs').href = element.getAttribute('data-link-vs');
             document.getElementById('modal-btn-yayin').href = element.getAttribute('data-link-yayin');
+            
+            // Sadece omu_bumu ve turnuva modlarında Yayın Başlat butonunu göster
+            const mod = element.getAttribute('data-oyun-modu') || '';
+            const yayinBtn = document.getElementById('modal-btn-yayin');
+            const yayinModu = (mod === 'omu_bumu' || mod === 'turnuva');
+            yayinBtn.style.display = yayinModu ? 'flex' : 'none';
             
             document.getElementById('onizleme-modal').classList.add('aktif');
         }

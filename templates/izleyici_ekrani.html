@@ -8,126 +8,246 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: #0b0c10; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-x: hidden; padding: 20px;}
-        
-        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1f0b2e 0%, #0b0c10 80%); z-index: -1; }
+        body {
+            background-color: #0b0c10; color: #ffffff; min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; overflow-x: hidden; padding: 20px;
+        }
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at center, #1f0b2e 0%, #0b0c10 80%); z-index: -1;
+        }
 
-        /* DURUM EKRANLARI */
-        .durum-ekrani { text-align: center; }
-        .durum-ikon { font-size: 60px; margin-bottom: 20px; text-shadow: 0 0 20px #00f2fe; animation: pulse 2s infinite; }
+        /* ── DURUM EKRANLARI ── */
+        .durum-ekrani { text-align: center; max-width: 500px; width: 100%; }
+        .durum-ikon { font-size: 60px; margin-bottom: 20px; animation: pulse 2s infinite; }
         .durum-metin { font-size: 24px; font-weight: 800; color: #00f2fe; text-transform: uppercase; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8;} 50% { transform: scale(1.05); opacity: 1;} 100% { transform: scale(1); opacity: 0.8;} }
+        @keyframes pulse { 0%,100% { transform: scale(1); opacity:.8; } 50% { transform: scale(1.05); opacity:1; } }
 
-        /* YENİ: İSİM GİRİŞ KUTUSU (LOBİ) */
-        .isim-kutusu { background: rgba(0, 242, 254, 0.05); border: 1px solid #00f2fe; padding: 40px; border-radius: 20px; box-shadow: 0 0 30px rgba(0, 242, 254, 0.2); width: 100%; max-width: 400px; text-align: center; }
-        .isim-input { width: 100%; padding: 15px; margin: 20px 0; border-radius: 12px; border: 2px solid #333; background: #000; color: #00f2fe; font-size: 20px; font-weight: 800; text-align: center; outline: none; transition: 0.3s; }
-        .isim-input:focus { border-color: #00f2fe; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
-        .btn-katil { width: 100%; padding: 15px; background: linear-gradient(45deg, #00f2fe, #4facfe); border: none; border-radius: 12px; color: #000; font-size: 18px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
-        .btn-katil:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0, 242, 254, 0.4); }
+        /* ── İSİM GİRİŞ KUTUSU ── */
+        .isim-kutusu {
+            background: rgba(0,242,254,0.05); border: 1px solid #00f2fe;
+            padding: 40px; border-radius: 20px; box-shadow: 0 0 30px rgba(0,242,254,0.2);
+            width: 100%; max-width: 420px; text-align: center;
+        }
+        .isim-input {
+            width: 100%; padding: 15px; margin: 20px 0; border-radius: 12px;
+            border: 2px solid #333; background: #000; color: #00f2fe;
+            font-size: 20px; font-weight: 800; text-align: center; outline: none; transition: 0.3s;
+        }
+        .isim-input:focus { border-color: #00f2fe; box-shadow: 0 0 15px rgba(0,242,254,0.3); }
+        .btn-katil {
+            width: 100%; padding: 15px; background: linear-gradient(45deg,#00f2fe,#4facfe);
+            border: none; border-radius: 12px; color: #000; font-size: 18px;
+            font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.2s;
+        }
+        .btn-katil:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,242,254,0.4); }
 
-        /* OYUN EKRANI */
-        #oyun-ekrani { display: none; width: 100%; max-width: 600px; text-align: center; }
-        .puan-tabelasi { background: rgba(0, 242, 254, 0.1); border: 1px solid #00f2fe; color: #00f2fe; padding: 10px 20px; border-radius: 20px; font-weight: 900; font-size: 18px; margin-bottom: 20px; display: inline-block;}
-        .soru-resim { width: 100%; max-height: 300px; object-fit: cover; border-radius: 15px; border: 3px solid #f39c12; margin-bottom: 20px; box-shadow: 0 0 30px rgba(243,156,18,0.3); display: none; }
+        /* ── OYUN ALANI (Normal sorular için) ── */
+        #oyun-ekrani { display: none; width: 100%; max-width: 640px; text-align: center; }
+        .puan-tabelasi {
+            background: rgba(0,242,254,0.1); border: 1px solid #00f2fe; color: #00f2fe;
+            padding: 10px 20px; border-radius: 20px; font-weight: 900; font-size: 18px;
+            margin-bottom: 20px; display: inline-block;
+        }
+        .soru-resim {
+            width: 100%; max-height: 300px; object-fit: cover; border-radius: 15px;
+            border: 3px solid #f39c12; margin-bottom: 20px;
+            box-shadow: 0 0 30px rgba(243,156,18,0.3); display: none;
+        }
         .secenekler-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn-secenek { background: #222; border: 2px solid #444; color: white; padding: 20px 10px; border-radius: 12px; font-size: 18px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase;}
-        
-        /* Buton Tıklanma Efektleri */
+        .btn-secenek {
+            background: #222; border: 2px solid #444; color: white;
+            padding: 20px 10px; border-radius: 12px; font-size: 18px;
+            font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase;
+        }
         .btn-secenek:active { transform: scale(0.95); }
-        .btn-secenek.dogru { background: #2ecc71 !important; border-color: #2ecc71 !important; color: #000; }
-        .btn-secenek.yanlis { background: #e74c3c !important; border-color: #e74c3c !important; color: #fff; }
+        .btn-secenek.dogru  { background: #2ecc71 !important; border-color: #2ecc71 !important; color:#000; }
+        .btn-secenek.yanlis { background: #e74c3c !important; border-color: #e74c3c !important; }
         .kilitli { pointer-events: none; opacity: 0.6; }
+        .kilit-uyarisi {
+            display: none; color: #f39c12; margin-top: 20px;
+            font-weight: 800; animation: pulse 1s infinite;
+        }
+
+        /* ── OMU BUMU / TURNUVA OYUN ALANI ── */
+        #kapisma-ekrani { display: none; width: 100%; max-width: 700px; }
+        .kapisma-baslik {
+            text-align: center; margin-bottom: 20px;
+            font-size: 18px; color: #aaa; font-weight: 600;
+        }
+        .kapisma-grid {
+            display: grid; grid-template-columns: 1fr auto 1fr; gap: 15px;
+            align-items: center; margin-bottom: 20px;
+        }
+        .kapisma-kart {
+            background: rgba(25,25,35,0.8); border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 16px; overflow: hidden; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+            text-align: center;
+        }
+        .kapisma-kart:hover { transform: translateY(-8px) scale(1.02); border-color: #f39c12; }
+        .kapisma-kart.secildi {
+            border-color: #00b09b !important;
+            background: rgba(0,176,155,0.2) !important;
+            box-shadow: 0 0 30px rgba(0,176,155,0.5) !important;
+        }
+        .kapisma-kart.kilitli { pointer-events: none; }
+        .kapisma-kart img {
+            width: 100%; height: 200px; object-fit: cover;
+            border-bottom: 2px solid rgba(255,255,255,0.05);
+        }
+        .kapisma-kart h3 { padding: 15px; font-size: 16px; font-weight: 800; color: #fff; }
+        .vs-rozet {
+            width: 55px; height: 55px; border-radius: 50%;
+            background: linear-gradient(135deg,#ff0055,#ff007a); color: #fff;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 18px; font-weight: 900; flex-shrink: 0;
+            box-shadow: 0 0 20px rgba(255,0,85,0.5);
+            animation: pulseVS 2s infinite;
+        }
+        @keyframes pulseVS {
+            0%,100% { box-shadow: 0 0 20px rgba(255,0,85,0.5); }
+            50%      { box-shadow: 0 0 40px rgba(255,0,85,0.8); }
+        }
+
+        /* Oy bar progress */
+        .oy-bar-wrap {
+            display: flex; align-items: center; gap: 8px;
+            padding: 0 15px 10px; font-size: 12px; color: #aaa; font-weight: 700;
+        }
+        .oy-bar { flex: 1; height: 6px; background: #333; border-radius: 3px; overflow: hidden; }
+        .oy-bar-ic {
+            height: 100%; background: linear-gradient(90deg,#00b09b,#00f2fe);
+            border-radius: 3px; transition: width 0.4s ease;
+        }
+
+        /* ── BİTİŞ EKRANI ── */
+        #bitis-ekrani { display: none; text-align: center; }
+
+        /* ── BEKLEME ── */
+        #bekleme-ekrani { display: none; text-align: center; }
     </style>
 </head>
 <body>
 
-    <!-- YENİ: ADIM 1 - İSİM SORGULAMA EKRANI (LOBİ) -->
+    <!-- ADIM 1: İSİM GİRİŞ -->
     <div id="isim-ekrani" class="isim-kutusu">
-        <div class="durum-metin" style="font-size: 28px; margin-bottom: 10px;">Hangieasy Live</div>
-        <p style="color: #aaa; font-size: 14px;">Arenaya girmeden önce kendini tanıt!</p>
-        
-        <!-- Eğer adam zaten siteye üye ise ve giriş yapmışsa Jinja ile adını otomatik yazdırırız (CTO Hack) -->
-        <input type="text" id="oyuncu-ismi" class="isim-input" placeholder="Takma Adın" value="{{ current_user.kullanici_adi if current_user.is_authenticated else '' }}" autocomplete="off">
-        
+        <div class="durum-metin" style="font-size:28px; margin-bottom:10px;">🎯 Hangieasy Live</div>
+        <p style="color:#aaa; font-size:14px;">Arenaya girmeden önce kendini tanıt!</p>
+        <input type="text" id="oyuncu-ismi" class="isim-input" placeholder="Takma Adın" autocomplete="off">
         <button class="btn-katil" onclick="oyunaGirisYap()">ARENAYA KATIL 🚀</button>
     </div>
 
-    <!-- ADIM 2 - BEKLEME EKRANI (Başlangıçta Gizli) -->
-    <div id="bekleme-ekrani" class="durum-ekrani" style="display: none;">
+    <!-- ADIM 2: BEKLEME -->
+    <div id="bekleme-ekrani" class="durum-ekrani">
         <div class="durum-ikon">⏳</div>
         <div class="durum-metin">Yayıncının Başlatması Bekleniyor...</div>
-        <div style="margin-top: 15px; font-size: 18px; color: #f39c12; font-weight: bold;">Oyuncu: <span id="gosterilecek-isim"></span></div>
-        <p style="color: #aaa; margin-top: 10px; font-size: 14px;">Telefonu elinden bırakma, şov birazdan başlıyor!</p>
+        <div style="margin-top:15px; font-size:18px; color:#f39c12; font-weight:bold;">
+            Oyuncu: <span id="gosterilecek-isim"></span>
+        </div>
+        <p style="color:#aaa; margin-top:10px; font-size:14px;">Telefonu elinden bırakma, şov birazdan başlıyor!</p>
     </div>
 
-    <!-- OYUN ALANI -->
+    <!-- OYUN ALANI (Normal mod — sorular için) -->
     <div id="oyun-ekrani">
         <div class="puan-tabelasi"><span id="ekran-oyuncu-ismi"></span> | Skor: <span id="benim-puanim">0</span></div>
         <img src="" id="soru-resmi" class="soru-resim">
         <div class="secenekler-grid" id="secenekler-alani"></div>
-        <div id="kilit-uyarisi" style="display: none; color: #f39c12; margin-top: 20px; font-weight: 800; animation: pulse 1s infinite;">Yayıncının Sıradaki Soruya Geçmesi Bekleniyor...</div>
+        <div id="kilit-uyarisi" class="kilit-uyarisi">⏳ Yayıncının Sıradaki Soruya Geçmesi Bekleniyor...</div>
+    </div>
+
+    <!-- OYUN ALANI (Omu Bumu / Turnuva modu — kapışma için) -->
+    <div id="kapisma-ekrani">
+        <div class="puan-tabelasi" style="margin-bottom:20px;">
+            <span id="kapisma-oyuncu-ismi"></span> | Oy: <span id="kapisma-oyum">-</span>
+        </div>
+        <div class="kapisma-baslik" id="kapisma-tur-bilgisi">Yayıncının soruyu başlatması bekleniyor...</div>
+        <div class="kapisma-grid" id="kapisma-alani">
+            <!-- JS tarafından doldurulur -->
+        </div>
+        <div id="kapisma-kilit" class="kilit-uyarisi" style="text-align:center;">⏳ Yayıncının Sıradaki Soruya Geçmesi Bekleniyor...</div>
     </div>
 
     <!-- BİTİŞ EKRANI -->
-    <div id="bitis-ekrani" class="durum-ekrani" style="display: none;">
-        <div class="durum-ikon" style="color: #2ecc71; animation: none;">🏁</div>
-        <div class="durum-metin" style="color: #2ecc71;">Yayın Sona Erdi!</div>
-        <div style="font-size: 40px; font-weight: 900; margin-top: 20px;" id="final-skor">0 Puan</div>
-        <p style="color: #aaa; margin-top: 10px;">Liderlik tablosu için yayıncının ekranına bak!</p>
-        <a href="/" style="display:inline-block; margin-top: 30px; padding:15px 30px; background:#333; color:#fff; text-decoration:none; font-weight:800; border-radius:12px;">Ana Sayfaya Dön</a>
+    <div id="bitis-ekrani" class="durum-ekrani">
+        <div class="durum-ikon" style="animation:none;">🏁</div>
+        <div class="durum-metin" style="color:#2ecc71;">Yayın Sona Erdi!</div>
+        <div style="font-size:36px; font-weight:900; margin-top:20px;" id="final-skor">0</div>
+        <p style="color:#aaa; margin-top:10px;">Liderlik tablosu için yayıncının ekranına bak!</p>
+        <a href="/dashboard" style="display:inline-block; margin-top:30px; padding:15px 30px;
+           background:#333; color:#fff; text-decoration:none; font-weight:800; border-radius:12px;">
+           Ana Sayfaya Dön
+        </a>
     </div>
 
     <script>
-        const socket = io();
-        const YAYIN_KODU = "{{ yayin_kodu }}";
-        const OYUN_ID = "{{ oyun.id }}";
-        
-        let SORULAR = [];
-        let benimSkorum = 0;
-        let soruCevaplandi = false;
-        let OYUNCU_ISMI = ""; // Hayaletleri önleyecek asıl silahımız
+        const socket      = io();
+        const YAYIN_KODU  = "{{ yayin_kodu }}";
+        const OYUN_ID     = "{{ oyun.id }}";
+        const OYUN_MODU   = "{{ oyun.oyun_modu }}";
 
-        // 1. Arka Planda Soruları İndir
+        // Kapışma modları
+        const KAPISMA_MODLARI = ['omu_bumu', 'turnuva'];
+        const isKapisma = KAPISMA_MODLARI.includes(OYUN_MODU);
+
+        let SORULAR       = [];
+        let benimSkorum   = 0;
+        let soruCevaplandi = false;
+        let OYUNCU_ISMI   = "";
+
+        // ── Soruları önceden indir ──
         fetch(`/api/sorular/${OYUN_ID}`)
-            .then(res => res.json())
+            .then(r => r.json())
             .then(data => { SORULAR = data; });
 
-        // 🚀 CTO MOTORU: Oyuncuyu Kayıt Et ve Odaya Al
+        // ── GİRİŞ ──
         function oyunaGirisYap() {
-            let girilenIsim = document.getElementById('oyuncu-ismi').value.trim();
-            
-            if (girilenIsim === "") {
-                alert("Kral, isimsiz arenaya girilmez! Bir takma ad belirle.");
-                return;
-            }
-            
-            OYUNCU_ISMI = girilenIsim; // İsmi hafızaya kazıdık
-            
-            // Ekranları Değiştir
-            document.getElementById('isim-ekrani').style.display = 'none';
+            const isim = document.getElementById('oyuncu-ismi').value.trim();
+            if (!isim) { alert("Kral, isimsiz arenaya girilmez!"); return; }
+            OYUNCU_ISMI = isim;
+
+            document.getElementById('isim-ekrani').style.display    = 'none';
             document.getElementById('bekleme-ekrani').style.display = 'block';
-            document.getElementById('gosterilecek-isim').innerText = OYUNCU_ISMI;
-            document.getElementById('ekran-oyuncu-ismi').innerText = OYUNCU_ISMI;
-            
-            // 🚨 EN ÖNEMLİ HAMLE: Sunucuya kim olduğumuzu bildirerek odaya giriyoruz!
+            document.getElementById('gosterilecek-isim').innerText  = OYUNCU_ISMI;
+
+            // İsim-ekranındaki metni oyun alanlarına da yaz
+            if (document.getElementById('ekran-oyuncu-ismi'))
+                document.getElementById('ekran-oyuncu-ismi').innerText = OYUNCU_ISMI;
+            if (document.getElementById('kapisma-oyuncu-ismi'))
+                document.getElementById('kapisma-oyuncu-ismi').innerText = OYUNCU_ISMI;
+
             socket.emit('yayina_katil', { yayin_kodu: YAYIN_KODU, oyuncu_adi: OYUNCU_ISMI });
         }
 
-        // 3. YAYINCIDAN GELEN EMRİ DİNLE
-        socket.on('yayinci_emri', (data) => {
-            let aksiyon = data.aksiyon;
-            let index = data.index;
+        // ── Enter ile katıl ──
+        document.getElementById('oyuncu-ismi').addEventListener('keyup', e => {
+            if (e.key === 'Enter') oyunaGirisYap();
+        });
+
+        // ── YAYINCI EMİRLERİNİ DİNLE ──
+        socket.on('yayinci_emri', data => {
+            const { aksiyon, index } = data;
 
             if (aksiyon === 'baslat') {
                 document.getElementById('bekleme-ekrani').style.display = 'none';
-                document.getElementById('oyun-ekrani').style.display = 'block';
-                soruyuCiz(0); 
-            } 
-            else if (aksiyon === 'siradaki_soru') {
-                if (index < SORULAR.length) {
-                    soruyuCiz(index);
+                if (isKapisma) {
+                    document.getElementById('kapisma-ekrani').style.display = 'block';
+                    kapismaKurucu(index);
                 } else {
-                    yayiniKapat(); 
+                    document.getElementById('oyun-ekrani').style.display = 'block';
+                    soruyuCiz(index);
+                }
+            }
+            else if (aksiyon === 'siradaki_soru') {
+                if (isKapisma) {
+                    kapismaKurucu(index);
+                } else {
+                    if (index < SORULAR.length) {
+                        soruyuCiz(index);
+                    } else {
+                        yayiniKapat();
+                    }
                 }
             }
             else if (aksiyon === 'bitir') {
@@ -135,71 +255,158 @@
             }
         });
 
+        // ════════════════════════════════════════
+        // NORMAL MOD (sorular, butonlar)
+        // ════════════════════════════════════════
         function soruyuCiz(index) {
             soruCevaplandi = false;
             document.getElementById('secenekler-alani').classList.remove('kilitli');
             document.getElementById('kilit-uyarisi').style.display = 'none';
-            
-            let soru = SORULAR[index];
-            let resimUrl = (soru.resim_url || soru.resim || "").split(',')[0]; 
-            let resimElem = document.getElementById('soru-resmi');
-            
-            if(resimUrl && resimUrl.trim() !== "") {
-                resimElem.src = resimUrl.trim();
+
+            const soru     = SORULAR[index];
+            const resimUrl = (soru.resim_url || '').split(',')[0].trim();
+            const resimElem = document.getElementById('soru-resmi');
+
+            if (resimUrl) {
+                resimElem.src = resimUrl;
                 resimElem.style.display = 'block';
-                resimElem.onerror = function() { this.style.display = 'none'; }; 
+                resimElem.onerror = () => resimElem.style.display = 'none';
             } else {
-                resimElem.style.display = 'none'; 
+                resimElem.style.display = 'none';
             }
-            
-            let secAlan = document.getElementById('secenekler-alani');
+
+            const secAlan = document.getElementById('secenekler-alani');
             secAlan.innerHTML = '';
-            
-            let hamSecenekler = soru.secenekler || "";
-            let seceneklerDizisi = (typeof hamSecenekler === 'string') ? hamSecenekler.split(',') : hamSecenekler;
-            let karisik = [...seceneklerDizisi].sort(() => Math.random() - 0.5);
-            
-            karisik.forEach(sec => {
-                let s = sec.trim();
-                if(s !== "") {
-                    let guvenliS = s.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                    let dogruCevap = (soru.dogru_cevap || "").trim().replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                    secAlan.innerHTML += `<button class="btn-secenek" onclick="cevapVer(this, '${guvenliS}', '${dogruCevap}')">${s}</button>`;
-                }
+            const ham    = soru.secenekler || '';
+            const liste  = (typeof ham === 'string') ? ham.split(',') : ham;
+            const karisik = [...liste].sort(() => Math.random() - 0.5);
+
+            karisik.forEach(s => {
+                s = s.trim();
+                if (!s) return;
+                const gs = s.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                const dc = (soru.dogru_cevap || '').trim().replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                secAlan.innerHTML += `<button class="btn-secenek" onclick="cevapVer(this,'${gs}','${dc}')">${s}</button>`;
             });
         }
 
-        // Tıklama Motoru Güncellendi
         function cevapVer(buton, secim, dogruCevap) {
             if (soruCevaplandi) return;
             soruCevaplandi = true;
-
             document.getElementById('secenekler-alani').classList.add('kilitli');
             document.getElementById('kilit-uyarisi').style.display = 'block';
 
-            if (secim === dogruCevap || dogruCevap === "Farketmez") {
+            if (secim === dogruCevap || dogruCevap === 'Farketmez') {
                 buton.classList.add('dogru');
-                benimSkorum += 10; 
+                benimSkorum += 10;
                 document.getElementById('benim-puanim').innerText = benimSkorum;
-                
-                // 🚨 SUNUCUYA HABER VER: Artık ismimi de yolluyorum!
-                socket.emit('izleyici_cevap_gonder', { 
-                    yayin_kodu: YAYIN_KODU, 
-                    oyuncu_adi: OYUNCU_ISMI, // İSİM EKLENDİ!
-                    puan: benimSkorum 
+                socket.emit('izleyici_cevap_gonder', {
+                    yayin_kodu: YAYIN_KODU,
+                    oyuncu_adi: OYUNCU_ISMI,
+                    puan: benimSkorum
                 });
             } else {
                 buton.classList.add('yanlis');
-                let butonlar = document.querySelectorAll('.btn-secenek');
-                butonlar.forEach(b => { if(b.innerText === dogruCevap) b.classList.add('dogru'); });
+                document.querySelectorAll('.btn-secenek').forEach(b => {
+                    if (b.innerText.trim() === dogruCevap) b.classList.add('dogru');
+                });
             }
         }
 
+        // ════════════════════════════════════════
+        // KAPIŞMA MODU (omu_bumu / turnuva)
+        // ════════════════════════════════════════
+        let kapismaCevaplandi = false;
+
+        function kapismaKurucu(index) {
+            if (!SORULAR[index]) return;
+            kapismaCevaplandi = false;
+
+            const soru     = SORULAR[index];
+            const isimler  = (soru.secenekler || '').split(',');
+            const resimler = (soru.resim_url  || '').split(',');
+
+            const isim1  = (isimler[0] || 'Seçenek 1').trim();
+            const isim2  = (isimler[1] || 'Seçenek 2').trim();
+            const resim1 = (resimler[0] || '').trim();
+            const resim2 = (resimler[1] || resim1).trim();
+
+            // Tur bilgisini güncelle
+            document.getElementById('kapisma-tur-bilgisi').innerText =
+                `Soru ${index + 1} / ${SORULAR.length} — Hangisini seçiyorsun?`;
+
+            document.getElementById('kapisma-kilit').style.display = 'none';
+
+            const alan = document.getElementById('kapisma-alani');
+            alan.innerHTML = `
+                <div class="kapisma-kart" id="kart-sol" onclick="kapismaSec('${isim1.replace(/'/g,"\\'")}', this)">
+                    <img src="${resim1}" onerror="this.style.display='none'" alt="${isim1}">
+                    <h3>${isim1}</h3>
+                    <div class="oy-bar-wrap">
+                        <span id="oy-sol-label">0 oy</span>
+                        <div class="oy-bar"><div class="oy-bar-ic" id="oy-bar-sol" style="width:0%"></div></div>
+                    </div>
+                </div>
+
+                <div class="vs-rozet">VS</div>
+
+                <div class="kapisma-kart" id="kart-sag" onclick="kapismaSec('${isim2.replace(/'/g,"\\'")}', this)">
+                    <img src="${resim2}" onerror="this.style.display='none'" alt="${isim2}">
+                    <h3>${isim2}</h3>
+                    <div class="oy-bar-wrap" style="flex-direction:row-reverse;">
+                        <span id="oy-sag-label">0 oy</span>
+                        <div class="oy-bar"><div class="oy-bar-ic" id="oy-bar-sag" style="width:0%"></div></div>
+                    </div>
+                </div>
+            `;
+
+            // Seçim ismini kaydet (oy sistemi için)
+            alan.dataset.isim1 = isim1;
+            alan.dataset.isim2 = isim2;
+            document.getElementById('kapisma-oyum').innerText = '-';
+        }
+
+        function kapismaSec(secim, kart) {
+            if (kapismaCevaplandi) return;
+            kapismaCevaplandi = true;
+
+            // Kartları kilitle
+            document.querySelectorAll('.kapisma-kart').forEach(k => k.classList.add('kilitli'));
+            kart.classList.add('secildi');
+            document.getElementById('kapisma-oyum').innerText = secim;
+            document.getElementById('kapisma-kilit').style.display = 'block';
+
+            benimSkorum += 1;
+            socket.emit('izleyici_cevap_gonder', {
+                yayin_kodu: YAYIN_KODU,
+                oyuncu_adi: OYUNCU_ISMI,
+                puan: benimSkorum,
+                secim: secim   // hangi seçeneği seçtiğimizi de gönder (oy sayımı için)
+            });
+            // Yayıncı panelindeki oy sayacını güncelle
+            socket.emit('kapisma_oy_gonder', {
+                yayin_kodu: YAYIN_KODU,
+                secim: secim
+            });
+        }
+
+        // Yayıncı panelinden gelen canlı oy güncellemesi
+        socket.on('canli_skor_guncelle', skorlar => {
+            // Bu event artık sadece yayıncı paneli tarafından işlenecek
+            // İzleyicide göstermek istersen burada işleyebilirsin
+        });
+
+        // ════════════════════════════════════════
+        // BİTİŞ
+        // ════════════════════════════════════════
         function yayiniKapat() {
-            document.getElementById('oyun-ekrani').style.display = 'none';
-            document.getElementById('bekleme-ekrani').style.display = 'none';
-            document.getElementById('bitis-ekrani').style.display = 'block';
-            document.getElementById('final-skor').innerText = benimSkorum + " Puan";
+            document.getElementById('oyun-ekrani').style.display      = 'none';
+            document.getElementById('kapisma-ekrani').style.display   = 'none';
+            document.getElementById('bekleme-ekrani').style.display   = 'none';
+            document.getElementById('bitis-ekrani').style.display     = 'block';
+            document.getElementById('final-skor').innerText = isKapisma
+                ? `${benimSkorum} Oy Verdin 🗳️`
+                : `${benimSkorum} Puan 🏆`;
         }
     </script>
 </body>

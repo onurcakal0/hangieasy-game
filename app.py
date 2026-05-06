@@ -298,11 +298,13 @@ def yayin_baslat(oyun_id):
     if not kadi or kadi.startswith('Misafir_'):
         return "Yayın başlatmak için gerçek bir hesapla giriş yapmalısın patron!"
         
-    yayin_kodu = str(random.randint(100000, 999999)) 
+    yayin_kodu = str(random.randint(100000, 999999))
+    oyun = Oyun.query.get_or_404(oyun_id)
     aktif_yayinlar[yayin_kodu] = {
-        'oyun_id': oyun_id, 
-        'yayinci': kadi, 
-        'izleyiciler': {},
+        'oyun_id': oyun_id,
+        'oyun_modu': oyun.oyun_modu,
+        'yayinci': kadi,
+        'izleyiciler': {},       # { isim: oy_sayisi }
         'aktif_soru_index': 0
     }
     return redirect(url_for('yayinci_odasi', yayin_kodu=yayin_kodu))
@@ -345,22 +347,46 @@ def yayina_katil(data):
 def yayin_hareketi(data):
     oda = data.get('yayin_kodu')
     yayinci = session.get('kullanici_adi')
-    aksiyon = data.get('aksiyon') 
-    
-    if oda in aktif_yayinlar and aktif_yayinlar[oda]['yayinci'] == yayinci:
-        if aksiyon == 'siradaki_soru':
-            aktif_yayinlar[oda]['aktif_soru_index'] += 1
-        emit('yayinci_emri', {'aksiyon': aksiyon, 'index': aktif_yayinlar[oda]['aktif_soru_index']}, room=oda)
+    aksiyon = data.get('aksiyon')
+
+    if oda not in aktif_yayinlar:
+        return
+    if aktif_yayinlar[oda]['yayinci'] != yayinci:
+        return
+
+    if aksiyon == 'baslat':
+        # İlk soruya geç, index sıfırda kalır
+        aktif_yayinlar[oda]['aktif_soru_index'] = 0
+    elif aksiyon == 'siradaki_soru':
+        aktif_yayinlar[oda]['aktif_soru_index'] += 1
+    elif aksiyon == 'bitir':
+        # Yayını sonlandır
+        pass
+
+    emit('yayinci_emri', {
+        'aksiyon': aksiyon,
+        'index': aktif_yayinlar[oda]['aktif_soru_index']
+    }, room=oda)
 
 @socketio.on('izleyici_cevap_gonder')
 def izleyici_cevap_gonder(data):
     oda = data.get('yayin_kodu')
-    oyuncu = session.get('kullanici_adi')
-    puan = data.get('puan')
-    
+    # Oyuncu adını data'dan al (isim-ekranında girilen ad)
+    oyuncu = data.get('oyuncu_adi') or session.get('kullanici_adi') or 'Anonim'
+    puan = data.get('puan', 0)
+
     if oda in aktif_yayinlar:
         aktif_yayinlar[oda]['izleyiciler'][oyuncu] = puan
         emit('canli_skor_guncelle', aktif_yayinlar[oda]['izleyiciler'], room=oda)
+
+@socketio.on('kapisma_oy_gonder')
+def kapisma_oy_gonder(data):
+    """Omu Bumu / Turnuva modlarında seçenek oyunu yayıncıya ilet."""
+    oda   = data.get('yayin_kodu')
+    secim = data.get('secim')
+    if oda in aktif_yayinlar and secim:
+        # Yayıncı paneline özel oy event'i gönder
+        emit('kapisma_oy', {'secim': secim}, room=oda)
 
 # --- DIŞARIDAN GELENLER İÇİN YENİ ANA SAYFA ---
 # --- 🌍 HANGIEASY ANA SAYFA (LANSMAN BİTTİ, SİSTEM CANLI!) ---
