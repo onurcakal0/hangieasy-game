@@ -92,6 +92,7 @@ class Kullanici(db.Model):
     son_gorev_tarihi = db.Column(db.String(20), default="")
     gunluk_test_sayaci = db.Column(db.Integer, default=0)
     gunluk_odul_alindi = db.Column(db.Boolean, default=False)
+    boss_bileti_alindi = db.Column(db.Boolean, default=False)  # Boss Arenası bilet kontrolü
 class Oyun(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     baslik = db.Column(db.String(100), nullable=False)
@@ -620,18 +621,25 @@ def boss_arenasi():
     kadi = session.get('kullanici_adi')
     if not kadi or kadi.startswith('Misafir_'):
         return redirect(url_for('giris'))
-    
+
     kullanici = Kullanici.query.filter_by(kullanici_adi=kadi).first()
-    return render_template('boss_arenasi.html', bakiye=kullanici.he_coin)
+    return render_template('boss_arenasi.html',
+                           bakiye=kullanici.he_coin,
+                           bilet_alindi=kullanici.boss_bileti_alindi)
 
 @app.route('/api/boss_giris', methods=['POST'])
 def boss_giris():
     kadi = session.get('kullanici_adi')
     kullanici = Kullanici.query.filter_by(kullanici_adi=kadi).first()
-    giris_ucreti = 250 
-    
+    giris_ucreti = 250
+
+    # — Zaten bilet almış mı?
+    if kullanici.boss_bileti_alindi:
+        return jsonify({"status": "error", "mesaj": "Zaten bir bileting var patron! Etkinlik başlayana kadar bekle."}), 400
+
     if kullanici.he_coin >= giris_ucreti:
         kullanici.he_coin -= giris_ucreti
+        kullanici.boss_bileti_alindi = True   # Bir daha alamaz
         db.session.commit()
         return jsonify({"status": "success", "yeni_bakiye": kullanici.he_coin, "mesaj": "Arenaya giriş bileti alındı!"})
     else:

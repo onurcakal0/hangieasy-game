@@ -3,111 +3,350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Haftalık Boss Arenası | Hangieasy</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <title>Boss Arenası | Hangieasy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: #050000; color: #ffffff; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; }
-        
-        /* Cehennem Ateşi Arkaplanı */
-        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at top center, #5a0000 0%, #050000 80%); z-index: -1; animation: ates 5s infinite alternate; }
-        @keyframes ates { 0% { opacity: 0.8; } 100% { opacity: 1; } }
 
-        .navbar { width: 100%; display: flex; justify-content: space-between; padding: 20px 5%; background: rgba(20, 0, 0, 0.8); border-bottom: 1px solid rgba(255, 0, 0, 0.2); }
-        .logo { font-size: 28px; font-weight: 900; color: #ff3333; text-decoration: none; text-shadow: 0 0 15px rgba(255,0,0,0.5); }
+        body {
+            background-color: #07050a;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
-        .arena-kutu { text-align: center; margin-top: 50px; max-width: 800px; padding: 40px; background: rgba(10, 0, 0, 0.9); border: 2px solid #ff0000; border-radius: 20px; box-shadow: 0 0 50px rgba(255,0,0,0.3); position: relative; overflow: hidden; }
-        
-        .boss-ikon { font-size: 100px; line-height: 1; margin-bottom: 20px; filter: drop-shadow(0 0 20px #ff0000); animation: salla 2s infinite; }
-        @keyframes salla { 0% { transform: rotate(-5deg) scale(1); } 50% { transform: rotate(5deg) scale(1.1); } 100% { transform: rotate(-5deg) scale(1); } }
+        /* ── Kırmızı / Mor Orb ── */
+        .orb-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(130px);
+            animation: orbFloat 18s infinite alternate ease-in-out;
+        }
+        .orb-1 { width: 60vw; height: 60vw; background: rgba(180, 0, 0, 0.18);   top: -20%; left: -15%; }
+        .orb-2 { width: 50vw; height: 50vw; background: rgba(100, 0, 180, 0.14); bottom: -15%; right: -10%; animation-delay: -7s; animation-direction: alternate-reverse; }
+        .orb-3 { width: 35vw; height: 35vw; background: rgba(255, 80, 0, 0.08);  top: 40%;   left: 35%; animation-delay: -3s; animation-duration: 25s; }
+        @keyframes orbFloat {
+            0%   { transform: translate(0,0) scale(1); }
+            100% { transform: translate(60px, 80px) scale(1.2); }
+        }
 
-        .baslik { font-size: 48px; font-weight: 900; color: #fff; text-transform: uppercase; margin-bottom: 10px; text-shadow: 0 5px 15px rgba(0,0,0,0.8); }
-        .alt-baslik { font-size: 18px; color: #ff6666; margin-bottom: 30px; font-weight: 600; }
+        /* Kıvılcım parçacıkları */
+        .sparks {
+            position: fixed; inset: 0; pointer-events: none; z-index: 1;
+            background-image:
+                radial-gradient(1.5px 1.5px at  30px  50px, rgba(255,100,0,0.9), transparent),
+                radial-gradient(1px   1px   at  80px 120px, rgba(255,0,0,0.7),   transparent),
+                radial-gradient(2px   2px   at 140px  20px, rgba(255,200,0,0.8), transparent),
+                radial-gradient(1px   1px   at 200px  80px, rgba(255,60,0,0.6),  transparent),
+                radial-gradient(1.5px 1.5px at 260px 150px, rgba(255,0,0,0.9),   transparent),
+                radial-gradient(1px   1px   at  60px 200px, rgba(255,120,0,0.7), transparent),
+                radial-gradient(2px   2px   at 320px  60px, rgba(200,0,0,0.5),   transparent),
+                radial-gradient(1px   1px   at 100px 280px, rgba(255,80,0,0.8),  transparent),
+                radial-gradient(1.5px 1.5px at 180px 230px, rgba(255,0,50,0.7),  transparent),
+                radial-gradient(2px   2px   at 350px 180px, rgba(255,150,0,0.6), transparent),
+                radial-gradient(1px   1px   at  20px 320px, rgba(255,0,0,0.5),   transparent),
+                radial-gradient(1.5px 1.5px at 280px 300px, rgba(255,80,0,0.8),  transparent);
+            background-size: 400px 400px;
+            animation: sparkDrift 80s linear infinite;
+        }
+        @keyframes sparkDrift { from { background-position: 0 0; } to { background-position: 1200px 900px; } }
 
-        .havuz-kutu { background: linear-gradient(45deg, #f39c12, #e67e22); padding: 20px; border-radius: 15px; display: inline-block; margin-bottom: 40px; border: 2px solid #fff; box-shadow: 0 10px 30px rgba(243,156,18,0.5); }
-        .havuz-baslik { font-size: 14px; color: #000; font-weight: 800; text-transform: uppercase; }
-        .havuz-odul { font-size: 40px; font-weight: 900; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        /* ── NAVBAR ── */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px 5%;
+            background: rgba(10, 5, 5, 0.7);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 0, 0, 0.15);
+            position: relative; z-index: 100;
+        }
+        .logo {
+            font-size: 26px; font-weight: 900;
+            background: linear-gradient(90deg, #ff4444, #ff8800);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none; letter-spacing: 1px;
+        }
+        .bakiye-badge {
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.3);
+            padding: 8px 20px; border-radius: 20px;
+            color: #ff6666; font-weight: 800; font-size: 14px;
+        }
 
-        .sayac { font-size: 36px; font-weight: 900; color: #fff; margin-bottom: 30px; letter-spacing: 5px; background: rgba(0,0,0,0.5); padding: 10px 30px; border-radius: 10px; border: 1px dashed #ff0000; display: inline-block;}
+        /* ── ANA İÇERİK ── */
+        .icerik {
+            flex: 1;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 40px 20px;
+            position: relative; z-index: 10;
+            text-align: center;
+        }
 
-        .giris-btn { background: #ff0000; color: #fff; padding: 20px 40px; font-size: 24px; font-weight: 900; border: none; border-radius: 15px; cursor: pointer; text-transform: uppercase; transition: 0.3s; box-shadow: 0 10px 30px rgba(255,0,0,0.5); display: flex; align-items: center; gap: 10px; margin: 0 auto; }
-        .giris-btn:hover { background: #cc0000; transform: scale(1.05); box-shadow: 0 10px 50px rgba(255,0,0,0.8); }
-        
-        .ucret { font-size: 14px; color: #aaa; margin-top: 15px; }
+        /* Boss kafatası / ikon */
+        .boss-ikon-wrap {
+            position: relative; margin-bottom: 30px;
+        }
+        .boss-ikon {
+            font-size: 110px;
+            filter: drop-shadow(0 0 40px rgba(255,0,0,0.6));
+            animation: bossFloat 4s ease-in-out infinite;
+            display: block;
+        }
+        @keyframes bossFloat {
+            0%,100% { transform: translateY(0) rotate(-3deg); }
+            50%      { transform: translateY(-15px) rotate(3deg); }
+        }
+        .boss-hale {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 160px; height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,0,0,0.25) 0%, transparent 70%);
+            animation: hale 3s ease-in-out infinite;
+        }
+        @keyframes hale { 0%,100%{transform:translate(-50%,-50%) scale(1);} 50%{transform:translate(-50%,-50%) scale(1.3);} }
 
-        /* Bildirim */
-        #toast { position: fixed; bottom: 30px; background: #2ecc71; color: #000; padding: 15px 30px; border-radius: 10px; font-weight: 900; transform: translateY(150px); transition: 0.4s; }
-        .goster { transform: translateY(0) !important; }
+        /* Kilitli rozet */
+        .kilitli-rozet {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,0,0,0.08);
+            border: 1px solid rgba(255,0,0,0.25);
+            padding: 8px 20px; border-radius: 30px;
+            font-size: 12px; font-weight: 700; color: #ff6666;
+            letter-spacing: 2px; text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+        .kilitli-rozet-nokta {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #ff3333;
+            animation: nokta 1.5s ease-in-out infinite;
+        }
+        @keyframes nokta { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+
+        .baslik {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 900; text-transform: uppercase;
+            letter-spacing: 3px; margin-bottom: 15px;
+            background: linear-gradient(180deg, #ffffff 0%, #ff6644 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 30px rgba(255,80,0,0.3));
+        }
+
+        .alt-metin {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: #8b7070; font-weight: 300;
+            max-width: 560px; line-height: 1.7;
+            margin-bottom: 50px;
+        }
+
+        /* Özellikler grid */
+        .ozellikler {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 20px; max-width: 700px; width: 100%;
+            margin-bottom: 50px;
+        }
+        .ozellik-kutu {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px; padding: 20px 15px;
+            transition: 0.3s;
+        }
+        .ozellik-kutu:hover {
+            background: rgba(255,60,0,0.08);
+            border-color: rgba(255,60,0,0.3);
+            transform: translateY(-5px);
+        }
+        .ozellik-ikon { font-size: 30px; margin-bottom: 10px; }
+        .ozellik-baslik { font-size: 13px; font-weight: 800; color: #ccc; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .ozellik-aciklama { font-size: 11px; color: #666; }
+
+        /* Ödül havuzu */
+        .odul-kutu {
+            background: linear-gradient(135deg, rgba(243,156,18,0.12), rgba(255,80,0,0.08));
+            border: 1px solid rgba(243,156,18,0.3);
+            border-radius: 20px; padding: 25px 40px;
+            margin-bottom: 40px; display: inline-flex;
+            flex-direction: column; align-items: center; gap: 5px;
+            position: relative; overflow: hidden;
+        }
+        .odul-kutu::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, #f39c12, transparent);
+        }
+        .odul-label { font-size: 11px; color: #f39c12; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; }
+        .odul-deger { font-size: 40px; font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(243,156,18,0.5); }
+        .odul-sub { font-size: 12px; color: #888; margin-top: 2px; }
+
+        /* Bildirim kartı */
+        .bildirim-kutu {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 20px; padding: 30px 40px;
+            max-width: 480px; width: 100%;
+        }
+        .bildirim-baslik {
+            font-size: 16px; font-weight: 800; color: #fff;
+            margin-bottom: 8px;
+        }
+        .bildirim-sub { font-size: 13px; color: #666; margin-bottom: 25px; }
+
+        .email-wrap { display: flex; gap: 10px; }
+        .email-input {
+            flex: 1; padding: 13px 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px; color: #fff;
+            font-size: 14px; outline: none; transition: 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+        .email-input::placeholder { color: #444; }
+        .email-input:focus { border-color: #ff4444; box-shadow: 0 0 15px rgba(255,0,0,0.2); }
+        .bildir-btn {
+            padding: 13px 20px;
+            background: linear-gradient(45deg, #cc0000, #ff4400);
+            color: #fff; border: none; border-radius: 12px;
+            font-weight: 800; font-size: 13px; cursor: pointer;
+            white-space: nowrap; transition: 0.3s;
+        }
+        .bildir-btn:hover { box-shadow: 0 8px 20px rgba(255,0,0,0.4); transform: translateY(-2px); }
+
+        /* Alt bilgi */
+        .geri-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 40px; color: #555; text-decoration: none;
+            font-size: 13px; font-weight: 600; transition: 0.3s;
+        }
+        .geri-btn:hover { color: #ff6644; }
+
+        /* Bilet alındı durumu */
+        .bilet-mevcut {
+            background: linear-gradient(135deg, rgba(255,60,0,0.15), rgba(180,0,0,0.1));
+            border: 1px solid rgba(255,60,0,0.4);
+            border-radius: 16px; padding: 18px 30px;
+            display: flex; align-items: center; gap: 15px;
+            margin-bottom: 25px; max-width: 420px;
+        }
+        .bilet-mevcut-ikon { font-size: 30px; }
+        .bilet-mevcut-metin strong { color: #ff8844; display: block; font-size: 14px; }
+        .bilet-mevcut-metin span { color: #666; font-size: 12px; }
+
+        @media (max-width: 600px) {
+            .ozellikler { grid-template-columns: 1fr; }
+            .email-wrap { flex-direction: column; }
+            .odul-kutu { padding: 20px 25px; }
+        }
     </style>
 </head>
 <body>
 
+    <div class="orb-wrap">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+    <div class="sparks"></div>
+
+    <!-- NAVBAR -->
     <nav class="navbar">
         <a href="/" class="logo">HangiEasy</a>
-        <div style="background: rgba(0,0,0,0.5); border: 1px solid #ff0000; padding: 8px 20px; border-radius: 20px; color: #ff3333; font-weight: 900;">
-            Bakiye: <span id="bakiye">{{ bakiye }}</span> 🪙
-        </div>
+        <div class="bakiye-badge">⚔️ Bakiye: <span id="bakiye-goster">{{ bakiye }}</span> 🪙</div>
     </nav>
 
-    <div class="arena-kutu">
-        <div class="boss-ikon">👹</div>
-        <div class="baslik">Haftalık Boss Uyanıyor</div>
-        <div class="alt-baslik">50 Zorlu Soru. 1 Can. Kazanan Hepsini Alır.</div>
+    <!-- ANA İÇERİK -->
+    <div class="icerik">
 
-        <div class="havuz-kutu">
-            <div class="havuz-baslik">💰 BİRİKEN BÜYÜK ÖDÜL HAVUZU</div>
-            <div class="havuz-odul">50.000 HE-Coin</div>
+        <div class="boss-ikon-wrap">
+            <div class="boss-hale"></div>
+            <span class="boss-ikon">💀</span>
         </div>
 
-        <div>
-            <div style="color: #ff3333; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;">Kapıların Açılmasına:</div>
-            <div class="sayac" id="gerisayim">48:12:05</div>
+        <div class="kilitli-rozet">
+            <div class="kilitli-rozet-nokta"></div>
+            Etkinlik Bekleniyor
         </div>
 
-        <button class="giris-btn" onclick="biletiAl()" id="bilet-btn">
-            ⚔️ ARENAYA GİRİŞ BİLETİ AL
-        </button>
-        <div class="ucret">Giriş Ücreti: 250 HE-Coin (Bakiyenden düşülür)</div>
+        <div class="baslik">Boss Arenası</div>
+        <p class="alt-metin">
+            Haftanın en güçlü rakiplerine meydan oku, 50 soruyu geç, zirveye tırman.
+            Ödül havuzu kazananı bekliyor — ama önce Boss uyanmalı.
+        </p>
+
+        <!-- Özellikler -->
+        <div class="ozellikler">
+            <div class="ozellik-kutu">
+                <div class="ozellik-ikon">⚔️</div>
+                <div class="ozellik-baslik">50 Soru</div>
+                <div class="ozellik-aciklama">Zordan zora artan soru seti</div>
+            </div>
+            <div class="ozellik-kutu">
+                <div class="ozellik-ikon">💀</div>
+                <div class="ozellik-baslik">1 Can</div>
+                <div class="ozellik-aciklama">Bir hata, her şeyi bitirir</div>
+            </div>
+            <div class="ozellik-kutu">
+                <div class="ozellik-ikon">🏆</div>
+                <div class="ozellik-baslik">Kazanan Alır</div>
+                <div class="ozellik-aciklama">Tüm havuz ilk bitirene</div>
+            </div>
+        </div>
+
+        <!-- Ödül Havuzu -->
+        <div class="odul-kutu">
+            <div class="odul-label">💰 Büyük Ödül Havuzu</div>
+            <div class="odul-deger">50.000 🪙</div>
+            <div class="odul-sub">HE-Coin • Bir sonraki etkinlikte dağıtılacak</div>
+        </div>
+
+        {% if bilet_alindi %}
+        <!-- Bilet zaten alınmış -->
+        <div class="bilet-mevcut">
+            <div class="bilet-mevcut-ikon">🎫</div>
+            <div class="bilet-mevcut-metin">
+                <strong>Biletini Zaten Aldın!</strong>
+                <span>Boss uyanınca sana haber vereceğiz. Hazır ol patron.</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Bildirim -->
+        <div class="bildirim-kutu">
+            <div class="bildirim-baslik">🔔 Boss Uyandığında Haber Ver</div>
+            <div class="bildirim-sub">Bir sonraki Boss Arenası açıldığında seni ilk haberdar edelim.</div>
+            <div class="email-wrap">
+                <input type="email" class="email-input" placeholder="E-posta adresin..." id="notif-email">
+                <button class="bildir-btn" onclick="bildirimi Kaydet()">Bildir</button>
+            </div>
+        </div>
+
+        <a href="/dashboard" class="geri-btn">← Testlere Geri Dön</a>
+
     </div>
 
-    <div id="toast">✅ Bilet Alındı! Kan banyosuna hazır ol.</div>
-
     <script>
-        function biletiAl() {
-            let btn = document.getElementById('bilet-btn');
-            btn.innerText = "İşleniyor...";
-            btn.disabled = true;
-
-            fetch('/api/boss_giris', { method: 'POST' })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    document.getElementById('bakiye').innerText = data.yeni_bakiye;
-                    btn.innerHTML = "✅ BİLET ONAYLANDI";
-                    btn.style.background = "#2ecc71";
-                    btn.style.boxShadow = "0 10px 30px rgba(46,204,113,0.5)";
-                    
-                    let toast = document.getElementById('toast');
-                    toast.classList.add('goster');
-                    setTimeout(() => toast.classList.remove('goster'), 3000);
-                } else {
-                    alert(data.mesaj); // Parası yetmezse uyarır!
-                    btn.innerHTML = "⚔️ ARENAYA GİRİŞ BİLETİ AL";
-                    btn.disabled = false;
-                }
-            });
+        function bildirimiKaydet() {
+            const input = document.getElementById('notif-email');
+            const val = input.value.trim();
+            if (!val || !val.includes('@')) {
+                input.style.borderColor = '#ff0055';
+                setTimeout(() => { input.style.borderColor = ''; }, 2000);
+                return;
+            }
+            input.value = '';
+            input.placeholder = '✅ Kaydedildi! Boss uyandığında haber vereceğiz.';
+            input.style.borderColor = '#2ecc71';
+            input.style.boxShadow = '0 0 15px rgba(46,204,113,0.3)';
         }
 
-        // Ufak bir görsel geri sayım hilesi
-        setInterval(() => {
-            let s = document.getElementById('gerisayim');
-            let parts = s.innerText.split(':');
-            let h = parseInt(parts[0]), m = parseInt(parts[1]), sec = parseInt(parts[2]);
-            sec--;
-            if(sec < 0) { sec = 59; m--; }
-            if(m < 0) { m = 59; h--; }
-            s.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
-        }, 1000);
+        // Enter ile kayıt
+        document.getElementById('notif-email').addEventListener('keyup', e => {
+            if (e.key === 'Enter') bildirimiKaydet();
+        });
+
+        // Buton onclick düzeltmesi
+        document.querySelector('.bildir-btn').onclick = bildirimiKaydet;
     </script>
+
 </body>
 </html>
