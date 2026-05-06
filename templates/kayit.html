@@ -79,6 +79,17 @@
     <div class="form-kutusu">
         <div class="logo">HangiEasy</div>
         <p>Aramıza Katıl ve Krallığını Kur</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div style="background: rgba(255,0,85,0.1); border: 1px solid rgba(255,0,85,0.4); color: #ff5577;
+                        border-radius: 10px; padding: 12px 15px; margin-bottom: 20px; font-size: 13px; font-weight: 600;">
+                ⚠️ {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
         
         <form method="POST">
             <input type="text" name="ad_soyad" placeholder="Ad Soyad" required>

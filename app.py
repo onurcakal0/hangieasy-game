@@ -673,10 +673,8 @@ def kayit():
         db.session.add(yeni_kullanici)
         db.session.commit()
         
-        # 3. MAİL MOTORUNU YENİDEN ATEŞLİYORUZ (Zırhlı 465 Portu Üzerinden)
+        # 3. MAİL GÖNDER (Başarısız olsa bile kayıt_basarili sayfasını göster)
         token = s.dumps(eposta, salt='eposta-dogrulama')
-        # Render/Heroku reverse proxy arkasında url_for localhost üretebilir!
-        # Bu yüzden SITE_URL env variable'ı ya da hangieasy.com'u kullanıyoruz.
         site_url = os.getenv('SITE_URL', 'https://hangieasy.com').rstrip('/')
         dogrulama_linki = f"{site_url}/dogrula/{token}"
 
@@ -690,12 +688,22 @@ def kayit():
             <p style="color:#666; font-size:12px; margin-top:30px;">Bu link 1 saat boyunca geçerlidir.</p>
         </div>
         """
+
+        mail_gonderildi = False
         try:
             mail.send(msg)
-            return render_template('kayit_basarili.html')
+            mail_gonderildi = True
+            print(f"✅ Doğrulama maili gönderildi: {eposta}")
         except Exception as e:
-            # Hata verirse ekranda ne olduğunu net görelim
-            return f"Mail gönderilirken bir hata oluştu: {str(e)}"
+            # Mail başarısız olsa da kullanıcı kayıt_basarili sayfasını görecek
+            # Admin manuel onaylayabilir ya da resend özelliği eklenebilir
+            print(f"❌ Mail gönderilemedi ({eposta}): {str(e)}")
+
+        # Her koşulda kayit_basarili sayfasına yönlendir
+        return render_template('kayit_basarili.html',
+                               mail_gonderildi=mail_gonderildi,
+                               eposta=eposta,
+                               dogrulama_linki=dogrulama_linki)
 
     return render_template('kayit.html')
 @app.route('/dogrula/<token>')
