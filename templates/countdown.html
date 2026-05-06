@@ -3,293 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HangiEasy | Efsane Başlıyor</title>
+    <title>HangiEasy | Yakında</title>
+    <meta name="description" content="Oyunun kurallarını yeniden yazıyoruz. HangiEasy çok yakında yayında.">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* İŞTE O EFSANE LOGO RENKLERİN */
-            --primary: #FCAF38;   /* Hangi kısmı (Sıcak Turuncu) */
-            --secondary: #FF3366; /* Easy kısmı (Canlı Pembe) */
-            --bg-dark: #0f111a;
-            --bg-light: #1c1f2e;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.06);
+            --primary:   #f39c12;   /* turuncu */
+            --secondary: #ff007a;   /* pembe */
+            --cyan:      #00f2fe;
+            --purple:    #8a2287;
+            --bg:        #0b0c10;   /* dashboard ile aynı */
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Outfit', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        html { scroll-behavior: smooth; }
 
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Derinliği olan, simsiyah olmayan premium arkaplan */
+        /* ══════════════════════════════════════
+           ARKAPLAN — Dashboard Rengi #0b0c10
+        ══════════════════════════════════════ */
         body {
-            background: radial-gradient(circle at top center, var(--bg-light) 0%, var(--bg-dark) 100%);
-            color: #ffffff;
+            background-color: var(--bg);
+            color: #fff;
             overflow-x: hidden;
             min-height: 100vh;
         }
 
-        /* ONURCAKAL.COM TARZI IŞILTILAR VE EFEKTLER */
-        .ambient-glow-1 {
-            position: fixed; width: 60vw; height: 60vw;
-            background: radial-gradient(circle, var(--primary) 0%, transparent 60%);
-            opacity: 0.12; top: -20vh; left: -20vw;
-            border-radius: 50%; filter: blur(100px);
-            z-index: -1; animation: float 12s infinite alternate ease-in-out;
+        /* ══════════════════════════════════════
+           ORB'LAR — Dashboard ::before / ::after
+           ile birebir aynı (morlu + cyanlı top)
+        ══════════════════════════════════════ */
+        .orb-wrap {
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 0;
+            overflow: hidden;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            animation: orbFloat 15s infinite alternate ease-in-out;
+        }
+        .orb-1 {           /* sol üst — mor (dashboard ::before) */
+            width: 55vw; height: 55vw;
+            background: rgba(138, 35, 135, 0.18);
+            top: -12%; left: -12%;
+        }
+        .orb-2 {           /* sağ alt — cyan (dashboard ::after) */
+            width: 50vw; height: 50vw;
+            background: rgba(0, 242, 254, 0.15);
+            bottom: -12%; right: -12%;
+            animation-delay: -6s;
+            animation-direction: alternate-reverse;
+        }
+        .orb-3 {           /* merkez — turuncu, hafif */
+            width: 35vw; height: 35vw;
+            background: rgba(243, 156, 18, 0.08);
+            top: 30%; left: 30%;
+            animation-delay: -3s;
+            animation-duration: 20s;
+        }
+        @keyframes orbFloat {
+            0%   { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 90px) scale(1.18); }
         }
 
-        .ambient-glow-2 {
-            position: fixed; width: 50vw; height: 50vw;
-            background: radial-gradient(circle, var(--secondary) 0%, transparent 60%);
-            opacity: 0.12; bottom: -10vh; right: -10vw;
-            border-radius: 50%; filter: blur(100px);
-            z-index: -1; animation: float 15s infinite alternate-reverse ease-in-out;
+        /* ══════════════════════════════════════
+           YILDIZ PARÇACIKLARI — onurcakal.com
+           tarzı çift katman drift efekti
+        ══════════════════════════════════════ */
+        .particles,
+        .particles-2 {
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 1;
+            background-image:
+                radial-gradient(1.5px 1.5px at  20px  30px, rgba(255,255,255,0.85), transparent),
+                radial-gradient(2px   2px   at  40px  70px, var(--cyan), transparent),
+                radial-gradient(1px   1px   at  90px  40px, rgba(255,255,255,0.6),  transparent),
+                radial-gradient(2px   2px   at 150px  10px, var(--primary), transparent),
+                radial-gradient(1.5px 1.5px at 200px  90px, rgba(255,255,255,0.7),  transparent),
+                radial-gradient(1px   1px   at  60px 130px, var(--secondary), transparent),
+                radial-gradient(2px   2px   at 280px  50px, rgba(255,255,255,0.5),  transparent),
+                radial-gradient(1px   1px   at 310px 120px, var(--cyan), transparent),
+                radial-gradient(1.5px 1.5px at 100px 200px, rgba(255,255,255,0.8),  transparent),
+                radial-gradient(2px   2px   at 230px 170px, var(--primary), transparent),
+                radial-gradient(1px   1px   at  10px 250px, rgba(255,255,255,0.6),  transparent),
+                radial-gradient(1.5px 1.5px at 340px 220px, var(--secondary), transparent),
+                radial-gradient(2px   2px   at 170px 300px, rgba(255,255,255,0.4),  transparent),
+                radial-gradient(1px   1px   at  80px 320px, var(--cyan), transparent),
+                radial-gradient(1.5px 1.5px at 250px 350px, rgba(255,255,255,0.7),  transparent);
+            background-size: 380px 380px;
+        }
+        .particles   { animation: drift  100s linear infinite; }
+        .particles-2 { animation: driftR  70s linear infinite; opacity: 0.55; }
+
+        @keyframes drift  { from { background-position: 0 0; }         to { background-position: 1200px 800px; } }
+        @keyframes driftR { from { background-position: 1200px 800px; } to { background-position: 0 0; } }
+
+        /* ══════════════════════════════════════
+           PARLAYAN YILDIZLAR (büyük, animasyonlu)
+        ══════════════════════════════════════ */
+        .sparkle {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+            animation: sparkle-pulse 4s ease-in-out infinite;
+        }
+        @keyframes sparkle-pulse {
+            0%,100% { transform: scale(0.8); opacity: 0.3; }
+            50%      { transform: scale(1.4); opacity: 1; }
         }
 
-        /* Uçuşan küçük ışık tozları */
-        .particles {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-            opacity: 0.3; z-index: -1;
-        }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(30px, 50px) scale(1.1); }
-            100% { transform: translate(-20px, 20px) scale(0.9); }
-        }
-
-        /* İlk Ekran - Hero Section */
+        /* ══════════════════════════════════════
+           HERO
+        ══════════════════════════════════════ */
         section.hero {
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
             text-align: center;
-            position: relative;
             padding: 20px;
-            z-index: 10;
+            position: relative; z-index: 10;
         }
 
-        /* Logodaki Orijinal Gradyan */
+        /* Üst rozet */
+        .pre-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 20px; border-radius: 50px;
+            font-size: 13px; font-weight: 600; color: #aaa;
+            letter-spacing: 2px; text-transform: uppercase;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .pre-badge span {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--secondary);
+            box-shadow: 0 0 8px var(--secondary);
+            animation: blink 1.4s ease-in-out infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+
         h1.brand {
-            font-size: clamp(3.5rem, 8vw, 6.5rem);
+            font-size: clamp(4rem, 9vw, 7.5rem);
             font-weight: 900;
             letter-spacing: 2px;
             background: linear-gradient(90deg, var(--primary) 0%, #ff6b4a 50%, var(--secondary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 15px;
-            filter: drop-shadow(0px 10px 20px rgba(255, 51, 102, 0.2));
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 40px rgba(255,51,102,0.25));
+            position: relative;
+        }
+
+        /* İnce glow altı */
+        h1.brand::after {
+            content: 'HangiEasy';
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: blur(30px);
+            opacity: 0.35;
+            z-index: -1;
         }
 
         .motto {
-            font-size: clamp(1.1rem, 3vw, 1.6rem);
-            color: #b4bac4;
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            color: #8b93a8;
             font-weight: 300;
             margin-bottom: 60px;
             letter-spacing: 1px;
-            max-width: 800px;
+            max-width: 680px;
         }
 
+        /* ── Geri Sayım Kutuları ── */
         .countdown-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            width: 100%;
-            max-width: 800px;
+            display: flex; flex-wrap: wrap;
+            justify-content: center; gap: 20px;
+            width: 100%; max-width: 780px;
+            margin-bottom: 60px;
         }
 
         .time-box {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            padding: 25px 15px;
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.07);
+            padding: 28px 15px;
             border-radius: 24px;
-            flex: 1;
-            min-width: 130px;
-            max-width: 180px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
+            flex: 1; min-width: 130px; max-width: 175px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+            position: relative; overflow: hidden;
         }
-
         .time-box::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            content: ''; position: absolute; top: 0; left: 0;
+            width: 100%; height: 2px;
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             opacity: 0; transition: opacity 0.3s;
         }
-
-        .time-box:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
+        .time-box:hover { transform: translateY(-10px); background: rgba(255,255,255,0.06); }
         .time-box:hover::before { opacity: 1; }
 
         .time-box span {
             display: block;
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
-            font-weight: 700;
-            color: #ffffff;
-            line-height: 1;
+            font-size: clamp(2.8rem, 5vw, 4.8rem);
+            font-weight: 700; color: #fff; line-height: 1;
         }
-
         .time-box .label {
-            font-size: 0.9rem;
-            color: #8b949e;
-            text-transform: uppercase;
-            margin-top: 12px;
-            letter-spacing: 2px;
-            font-weight: 400;
+            font-size: 0.85rem; color: #6b7280;
+            text-transform: uppercase; margin-top: 12px;
+            letter-spacing: 2px; font-weight: 400;
         }
 
-        /* Kaydır İkonu */
+        /* ── E-Posta Bekleme Listesi ── */
+        .email-wrap {
+            display: flex; gap: 10px; max-width: 480px; width: 100%;
+        }
+        .email-input {
+            flex: 1; padding: 15px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px; color: #fff;
+            font-size: 15px; outline: none; transition: 0.3s;
+            font-family: 'Outfit', sans-serif;
+        }
+        .email-input::placeholder { color: #555; }
+        .email-input:focus { border-color: var(--primary); box-shadow: 0 0 20px rgba(243,156,18,0.2); }
+        .notify-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff; border: none; border-radius: 14px;
+            font-size: 14px; font-weight: 700; cursor: pointer;
+            white-space: nowrap; transition: 0.3s; letter-spacing: 0.5px;
+            position: relative; overflow: hidden;
+        }
+        .notify-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .notify-btn:hover::before { left: 100%; }
+        .notify-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255,0,122,0.4); }
+
+        /* Kaydır ikonu */
         .scroll-down {
-            position: absolute;
-            bottom: 30px;
-            animation: bounce 2s infinite;
-            cursor: pointer;
-            text-decoration: none;
-            color: rgba(255,255,255,0.6);
-            font-size: 0.85rem;
-            letter-spacing: 2px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: color 0.3s;
+            position: absolute; bottom: 30px;
+            animation: bounce 2.5s infinite;
+            cursor: pointer; text-decoration: none;
+            color: rgba(255,255,255,0.4);
+            font-size: 11px; letter-spacing: 3px;
+            display: flex; flex-direction: column;
+            align-items: center; transition: color 0.3s;
         }
-
         .scroll-down:hover { color: var(--primary); }
-
-        .scroll-down svg {
-            width: 28px; height: 28px; margin-top: 8px;
-            fill: none; stroke: currentColor; stroke-width: 1.5;
-        }
-
+        .scroll-down svg { width: 26px; height: 26px; margin-top: 8px; fill: none; stroke: currentColor; stroke-width: 1.5; }
         @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            0%,20%,50%,80%,100% { transform: translateY(0); }
             40% { transform: translateY(-12px); }
             60% { transform: translateY(-6px); }
         }
 
-        /* İkinci Ekran - Biz Kimiz */
+        /* ══════════════════════════════════════
+           ABOUT
+        ══════════════════════════════════════ */
         section.about {
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 80px 20px;
-            text-align: center;
-            position: relative;
-            z-index: 10;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 80px 20px; text-align: center;
+            position: relative; z-index: 10;
         }
-
         .about-content {
-            max-width: 900px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            padding: clamp(40px, 5vw, 70px);
+            max-width: 860px; width: 100%;
+            background: rgba(255,255,255,0.025);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255,255,255,0.07);
+            padding: clamp(40px,5vw,70px);
             border-radius: 30px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+            position: relative; overflow: hidden;
         }
-
-        /* About kartının içindeki zarif ışık */
+        .about-content::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
+        }
         .about-content::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 60%);
-            z-index: -1;
+            content: ''; position: absolute; top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(243,156,18,0.03) 0%, transparent 60%);
+            pointer-events: none;
         }
-
         h2 {
-            font-size: clamp(2.2rem, 4vw, 3.5rem);
-            margin-bottom: 25px;
-            font-weight: 700;
-            background: linear-gradient(90deg, #fff, #d1d5db);
+            font-size: clamp(2rem,4vw,3.2rem);
+            margin-bottom: 25px; font-weight: 700;
+            background: linear-gradient(90deg, #fff, #b0b8c8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .about-text {
-            font-size: clamp(1.1rem, 2vw, 1.3rem);
-            line-height: 1.8;
-            color: #a1aab8;
-            margin-bottom: 45px;
-            font-weight: 300;
+            font-size: clamp(1rem,2vw,1.25rem);
+            line-height: 1.85; color: #7b8499;
+            margin-bottom: 45px; font-weight: 300;
         }
-
         .founder-link {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            display: inline-flex; align-items: center; justify-content: center;
             padding: 18px 45px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: #fff;
-            text-decoration: none;
-            border-radius: 50px;
-            font-size: 1.15rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 25px rgba(255, 51, 102, 0.3);
-            position: relative;
-            overflow: hidden;
+            color: #fff; text-decoration: none; border-radius: 50px;
+            font-size: 1.1rem; font-weight: 700; letter-spacing: 1px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(255,0,122,0.3);
+            position: relative; overflow: hidden;
         }
-
         .founder-link::before {
             content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
+            transition: left 0.5s;
         }
-
-        .founder-link:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 15px 35px rgba(252, 175, 56, 0.4);
-        }
-
+        .founder-link:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 18px 40px rgba(243,156,18,0.4); }
         .founder-link:hover::before { left: 100%; }
 
-        /* Mobil Optimizasyonları */
+        /* ══════════════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════════════ */
         @media (max-width: 600px) {
             .countdown-container { gap: 12px; }
             .time-box { min-width: calc(50% - 12px); padding: 20px 10px; border-radius: 18px; }
-            .ambient-glow-1, .ambient-glow-2 { width: 100vw; height: 100vw; opacity: 0.15; }
-            .founder-link { width: 100%; padding: 15px 20px; font-size: 1rem; }
+            .email-wrap { flex-direction: column; }
+            .notify-btn { padding: 14px 20px; }
+            .founder-link { width: 100%; padding: 15px; font-size: 1rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Arkaplan Efektleri -->
+    <!-- ── ARKAPLAN KATMANLARI ── -->
+    <div class="orb-wrap">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
     <div class="particles"></div>
-    <div class="ambient-glow-1"></div>
-    <div class="ambient-glow-2"></div>
+    <div class="particles-2"></div>
 
+    <!-- Büyük parlayan yıldızlar -->
+    <div class="sparkle" style="width:4px;height:4px;background:#00f2fe;top:15%;left:25%;box-shadow:0 0 6px 2px #00f2fe;animation-delay:0s;"></div>
+    <div class="sparkle" style="width:3px;height:3px;background:#f39c12;top:28%;left:72%;box-shadow:0 0 6px 2px #f39c12;animation-delay:1s;"></div>
+    <div class="sparkle" style="width:5px;height:5px;background:#fff;top:60%;left:10%;box-shadow:0 0 8px 3px rgba(255,255,255,0.8);animation-delay:2s;"></div>
+    <div class="sparkle" style="width:3px;height:3px;background:#ff007a;top:75%;left:80%;box-shadow:0 0 6px 2px #ff007a;animation-delay:0.5s;"></div>
+    <div class="sparkle" style="width:4px;height:4px;background:#00f2fe;top:45%;left:88%;box-shadow:0 0 6px 2px #00f2fe;animation-delay:3s;"></div>
+    <div class="sparkle" style="width:3px;height:3px;background:#f39c12;top:85%;left:40%;box-shadow:0 0 5px 2px #f39c12;animation-delay:1.5s;"></div>
+    <div class="sparkle" style="width:5px;height:5px;background:#fff;top:10%;left:55%;box-shadow:0 0 8px 3px rgba(255,255,255,0.8);animation-delay:2.5s;"></div>
+    <div class="sparkle" style="width:2px;height:2px;background:#00f2fe;top:50%;left:3%;box-shadow:0 0 4px 2px #00f2fe;animation-delay:0.8s;"></div>
+    <div class="sparkle" style="width:3px;height:3px;background:#ff007a;top:35%;left:48%;box-shadow:0 0 5px 2px #ff007a;animation-delay:3.5s;"></div>
+
+    <!-- ── HERO ── -->
     <section class="hero">
+
+        <div class="pre-badge">
+            <span></span> Çok Yakında Yayında
+        </div>
+
         <h1 class="brand">HangiEasy</h1>
-        <p class="motto">Oyunun kurallarını yeniden yazıyoruz. Beklentilerin ötesine geçmeye hazır olun.</p>
-        
+        <p class="motto">Oyunun kurallarını yeniden yazıyoruz.<br>Beklentilerin ötesine geçmeye hazır olun.</p>
+
         <div class="countdown-container">
             <div class="time-box"><span id="days">00</span><div class="label">Gün</div></div>
             <div class="time-box"><span id="hours">00</span><div class="label">Saat</div></div>
             <div class="time-box"><span id="minutes">00</span><div class="label">Dakika</div></div>
             <div class="time-box"><span id="seconds">00</span><div class="label">Saniye</div></div>
+        </div>
+
+        <!-- Bildirim formu -->
+        <div class="email-wrap">
+            <input type="email" class="email-input" placeholder="E-posta adresin..." id="email-girisi">
+            <button class="notify-btn" onclick="bildirimKayit()">🔔 Beni Haberdar Et</button>
         </div>
 
         <a href="#about" class="scroll-down">
@@ -298,43 +390,67 @@
         </a>
     </section>
 
+    <!-- ── ABOUT ── -->
     <section id="about" class="about">
         <div class="about-content">
             <h2>Biz Kimiz?</h2>
             <p class="about-text">
-                Sınırları reddeden, sıradanlığı bozan ve dijital dünyada yeni bir standart belirleyen bir ekibiz. 
-                HangiEasy sadece bir platform değil; teknolojiyle harmanlanmış bir vizyonun, yeni nesil bir deneyimin başlangıç noktasıdır. 
-                Geleceği inşa etmeye hazırlanıyoruz.
+                Sınırları reddeden, sıradanlığı bozan ve dijital dünyada yeni bir standart belirleyen bir ekibiz.
+                HangiEasy sadece bir platform değil; teknolojiyle harmanlanmış bir vizyonun,
+                yeni nesil interaktif eğlencenin başlangıç noktasıdır.
+                Rekabeti, zekayı ve eğlenceyi tek çatı altında birleştiriyoruz.
             </p>
             <a href="https://onurcakal.com" target="_blank" class="founder-link">
-                Kurucu & CTO: Mustafa Onur Çakal
+                ✦ Kurucu &amp; CTO: Mustafa Onur Çakal
             </a>
         </div>
     </section>
 
     <script>
-        // Lansman Tarihini buradan ayarlayabilirsin patron (Şu an 10 Mayıs 2026'ya ayarlı)
-        const countDownDate = new Date("May 10, 2026 20:00:00").getTime();
+        /* ── GERİ SAYIM ── */
+        const hedef = new Date("May 10, 2026 20:00:00").getTime();
 
-        const timerInterval = setInterval(function() {
-            const now = new Date().getTime();
-            const distance = countDownDate - now;
+        const timer = setInterval(() => {
+            const fark = hedef - Date.now();
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            document.getElementById("days").innerHTML = days < 10 ? '0' + days : days;
-            document.getElementById("hours").innerHTML = hours < 10 ? '0' + hours : hours;
-            document.getElementById("minutes").innerHTML = minutes < 10 ? '0' + minutes : minutes;
-            document.getElementById("seconds").innerHTML = seconds < 10 ? '0' + seconds : seconds;
-
-            if (distance < 0) {
-                clearInterval(timerInterval);
-                document.querySelector(".countdown-container").innerHTML = "<h2 style='color:#fff;'>Sistem Aktif. Yörüngeye Girildi.</h2>";
+            if (fark < 0) {
+                clearInterval(timer);
+                document.querySelector(".countdown-container").innerHTML =
+                    "<h2 style='color:#fff; font-size:2rem;'>🚀 Sistem Aktif — HangiEasy Yörüngede!</h2>";
+                return;
             }
+
+            const pad = n => String(Math.floor(n)).padStart(2, '0');
+            document.getElementById("days").textContent    = pad(fark / 864e5);
+            document.getElementById("hours").textContent   = pad((fark % 864e5) / 36e5);
+            document.getElementById("minutes").textContent = pad((fark % 36e5)  / 6e4);
+            document.getElementById("seconds").textContent = pad((fark % 6e4)   / 1e3);
         }, 1000);
+
+        /* ── E-POSTA BİLDİRİM ── */
+        function bildirimKayit() {
+            const input = document.getElementById('email-girisi');
+            const val   = input.value.trim();
+            if (!val || !val.includes('@')) {
+                input.style.borderColor = '#ff007a';
+                input.style.boxShadow   = '0 0 15px rgba(255,0,122,0.3)';
+                setTimeout(() => {
+                    input.style.borderColor = '';
+                    input.style.boxShadow   = '';
+                }, 2000);
+                return;
+            }
+            input.value = '';
+            input.placeholder = '✅ Kaydedildi! Haberdar edeceğiz.';
+            input.style.borderColor = '#17b978';
+            input.style.boxShadow   = '0 0 15px rgba(23,185,120,0.3)';
+        }
+
+        /* ── SCROLL — Parçacıkları parallax yavaşlat ── */
+        window.addEventListener('scroll', () => {
+            const y = window.scrollY * 0.15;
+            document.querySelector('.particles').style.backgroundPositionY = y + 'px';
+        });
     </script>
 </body>
 </html>
