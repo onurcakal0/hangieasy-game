@@ -365,17 +365,20 @@ def izleyici_cevap_gonder(data):
 # --- DIŞARIDAN GELENLER İÇİN YENİ ANA SAYFA ---
 # --- 🌍 HANGIEASY ANA SAYFA (LANSMAN BİTTİ, SİSTEM CANLI!) ---
 # --- 🌍 HANGIEASY ANA SAYFA (LANSMAN BİTTİ, SİSTEM CANLI!) ---
+# ANA SAYFA MOTORU
 @app.route('/')
-def index():
-    # 1. Kasadan (veritabanından) gerçek oyunları çekiyoruz!
+def dashboard():  # <-- FONKSİYONUN ADINI DA DASHBOARD YAPTIK!
     tum_oyunlar = Oyun.query.all()
     
     # 2. Eğer veritabanı henüz boşsa sistem çökmesin diye ufak bir CTO önlemi
     if not tum_oyunlar:
         tum_oyunlar = []
+    return render_template('dashboard.html')
+    # 1. Kasadan (veritabanından) gerçek oyunları çekiyoruz!
+   
 
     # 3. Paketi HTML'e teslim ediyoruz!
-    return render_template('dashboard.html', oyunlar=tum_oyunlar)
+ 
 # İstersen eski gizli odanın kapısını yönlendirme olarak açık bırakabilirsin
 @app.route('/gizli-test-odasi')
 def gizli_oda():
@@ -708,15 +711,14 @@ def giris():
 def cikis():
     session.pop('kullanici_adi', None); return redirect(url_for('dashboard'))
 
-
 @app.route('/god-mode')
 def god_mode():
     kadi = session.get('kullanici_adi')
-    
-    # GÜVENLİK DUVARI: Buraya kendi kullanıcı adını yaz!
+    # Sadece senin yeni kullanıcı adın olan 'onur' girebilir!
     if kadi != "onur": 
         return "Hop hemşerim nereye? Burası Onur Çakal A.Ş. Yönetim Kurulu odası! Sadece patron girebilir.", 403
     
+    # ... geri kalan kodlar ...
     toplam_kullanici = Kullanici.query.count()
     toplam_test = Oyun.query.count()
     tum_kullanicilar = Kullanici.query.order_by(Kullanici.he_coin.desc()).all() 
@@ -758,36 +760,7 @@ def test_sil(id):
     
     # İşlem bitince hemen CEO paneline geri dön
     return redirect(url_for('god_mode'))
-# --- 💎 KOZMETİK MAĞAZASI YAPAY ZEKASI ---
-@app.route('/api/cerceve_al/<cerceve_id>', methods=['POST'])
-def cerceve_al(cerceve_id):
-    kadi = session.get('kullanici_adi')
-    if not kadi or kadi.startswith('Misafir_'): 
-        return jsonify({"status": "error", "mesaj": "Giriş yapmalısın patron!"})
-        
-    kullanici = Kullanici.query.filter_by(kullanici_adi=kadi).first()
-    
-    # Çerçeve Fiyat Listesi
-    fiyatlar = {
-        'neon_siber': 500,     # 500 Coin
-        'kizil_ejder': 1000,   # 1000 Coin
-        'altin_ceo': 2500      # 2500 Coin
-    }
-    
-    if cerceve_id not in fiyatlar: return jsonify({"status": "error"})
-    
-    fiyat = fiyatlar[cerceve_id]
-    
-    # Adımda o kadar para var mı?
-    if kullanici.he_coin < fiyat:
-        return jsonify({"status": "yetersiz", "mesaj": "Bakiye Yetersiz!"})
-        
-    # Parayı kes, çerçeveyi ver!
-    kullanici.he_coin -= fiyat
-    kullanici.profil_cercevesi = cerceve_id
-    db.session.commit()
-    
-    return jsonify({"status": "success", "yeni_bakiye": kullanici.he_coin})
+
 @app.route('/aydinlatma-metni') # Bak burada tire (-) var!
 def aydinlatma_metni():
     return render_template('aydinlatma_metni.html') # Burada alt çizgi (_) var çünkü dosya adı böyle.
