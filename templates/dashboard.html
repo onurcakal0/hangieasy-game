@@ -90,6 +90,19 @@
         }
         .stealth-btn:hover { background: rgba(255,255,255,0.1); }
 
+        /* 🚀 GERİ SAYIM BANNER CSS'İ (DASHBOARD İÇİN) */
+        .dashboard-countdown {
+            background: rgba(255, 51, 102, 0.05);
+            border-bottom: 1px solid rgba(255, 51, 102, 0.2);
+            padding: 25px 20px; text-align: center; position: relative; overflow: hidden;
+        }
+        .dc-title { color: #fff; font-size: 18px; font-weight: 900; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
+        .dc-subtitle { color: #f39c12; font-size: 13px; margin-bottom: 15px; font-weight: 600; }
+        .dc-timer { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .dc-box { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 12px; min-width: 70px; }
+        .dc-box span { display: block; font-size: 24px; font-weight: 800; background: linear-gradient(90deg, #00f2fe, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .dc-box .label { font-size: 10px; color: #888; text-transform: uppercase; margin-top: 2px; letter-spacing: 1px; }
+
         /* ---------------- 📱 SOL AÇILIR MENÜ (SİDEBAR) ---------------- */
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -209,7 +222,7 @@
         .kart-baslik { font-size: 20px; margin-bottom: 10px; color: #fff; font-weight: 600;}
         .kart-aciklama { font-size: 14px; color: #999; margin-bottom: 25px; min-height: 42px;}
 
-        /* MODAL VE TOAST SİSTEMİ (ÖNCEKİYLE AYNI, KORUNDU) */
+        /* MODAL VE TOAST SİSTEMİ */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 3000; opacity: 0; pointer-events: none; transition: 0.3s ease; }
         .modal-overlay.aktif { opacity: 1; pointer-events: auto; }
         .modal-kutu { background: #0f1218; width: 90%; max-width: 600px; border-radius: 24px; overflow: hidden; position: relative; transform: scale(0.9) translateY(30px); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(0, 242, 254, 0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.9); }
@@ -234,14 +247,6 @@
         .btn-yayin { background: linear-gradient(45deg, #17b978, #086972); }
         .btn-yayin:hover { box-shadow: 0 0 20px rgba(23, 185, 120, 0.6); transform: translateY(-3px); }
 
-        .toast-container { position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: flex; flex-direction: column; gap: 15px; pointer-events: none; }
-        .toast-kutu { background: rgba(20, 20, 30, 0.85); backdrop-filter: blur(15px); border-left: 4px solid #00f2fe; border-radius: 12px; padding: 15px 20px; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); transform: translateX(120%); transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); display: flex; align-items: center; gap: 15px; }
-        .toast-kutu.goster { transform: translateX(0); }
-        .toast-ikon { font-size: 24px; }
-        .toast-icerik { flex: 1; }
-        .toast-baslik { font-size: 12px; color: #00f2fe; font-weight: 800; text-transform: uppercase; margin-bottom: 3px;}
-        .toast-metin { font-size: 13px; color: #fff; font-weight: 600; line-height: 1.4;}
-
         /* 🥷 STEALTH MODE (GİZLİ MOD) KODLARI */
         body.stealth-mode { background-color: #050505; }
         body.stealth-mode::before, body.stealth-mode::after { display: none; }
@@ -254,14 +259,13 @@
         body.stealth-mode .gurur-baslik span { background: #222; color: #fff; }
         body.stealth-mode .slider-kutu { border-color: #222; box-shadow: 0 15px 30px rgba(0,0,0,0.9); }
         body.stealth-mode .slide-btn { background: #fff; color: #000; box-shadow: none; }
-        
-        /* STEALTH MODE SİDEBAR EKLENTİSİ */
         body.stealth-mode .sidebar { background: #050505; border-color: #333; }
         body.stealth-mode .sidebar-bolum-baslik { color: #888; }
         body.stealth-mode .sidebar-link:hover, body.stealth-mode .sidebar-link.aktif-kat { background: #1a1a1a; border-color: #fff; color: #fff;}
         body.stealth-mode .vizyon-kutusu { background: #111; border-color: #333; }
         body.stealth-mode .vizyon-kutusu::before { background: #333; color: #fff;}
         body.stealth-mode .vizyon-kutusu h4 { color: #fff; }
+        body.stealth-mode .dashboard-countdown { background: rgba(10,10,10,0.9); border-color: #333; }
     </style>
 </head>
 <body>
@@ -274,7 +278,6 @@
             <span class="sidebar-kapat" onclick="sidebarKapat()">✖</span>
         </div>
         
-        <!-- Kategoriler -->
         <div class="sidebar-bolum">
             <div class="sidebar-bolum-baslik">📂 Katolog & Filtreler</div>
             <div class="sidebar-link aktif-kat" onclick="kategoriFiltrele('Hepsi', this)">🌍 Tüm Tesis (Hepsi)</div>
@@ -285,19 +288,13 @@
             <div class="sidebar-link" onclick="kategoriFiltrele('Oyun', this)">🎮 Video Oyunları</div>
         </div>
 
-        <!-- Kurumsal Tesisler -->
         <div class="sidebar-bolum">
             <div class="sidebar-bolum-baslik">📜 Hukuk & Kurumsal</div>
             <a href="/aydinlatma-metni" class="sidebar-link">⚖️ Halka Açık Aydınlatma Metni</a>
-            <!-- Eski hali: <a href="#" class="sidebar-link">🤝 Terzi İşi Kullanıcı Sözleşmesi</a> -->
-<!-- 🚀 JİLET GİBİ YENİ HALİ: -->
             <a href="/kullanici-sozlesmesi" class="sidebar-link">🤝 Terzi İşi Kullanıcı Sözleşmesi</a>
-            <!-- Eski hali: <a href="#" class="sidebar-link">🔒 Veri & Gizlilik Politikası</a> -->
-<!-- 🚀 JİLET GİBİ YENİ HALİ: -->
             <a href="/veri-gizlilik" class="sidebar-link">🔒 Veri & Gizlilik Politikası</a> 
         </div>
 
-        <!-- Vizyon Kutusu -->
         <div class="sidebar-bolum" style="border-bottom: none;">
             <div class="vizyon-kutusu">
                 <h4>Hangieasy Amacı</h4>
@@ -310,7 +307,6 @@
     <!-- 2. AŞAMA: NAVBAR -->
     <nav class="navbar">
         <div class="sol-grup">
-            <!-- 🚀 YENİ: Sidebar'ı açan Hamburger Butonu -->
             <button class="menu-btn" onclick="sidebarAc()">☰</button>
             <a href="/" class="logo">HangiEasy</a>
         </div>
@@ -324,7 +320,6 @@
                 <button id="stealth-salteri" class="stealth-btn" onclick="stealthModunuTetikle()">
                     <span id="stealth-ikon">🏎️</span> <span id="stealth-yazi">RGB</span>
                 </button>
-                <!-- 🚀 YENİ: DÜELLO / YAYIN KATILMA KAPSÜLU -->
             <div class="cuzdan-kapsulu" style="border-color: #00f2fe; overflow: hidden; padding: 0;">
                 <form action="/odaya-katil" method="POST" style="display: flex; align-items: center; margin: 0;">
                     <input type="text" name="oda_kodu" placeholder="Oda Kodu Gir" style="background: transparent; border: none; color: white; padding: 8px 12px; width: 110px; outline: none; font-size: 12px; font-weight: 600;" required autocomplete="off">
@@ -334,13 +329,21 @@
             </div>
 
             {% if session.kullanici_adi %}
+            <!-- 🛑 MAĞAZA GEÇİCİ OLARAK GİZLENDİ:
             <a href="/magaza" class="cuzdan-kapsulu">
                 <div class="cuzdan-bakiye">🪙 {{ bakiye }}</div>
                 <div class="cuzdan-magaza">Mağaza</div>
             </a>
+            -->
+            <!-- BAKIYE EKRANI (Mağaza Linki Olmadan) -->
+            <div class="cuzdan-kapsulu" style="cursor: default; border-color: rgba(255,255,255,0.1);">
+                <div class="cuzdan-bakiye" style="border-radius: 30px;">🪙 {{ bakiye }} HE-Coin</div>
+            </div>
             <a href="/boss-arenasi" class="profil-btn" style="background: #ff0000; color: white; border: 1px solid #cc0000; box-shadow: 0 0 15px rgba(255,0,0,0.6); animation: pulse 2s infinite;">👹 BOSS</a>
             {% else %}
+            <!-- 🛑 MAĞAZA GEÇİCİ OLARAK GİZLENDİ:
             <a href="/magaza" class="profil-btn btn-sari" style="padding: 8px 15px;">Mağaza</a>
+            -->
             {% endif %}
 
             {% if 'kullanici_adi' in session %}
@@ -353,6 +356,18 @@
             {% endif %}
         </div>
     </nav>
+
+    <!-- 🚀 EFSANE GERİ SAYIM ALANI (DASHBOARD'A EKLENDİ) -->
+    <div class="dashboard-countdown">
+        <h2 class="dc-title">HANGIEASY 2.0 GLOBAL YAYIN İÇİN GERİ SAYIM BAŞLADI</h2>
+        <p class="dc-subtitle">Mağaza ve yepyeni özelliklerin kilidi açılıyor, hazır ol!</p>
+        <div class="dc-timer" id="dc-timer">
+            <div class="dc-box"><span id="days">00</span><div class="label">Gün</div></div>
+            <div class="dc-box"><span id="hours">00</span><div class="label">Saat</div></div>
+            <div class="dc-box"><span id="minutes">00</span><div class="label">Dakika</div></div>
+            <div class="dc-box"><span id="seconds">00</span><div class="label">Saniye</div></div>
+        </div>
+    </div>
 
     <!-- SLIDER / GURUR TABLOSU -->
     {% set trend_oyunlar = oyunlar[:3] %}
@@ -445,6 +460,28 @@
 
 
     <script>
+        // --- 🚀 GERİ SAYIM MOTORU ---
+        const countDownDate = new Date("May 10, 2026 20:00:00").getTime();
+        const x = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = countDownDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = days < 10 ? '0' + days : days;
+            document.getElementById("hours").innerText = hours < 10 ? '0' + hours : hours;
+            document.getElementById("minutes").innerText = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById("seconds").innerText = seconds < 10 ? '0' + seconds : seconds;
+
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("dc-timer").innerHTML = "<h3 style='color:#00f2fe; font-size:24px; font-weight:900;'>SİSTEM AKTİF! HANGIEASY 2.0 YÖRÜNGEDE!</h3>";
+            }
+        }, 1000);
+
         // --- 🚀 YENİ: SİDEBAR KONTROL MOTORU ---
         function sidebarAc() {
             document.getElementById('sol-sidebar').classList.add('aktif');
@@ -458,23 +495,21 @@
 
         // Kategoriye Göre Filtreleme (Anında Çalışır)
         function kategoriFiltrele(kategori, element) {
-            // Aktif renk efektini değiştir
             document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('aktif-kat'));
             element.classList.add('aktif-kat');
             
-            // Başlığı güncelle
             document.getElementById('vitrin-baslik').innerText = kategori === 'Hepsi' ? "🎮 Tesisin Tamamı (Tüm Testler)" : `🎯 Filtrelenen: ${kategori}`;
             
             let kartlar = document.querySelectorAll('.oyun-karti');
             kartlar.forEach(kart => {
                 let kartKategori = kart.querySelector('.kategori-etiketi').innerText.toLowerCase();
                 if(kategori === 'Hepsi' || kartKategori.includes(kategori.toLowerCase())) {
-                    kart.style.display = "flex"; // CSS flex bozulmasın diye flex kullanıyoruz
+                    kart.style.display = "flex"; 
                 } else {
                     kart.style.display = "none";
                 }
             });
-            sidebarKapat(); // Filtreyi seçince menü klas bir şekilde kapansın
+            sidebarKapat();
         }
 
         // --- ARAMA MOTORU ---
@@ -490,9 +525,9 @@
 
         // --- GURUR TABLOSU MOTORU ---
         let suAnkiSlayt = 0;
-        const toplamSlayt = {{ trend_oyunlar|length }};
         const track = document.getElementById('sliderTrack');
         const noktalar = document.querySelectorAll('.nokta');
+        const toplamSlayt = noktalar.length; // Otomatik hesaplansın
 
         function slaytaGit(index) {
             if(!track) return;
@@ -533,7 +568,6 @@
                 modalKapat();
             }
         }
-
 
         // --- STEALTH MODE ---
         const stealthSalteri = document.getElementById('stealth-salteri');
