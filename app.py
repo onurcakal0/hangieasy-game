@@ -864,7 +864,11 @@ def ilerleme_kaydet(kullanici_adi, kazanilan_puan=0):
     # Kasayı Kilitle
     db.session.commit()
     return True
-
+@app.route('/kimim-ben')
+def kimim_ben():
+    kullanicilar = Kullanici.query.all()
+    liste = [f"{k.kullanici_adi} - {k.eposta}" for k in kullanicilar]
+    return f"Sistemdeki Krallar: {liste}"
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     socketio.run(app, host='0.0.0.0', port=port)
