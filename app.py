@@ -395,8 +395,8 @@ def kapisma_oy_gonder(data):
 # --- 🌍 DIŞARIDAN GELENLER İÇİN (GERİ SAYIM VİTRİNİ) ---
 @app.route('/')
 def coming_soon():
-    # Herkes bu efsanevi sayacı görecek
-    return render_template('countdown.html')
+    # Direkt dashboard'a yönlendir
+    return redirect(url_for('dashboard'))
 
 # --- 🕵️‍♂️ PATRON VE TEST EKİBİ İÇİN GİZLİ KAPI (ASIL SİSTEM) ---
 @app.route('/dashboard')
