@@ -6,7 +6,7 @@ import string
 from datetime import date
 
 # --- FLASK VE EKLENTİLER ---
-from flask import Flask, render_template, jsonify, request, redirect, url_for, session
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from flask_socketio import SocketIO, emit, join_room
@@ -401,8 +401,10 @@ def coming_soon():
 # --- 🕵️‍♂️ PATRON VE TEST EKİBİ İÇİN GİZLİ KAPI (ASIL SİSTEM) ---
 @app.route('/dashboard')
 def dashboard():
-    # Sistem arka planda tıkır tıkır çalışmaya devam ediyor
-    return render_template('dashboard.html')
+    # Tüm testleri oynanma sayısına göre sırala (en popüler üstte)
+    oyunlar = Oyun.query.order_by(Oyun.oynanma_sayisi.desc()).all()
+    return render_template('dashboard.html', oyunlar=oyunlar)
+
 @app.route('/gizli-test-odasi')
 def gizli_oda():
     return redirect(url_for('dashboard'))
@@ -571,7 +573,7 @@ def api_sorular(oyun_id):
         "dogru_cevap": str(s.dogru_cevap) # <-- SİSTEMİ ÇÖKERTEN EKSİK BUYDU!
     } for s in sorular])
 # --- 🛒 MAĞAZA & SATIN ALMA SİSTEMİ ---
-from flask import flash, redirect, url_for
+# (flash zaten yukarıda import edildi)
 
 # ==========================================
 # 🛒 MAĞAZA VE ÖDEME SİSTEMLERİ (GEÇİCİ OLARAK ASKIYA ALINDI)
