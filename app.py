@@ -3,6 +3,7 @@ import time
 import uuid
 import random
 import string
+import threading
 from datetime import date
 
 # --- FLASK VE EKLENTİLER ---
@@ -673,7 +674,7 @@ def kayit():
         db.session.add(yeni_kullanici)
         db.session.commit()
         
-        # 3. MAİL GÖNDER (Başarısız olsa bile kayıt_basarili sayfasını göster)
+        # 3. MAİL GÖNDER — arka plan thread'inde (sayfayı bloke etmesin!)
         token = s.dumps(eposta, salt='eposta-dogrulama')
         site_url = os.getenv('SITE_URL', 'https://hangieasy.com').rstrip('/')
         dogrulama_linki = f"{site_url}/dogrula/{token}"
@@ -689,19 +690,21 @@ def kayit():
         </div>
         """
 
-        mail_gonderildi = False
-        try:
-            mail.send(msg)
-            mail_gonderildi = True
-            print(f"✅ Doğrulama maili gönderildi: {eposta}")
-        except Exception as e:
-            # Mail başarısız olsa da kullanıcı kayıt_basarili sayfasını görecek
-            # Admin manuel onaylayabilir ya da resend özelliği eklenebilir
-            print(f"❌ Mail gönderilemedi ({eposta}): {str(e)}")
+        def mail_gonder_bg(flask_app, mesaj):
+            """Mail'i arka planda gönder — isteği bloke etme."""
+            with flask_app.app_context():
+                try:
+                    mail.send(mesaj)
+                    print(f"✅ Doğrulama maili gönderildi: {eposta}")
+                except Exception as ex:
+                    print(f"❌ Mail gönderilemedi ({eposta}): {ex}")
 
-        # Her koşulda kayit_basarili sayfasına yönlendir
+        t = threading.Thread(target=mail_gonder_bg, args=(app, msg), daemon=True)
+        t.start()
+
+        # Kullanıcıyı BEKLETMEDEN anında başarı sayfasına gönder
         return render_template('kayit_basarili.html',
-                               mail_gonderildi=mail_gonderildi,
+                               mail_gonderildi=True,   # Arka planda gönderiliyor, iyimser göster
                                eposta=eposta,
                                dogrulama_linki=dogrulama_linki)
 
