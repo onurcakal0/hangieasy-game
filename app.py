@@ -364,15 +364,18 @@ def izleyici_cevap_gonder(data):
         emit('canli_skor_guncelle', aktif_yayinlar[oda]['izleyiciler'], room=oda)
 
 # --- DIŞARIDAN GELENLER İÇİN YENİ ANA SAYFA ---
+# --- 🌍 HANGIEASY ANA SAYFA (LANSMAN BİTTİ, SİSTEM CANLI!) ---
 @app.route('/')
-def coming_soon():
-    return render_template('countdown.html')
-
-# --- SENİN İÇİN GİZLİ TEST ODASI (Eski Ana Sayfan) ---
-@app.route('/gizli-test-odasi')
 def index():
-    # Burada senin eski ana sayfanı çalıştıran kodlar duracak
+    # Artık herkes doğrudan efsanevi panele giriyor
     return render_template('dashboard.html')
+
+# İstersen eski gizli odanın kapısını yönlendirme olarak açık bırakabilirsin
+@app.route('/gizli-test-odasi')
+def gizli_oda():
+    return redirect(url_for('index'))
+# --- SENİN İÇİN GİZLİ TEST ODASI (Eski Ana Sayfan) ---
+
 @app.route('/test-olustur', methods=['GET', 'POST'])
 def test_olustur():
     kadi = session.get('kullanici_adi')
@@ -536,67 +539,31 @@ def api_sorular(oyun_id):
         "dogru_cevap": str(s.dogru_cevap) # <-- SİSTEMİ ÇÖKERTEN EKSİK BUYDU!
     } for s in sorular])
 # --- 🛒 MAĞAZA & SATIN ALMA SİSTEMİ ---
-@app.route('/magaza')
-def magaza():
-    kadi = session.get('kullanici_adi')
-    if not kadi or kadi.startswith('Misafir_'): 
-        return redirect(url_for('giris'))
-    return render_template('magaza.html')
+from flask import flash, redirect, url_for
+
+# ==========================================
+# 🛒 MAĞAZA VE ÖDEME SİSTEMLERİ (GEÇİCİ OLARAK ASKIYA ALINDI)
+# Şirket stratejisi gereği ödeme altyapısı onaylanana kadar uyku modundalar.
+# ==========================================
+
+# @app.route('/magaza')
+# def magaza():
+#     flash("Mağaza sistemimiz efsanevi güncellemeler için kısa süreliğine bakıma alınmıştır. Çok yakında buradayız!", "info")
+#     return redirect(url_for('index'))
 
 # --- 💳 STRIPE GERÇEK ÖDEME AKIŞI ---
-# --- 💳 STRIPE GERÇEK ÖDEME AKIŞI ---
-@app.route('/odeme-baslat/<paket>')
-def odeme_baslat(paket):
-    kadi = session.get('kullanici_adi')
-    if not kadi or kadi.startswith('Misafir_'): 
-        return redirect(url_for('giris'))
+# @app.route('/odeme-baslat/<paket>')
+# def odeme_baslat(paket):
+#     ... (Buradaki tüm kodlar yorum satırında kalacak) ...
 
-    # ÜRÜN YELPAZESİ (Fiyatlar kuruş cinsindendir. 1500 = 15.00 TL)
-    paketler = {
-        # HE-Coin Paketleri
-        'stajyer': {'isim': '100 HE-Coin', 'fiyat': 1500, 'coin': 100},
-        'baslangic': {'isim': '500 HE-Coin', 'fiyat': 5000, 'coin': 500},
-        'pro': {'isim': '2.500 HE-Coin (Popüler)', 'fiyat': 15000, 'coin': 2500},
-        'mega': {'isim': '5.000 HE-Coin', 'fiyat': 25000, 'coin': 5000},
-        'ceo': {'isim': '10.000 HE-Coin (VIP)', 'fiyat': 45000, 'coin': 10000}, # CEO'ya ufak indirim :)
-        
-        # Turnuva & Boss Biletleri
-        'boss_bilet': {'isim': 'Boss Arenası Tekli Bilet', 'fiyat': 2500, 'coin': 250},
-        'turnuva_pass': {'isim': 'Sezonluk Pass (5 Giriş)', 'fiyat': 10000, 'coin': 1250}
-    }
-    
-    secilen = paketler.get(paket)
-    if not secilen: return "Böyle bir paket yok patron!", 404
-    
-    try:
-        checkout_session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[{
-                'price_data': {
-                    'currency': 'try',
-                    'product_data': {'name': secilen['isim']},
-                    'unit_amount': secilen['fiyat'],
-                },
-                'quantity': 1,
-            }],
-            mode='payment',
-            success_url=url_for('odeme_basarili', miktar=secilen['coin'], _external=True),
-            cancel_url=url_for('magaza', _external=True),
-        )
-        return redirect(checkout_session.url, code=303)
-    except Exception as e:
-        return str(e)
-@app.route('/odeme-basarili/<int:miktar>')
-def odeme_basarili(miktar):
-    kadi = session.get('kullanici_adi')
-    kullanici = Kullanici.query.filter_by(kullanici_adi=kadi).first()
-    if kullanici:
-        kullanici.he_coin += miktar
-        db.session.commit()
-    # Ödeme başarılıysa havalı bir karşılama ekranı
-    return render_template('basarili.html', miktar=miktar)
+# @app.route('/odeme-basarili/<int:miktar>')
+# def odeme_basarili(miktar):
+#     ... (Buradaki tüm kodlar yorum satırında kalacak) ...
 
-# --- 👹 HAFTALIK BOSS TURNUVASI ---
+# --- 💎 KOZMETİK MAĞAZASI YAPAY ZEKASI ---
+# @app.route('/api/cerceve_al/<cerceve_id>', methods=['POST'])
+# def cerceve_al(cerceve_id):
+#     ... (Buradaki tüm kodlar yorum satırında kalacak) ...
 @app.route('/istatistikler/<int:oyun_id>')
 def istatistikler_sayfasi(oyun_id):
     # 1. Oyunu bul
