@@ -742,17 +742,61 @@ def giris():
     if request.method == 'POST':
         kullanici = Kullanici.query.filter_by(kullanici_adi=request.form['kullanici_adi']).first()
         if kullanici and check_password_hash(kullanici.sifre_hash, request.form['sifre']):
-            if not kullanici.onayli_mi:
-                hata = "⚠️ Hesabın henüz onaylanmamış! E-posta kutunu kontrol et ve onay linkine tıkla."
-            else:
-                session['kullanici_adi'] = kullanici.kullanici_adi
-                return redirect(url_for('dashboard'))
+            # Onaylı olsun olmasın girişe izin ver
+            session['kullanici_adi'] = kullanici.kullanici_adi
+            session['onayli_mi'] = kullanici.onayli_mi  # Profile banner için
+            return redirect(url_for('dashboard'))
         else:
             hata = "Kullanıcı adı veya şifre hatalı!"
     return render_template('giris.html', hata=hata)
 @app.route('/cikis')
 def cikis():
-    session.pop('kullanici_adi', None); return redirect(url_for('dashboard'))
+    session.clear()
+    return redirect(url_for('dashboard'))
+
+@app.route('/yeniden-dogrula')
+def yeniden_dogrula():
+    """Onaylı değil hesap için doğrulama mailini tekrar gönder."""
+    kadi = session.get('kullanici_adi')
+    if not kadi:
+        return redirect(url_for('giris'))
+
+    kullanici = Kullanici.query.filter_by(kullanici_adi=kadi).first()
+    if not kullanici:
+        return redirect(url_for('giris'))
+
+    if kullanici.onayli_mi:
+        # Zaten onaylı, gerek yok
+        flash("✅ Hesabın zaten onaylanmış!", "success")
+        return redirect(url_for('profil'))
+
+    token = s.dumps(kullanici.eposta, salt='eposta-dogrulama')
+    site_url = os.getenv('SITE_URL', 'https://hangieasy.com').rstrip('/')
+    dogrulama_linki = f"{site_url}/dogrula/{token}"
+
+    msg = Message('HangiEasy — Hesabını Onayla ⚡', recipients=[kullanici.eposta])
+    msg.html = f"""
+    <div style="background-color:#0b0c10; color:white; padding:30px; font-family:sans-serif; border-radius:10px; text-align:center;">
+        <h1 style="color:#f39c12;">E-posta Doğrulama ⚡</h1>
+        <p style="color:#aaa;">Merhaba {kullanici.kullanici_adi}! Hesabını aktifleştirmek için aşağıya tıkla:</p>
+        <a href="{dogrulama_linki}" style="display:inline-block; padding:15px 30px; background-color:#f39c12; color:#000; text-decoration:none; font-weight:bold; border-radius:10px; margin-top:20px;">HESABIMI ONAYLA ⚡</a>
+        <p style="color:#666; font-size:12px; margin-top:30px;">Bu link 1 saat geçerlidir.</p>
+    </div>
+    """
+
+    def mail_bg(flask_app, mesaj):
+        with flask_app.app_context():
+            try:
+                mail.send(mesaj)
+                print(f"✅ Yeniden doğrulama maili gönderildi: {kullanici.eposta}")
+            except Exception as ex:
+                print(f"❌ Mail hatası: {ex}")
+
+    threading.Thread(target=mail_bg, args=(app, msg), daemon=True).start()
+    return render_template('kayit_basarili.html',
+                           mail_gonderildi=True,
+                           eposta=kullanici.eposta,
+                           dogrulama_linki=dogrulama_linki)
 
 @app.route('/god-mode')
 def god_mode():
