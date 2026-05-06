@@ -365,11 +365,18 @@ def izleyici_cevap_gonder(data):
 
 # --- DIŞARIDAN GELENLER İÇİN YENİ ANA SAYFA ---
 # --- 🌍 HANGIEASY ANA SAYFA (LANSMAN BİTTİ, SİSTEM CANLI!) ---
+# --- 🌍 HANGIEASY ANA SAYFA (LANSMAN BİTTİ, SİSTEM CANLI!) ---
 @app.route('/')
 def index():
-    # Artık herkes doğrudan efsanevi panele giriyor
-    return render_template('dashboard.html')
+    # 1. Kasadan (veritabanından) gerçek oyunları çekiyoruz!
+    tum_oyunlar = Oyun.query.all()
+    
+    # 2. Eğer veritabanı henüz boşsa sistem çökmesin diye ufak bir CTO önlemi
+    if not tum_oyunlar:
+        tum_oyunlar = []
 
+    # 3. Paketi HTML'e teslim ediyoruz!
+    return render_template('dashboard.html', oyunlar=tum_oyunlar)
 # İstersen eski gizli odanın kapısını yönlendirme olarak açık bırakabilirsin
 @app.route('/gizli-test-odasi')
 def gizli_oda():
