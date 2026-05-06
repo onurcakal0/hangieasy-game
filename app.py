@@ -33,15 +33,14 @@ app = Flask(__name__)
 # İki farklı secret key vardı, onları kasadan çekip tek bir mühürde birleştirdik.
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.secret_key = app.config['SECRET_KEY']
-
 # --- 📧 HANGIEASY POSTACI (MAIL) AYARLARI ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_PORT'] = 465             # 587'yi çöpe attık, 465 SSL portuna geçtik!
+app.config['MAIL_USE_TLS'] = False        # TLS'i kapattık
+app.config['MAIL_USE_SSL'] = True         # Zırhlı SSL bağlantısını aktif ettik!
 app.config['MAIL_USERNAME'] = 'hangieasy@gmail.com'
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = ('Hangieasy Merkez', 'hangieasy@gmail.com')
-
+app.config['MAIL_DEFAULT_SENDER'] = ('HangiEasy Merkez', 'hangieasy@gmail.com')
 # --- 💾 YEREL VERİTABANI (SQLITE) VE KLASÖR AYARLARI ---
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -616,7 +615,6 @@ def oyun_sil(oyun_id):
     db.session.delete(oyun); db.session.commit()
     return redirect(url_for('profil'))
 
-# --- ÜYELİK İŞLEMLERİ ---
 @app.route('/kayit', methods=['GET', 'POST'])
 def kayit():
     if request.method == 'POST':
@@ -625,43 +623,37 @@ def kayit():
         eposta = request.form.get('eposta')
         dogum_tarihi = request.form.get('dogum_tarihi')
         sifre = request.form.get('sifre')
-        referans_kodu = request.form.get('referans_kodu')
 
-        # 1. VERİTABANINA KAYDET (CTO Dokunuşu)
-        # Önce bu e-posta veya kullanıcı adı zaten var mı diye kontrol edelim ki veritabanı çökmesin
+        # 1. VERİTABANI KONTROLÜ
         mevcut_kullanici = Kullanici.query.filter((Kullanici.eposta == eposta) | (Kullanici.kullanici_adi == kullanici_adi)).first()
         if mevcut_kullanici:
             flash("Bu e-posta veya kullanıcı adı zaten kullanımda! Lütfen giriş yapın veya başka bir tane deneyin.", "error")
             return redirect(url_for('kayit'))
 
-        # Şifreyi güçlü bir şekilde şifrele (Hacklenemez yapıyoruz)
         hashed_sifre = generate_password_hash(sifre, method='pbkdf2:sha256')
 
-        # Yeni kullanıcıyı oluştur (Başlangıçta onayli_mi = False olarak geliyor)
-        # Yeni kullanıcıyı oluştur
+        # 2. YENİ KULLANICI (onayli_mi = False olarak geri döndü!)
         yeni_kullanici = Kullanici(
             ad_soyad=ad_soyad,
             kullanici_adi=kullanici_adi,
             eposta=eposta,
             dogum_tarihi=dogum_tarihi,
-            sifre_hash=hashed_sifre, # BURASI sifre YERİNE sifre_hash OLDU!
-            onayli_mi=False
+            sifre_hash=hashed_sifre, 
+            onayli_mi=False  # Patronun emriyle doğrulama sistemi devrede!
         )
-        # Kasaya ekle ve kilitle
+        
         db.session.add(yeni_kullanici)
         db.session.commit()
         
-        # 2. DOĞRULAMA JETONU ÜRET
-        # Kullanıcının e-postasını şifreleyerek özel bir link oluşturuyoruz
+        # 3. MAİL MOTORUNU YENİDEN ATEŞLİYORUZ (Zırhlı 465 Portu Üzerinden)
         token = s.dumps(eposta, salt='eposta-dogrulama')
         dogrulama_linki = url_for('dogrula', token=token, _external=True)
 
-        # 3. HOŞ GELDİN & DOĞRULAMA MAİLİNİ ATEŞLE
-        msg = Message('Hangieasy Krallığına Hoş Geldin! 👑', recipients=[eposta])
+        msg = Message('HangiEasy Krallığına Hoş Geldin! 👑', recipients=[eposta])
         msg.html = f"""
         <div style="background-color:#0b0c10; color:white; padding:30px; font-family:sans-serif; border-radius:10px; text-align:center;">
             <h1 style="color:#00b09b;">Aramıza Hoş Geldin {kullanici_adi}!</h1>
-            <p style="color:#aaa; font-size:16px;">Hangieasy'de rakiplerini ezmeye başlamadan önce son bir adım kaldı.</p>
+            <p style="color:#aaa; font-size:16px;">HangiEasy'de rakiplerini ezmeye başlamadan önce son bir adım kaldı.</p>
             <p>Aşağıdaki butona tıklayarak e-posta adresini doğrula ve hesabını aktifleştir:</p>
             <a href="{dogrulama_linki}" style="display:inline-block; padding:15px 30px; background-color:#f39c12; color:#000; text-decoration:none; font-weight:bold; border-radius:10px; margin-top:20px;">HESABIMI ONAYLA ⚡</a>
             <p style="color:#666; font-size:12px; margin-top:30px;">Bu link 1 saat boyunca geçerlidir.</p>
@@ -669,13 +661,12 @@ def kayit():
         """
         try:
             mail.send(msg)
-            # BEYAZ EKRAN ÇÖPE GİTTİ! Artık efsanevi neon tasarımını çağırıyoruz:
             return render_template('kayit_basarili.html')
         except Exception as e:
+            # Hata verirse ekranda ne olduğunu net görelim
             return f"Mail gönderilirken bir hata oluştu: {str(e)}"
 
     return render_template('kayit.html')
-
 @app.route('/dogrula/<token>')
 def dogrula(token):
     try:
