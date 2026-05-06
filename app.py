@@ -366,23 +366,20 @@ def izleyici_cevap_gonder(data):
 # --- 🌍 HANGIEASY ANA SAYFA (LANSMAN BİTTİ, SİSTEM CANLI!) ---
 # --- 🌍 HANGIEASY ANA SAYFA (LANSMAN BİTTİ, SİSTEM CANLI!) ---
 # ANA SAYFA MOTORU
+# --- 🌍 DIŞARIDAN GELENLER İÇİN (GERİ SAYIM VİTRİNİ) ---
 @app.route('/')
-def dashboard():  # <-- FONKSİYONUN ADINI DA DASHBOARD YAPTIK!
-    tum_oyunlar = Oyun.query.all()
-    
-    # 2. Eğer veritabanı henüz boşsa sistem çökmesin diye ufak bir CTO önlemi
-    if not tum_oyunlar:
-        tum_oyunlar = []
-    return render_template('dashboard.html')
-    # 1. Kasadan (veritabanından) gerçek oyunları çekiyoruz!
-   
+def coming_soon():
+    # Herkes bu efsanevi sayacı görecek
+    return render_template('countdown.html')
 
-    # 3. Paketi HTML'e teslim ediyoruz!
- 
-# İstersen eski gizli odanın kapısını yönlendirme olarak açık bırakabilirsin
+# --- 🕵️‍♂️ PATRON VE TEST EKİBİ İÇİN GİZLİ KAPI (ASIL SİSTEM) ---
+@app.route('/dashboard')
+def dashboard():
+    # Sistem arka planda tıkır tıkır çalışmaya devam ediyor
+    return render_template('dashboard.html')
 @app.route('/gizli-test-odasi')
 def gizli_oda():
-    return redirect(url_for('index'))
+    return redirect(url_for('dashboard'))
 # --- SENİN İÇİN GİZLİ TEST ODASI (Eski Ana Sayfan) ---
 
 @app.route('/test-olustur', methods=['GET', 'POST'])
