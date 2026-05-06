@@ -647,7 +647,10 @@ def kayit():
         
         # 3. MAİL MOTORUNU YENİDEN ATEŞLİYORUZ (Zırhlı 465 Portu Üzerinden)
         token = s.dumps(eposta, salt='eposta-dogrulama')
-        dogrulama_linki = url_for('dogrula', token=token, _external=True)
+        # Render/Heroku reverse proxy arkasında url_for localhost üretebilir!
+        # Bu yüzden SITE_URL env variable'ı ya da hangieasy.com'u kullanıyoruz.
+        site_url = os.getenv('SITE_URL', 'https://hangieasy.com').rstrip('/')
+        dogrulama_linki = f"{site_url}/dogrula/{token}"
 
         msg = Message('HangiEasy Krallığına Hoş Geldin! 👑', recipients=[eposta])
         msg.html = f"""
@@ -700,9 +703,13 @@ def giris():
     if request.method == 'POST':
         kullanici = Kullanici.query.filter_by(kullanici_adi=request.form['kullanici_adi']).first()
         if kullanici and check_password_hash(kullanici.sifre_hash, request.form['sifre']):
-            session['kullanici_adi'] = kullanici.kullanici_adi
-            return redirect(url_for('dashboard'))
-        hata = "Kullanıcı adı veya şifre hatalı!" # Çirkin beyaz sayfa yerine değişken atadık
+            if not kullanici.onayli_mi:
+                hata = "⚠️ Hesabın henüz onaylanmamış! E-posta kutunu kontrol et ve onay linkine tıkla."
+            else:
+                session['kullanici_adi'] = kullanici.kullanici_adi
+                return redirect(url_for('dashboard'))
+        else:
+            hata = "Kullanıcı adı veya şifre hatalı!"
     return render_template('giris.html', hata=hata)
 @app.route('/cikis')
 def cikis():
