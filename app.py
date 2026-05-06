@@ -422,8 +422,9 @@ def kapisma_oy_gonder(data):
 # --- 🌍 DIŞARIDAN GELENLER İÇİN (GERİ SAYIM VİTRİNİ) ---
 @app.route('/')
 def coming_soon():
-    # Direkt dashboard'a yönlendir
-    return redirect(url_for('dashboard'))
+    # Toplam test sayısını da geçir
+    toplam_test = Oyun.query.count()
+    return render_template('countdown.html', toplam_test=toplam_test)
 
 # --- 🕵️‍♂️ PATRON VE TEST EKİBİ İÇİN GİZLİ KAPI (ASIL SİSTEM) ---
 @app.route('/dashboard')
