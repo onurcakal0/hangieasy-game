@@ -607,6 +607,16 @@
             const yayinBtn = document.getElementById('modal-btn-yayin');
             const yayinModu = (mod === 'omu_bumu' || mod === 'turnuva');
             yayinBtn.style.display = yayinModu ? 'flex' : 'none';
+
+            // ⚔️ VS Düello sadece soru-cevap modlarında çalışır
+            const duelloUyumlu = ['normal', 'butce_savasi', 'sesli_quiz', 'casus_kim', 'piksel_avcisi'];
+            const vsBtn = document.getElementById('modal-btn-vs');
+            if (duelloUyumlu.includes(mod)) {
+                vsBtn.style.display = 'flex';
+                vsBtn.title = '';
+            } else {
+                vsBtn.style.display = 'none';
+            }
             
             document.getElementById('onizleme-modal').classList.add('aktif');
         }
