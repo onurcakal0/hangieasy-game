@@ -108,11 +108,38 @@
         .founder-link:hover { transform:translateY(-5px) scale(1.03); box-shadow:0 20px 50px rgba(243,156,18,0.5); }
         .founder-link:hover::before { left:100%; }
 
+        /* CTA BUTONLARI */
+        .cta-wrap { display:flex; gap:20px; justify-content:center; flex-wrap:wrap; margin-bottom:50px; }
+        .cta-btn { display:inline-flex; align-items:center; gap:12px; padding:18px 38px; border-radius:60px; text-decoration:none; font-size:1rem; font-weight:700; letter-spacing:0.8px; transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275); position:relative; overflow:hidden; cursor:pointer; border:none; }
+
+        /* Birincil: Gradient dolgu */
+        .cta-primary { background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; box-shadow:0 8px 30px rgba(255,0,122,0.35), 0 2px 8px rgba(243,156,18,0.2); }
+        .cta-primary::before { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent); transition:left 0.6s ease; }
+        .cta-primary:hover { transform:translateY(-6px) scale(1.04); box-shadow:0 16px 50px rgba(255,0,122,0.5), 0 4px 15px rgba(243,156,18,0.3); }
+        .cta-primary:hover::before { left:100%; }
+
+        /* İkincil: Glassmorphism */
+        .cta-secondary { background:rgba(255,255,255,0.04); backdrop-filter:blur(20px); color:#fff; border:1px solid rgba(255,255,255,0.12); box-shadow:0 8px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06); }
+        .cta-secondary::before { content:''; position:absolute; inset:-2px; border-radius:62px; background:linear-gradient(135deg,var(--primary),var(--secondary),var(--cyan)); opacity:0; transition:opacity 0.4s; z-index:-1; }
+        .cta-secondary::after { content:''; position:absolute; inset:0; border-radius:60px; background:rgba(11,12,16,0.85); z-index:-1; }
+        .cta-secondary:hover { transform:translateY(-6px) scale(1.04); border-color:transparent; box-shadow:0 16px 50px rgba(0,242,254,0.2), 0 4px 15px rgba(0,0,0,0.4); }
+        .cta-secondary:hover::before { opacity:1; }
+
+        .cta-btn svg { width:20px; height:20px; flex-shrink:0; }
+        .cta-btn .btn-text { white-space:nowrap; }
+
+        /* Pulse ring animasyonu */
+        .cta-pulse { position:relative; }
+        .cta-pulse::after { content:''; position:absolute; inset:-4px; border-radius:64px; border:2px solid var(--primary); opacity:0; animation:ctaPulse 2.5s ease-out infinite; }
+        @keyframes ctaPulse { 0%{opacity:0.6; transform:scale(1);} 100%{opacity:0; transform:scale(1.15);} }
+
         @media(max-width:600px) {
             .countdown-container{gap:12px;} .time-box{min-width:calc(50% - 12px); padding:20px 10px;}
             .stats-bant{gap:15px;} .stat-ayrac{display:none;}
             .stat-sayi{font-size:28px;}
             section.hero{padding-top:140px;}
+            .cta-wrap{flex-direction:column; align-items:center; gap:14px;}
+            .cta-btn{padding:16px 32px; font-size:0.95rem; width:85%; justify-content:center;}
         }
     </style>
 </head>
@@ -178,9 +205,20 @@
         <div class="time-box"><span id="minutes">00</span><div class="label">Dakika</div></div>
         <div class="time-box"><span id="seconds">00</span><div class="label">Saniye</div></div>
     </div>
-    <div class="site-buttons" style="display:flex; gap:20px; justify-content:center; margin-top:30px;">
-        <a href="/" class="sosyal-btn" style="background:linear-gradient(90deg,var(--primary),var(--secondary)); color:#fff;">Siteyi Gör</a>
-        <a href="/test_olustur.html" class="sosyal-btn" style="background:linear-gradient(90deg,var(--secondary),var(--primary)); color:#fff;">Test Oluştur</a>
+
+    <div class="cta-wrap">
+        <a href="/dashboard" class="cta-btn cta-primary cta-pulse" id="btn-siteye-goz-at">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span class="btn-text">🚀 Siteye Göz At</span>
+        </a>
+        <a href="/kayit" class="cta-btn cta-secondary" id="btn-kayit-ol">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+            <span class="btn-text">✦ Hemen Kayıt Ol</span>
+        </a>
+        <a href="/test-olustur" class="cta-btn cta-secondary" id="btn-test-olustur">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <span class="btn-text">🎯 Test Oluştur</span>
+        </a>
     </div>
 
     <div class="sosyal-wrap">
