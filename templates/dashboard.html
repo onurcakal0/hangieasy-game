@@ -15,18 +15,42 @@
             overflow-x: hidden; position: relative; min-height: 100vh;
         }
         
-        /* 🌌 IŞILTILI RGB ARKAPLAN */
-        body::before, body::after {
-            content: ''; position: fixed; width: 50vw; height: 50vw;
-            border-radius: 50%; filter: blur(120px); z-index: -1;
-            animation: orbFloat 15s infinite alternate ease-in-out;
-        }
-        body::before { background: rgba(138, 35, 135, 0.15); top: -10%; left: -10%; }
-        body::after { background: rgba(0, 242, 254, 0.15); bottom: -10%; right: -10%; animation-delay: -5s; }
+        /* 🌌 IŞILTILI RGB ARKAPLAN — ORB'LAR */
+        .orb-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(120px); animation: orbFloat 15s infinite alternate ease-in-out; }
+        .orb-1 { width: 55vw; height: 55vw; background: rgba(138, 35, 135, 0.18); top: -12%; left: -12%; }
+        .orb-2 { width: 50vw; height: 50vw; background: rgba(0, 242, 254, 0.15); bottom: -12%; right: -12%; animation-delay: -6s; animation-direction: alternate-reverse; }
+        .orb-3 { width: 35vw; height: 35vw; background: rgba(243, 156, 18, 0.08); top: 30%; left: 30%; animation-delay: -3s; animation-duration: 20s; }
         @keyframes orbFloat {
             0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 100px) scale(1.2); }
+            100% { transform: translate(50px, 90px) scale(1.18); }
         }
+
+        /* ✨ PARTICLES — Yıldız Tozu */
+        .particles, .particles-2 {
+            position: fixed; inset: 0; pointer-events: none; z-index: 1;
+            background-image:
+                radial-gradient(1.5px 1.5px at 20px 30px, rgba(255,255,255,0.85), transparent),
+                radial-gradient(2px 2px at 40px 70px, #00f2fe, transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(2px 2px at 150px 10px, #f39c12, transparent),
+                radial-gradient(1.5px 1.5px at 200px 90px, rgba(255,255,255,0.7), transparent),
+                radial-gradient(1px 1px at 60px 130px, #ff007a, transparent),
+                radial-gradient(2px 2px at 280px 50px, rgba(255,255,255,0.5), transparent),
+                radial-gradient(1px 1px at 310px 120px, #00f2fe, transparent);
+            background-size: 380px 380px;
+        }
+        .particles { animation: drift 100s linear infinite; }
+        .particles-2 { animation: driftR 70s linear infinite; opacity: 0.55; }
+        @keyframes drift { from { background-position: 0 0; } to { background-position: 1200px 800px; } }
+        @keyframes driftR { from { background-position: 1200px 800px; } to { background-position: 0 0; } }
+
+        /* 💫 SPARKLES — Nabız Atan Işık Noktaları */
+        .sparkle {
+            position: fixed; border-radius: 50%; pointer-events: none; z-index: 2;
+            animation: sparkle-pulse 4s ease-in-out infinite;
+        }
+        @keyframes sparkle-pulse { 0%,100% { transform: scale(0.8); opacity: 0.3; } 50% { transform: scale(1.4); opacity: 1; } }
 
         /* ---------------- NAVBAR DÜZENLEMELERİ ---------------- */
         .navbar {
@@ -249,7 +273,7 @@
 
         /* 🥷 STEALTH MODE (GİZLİ MOD) KODLARI */
         body.stealth-mode { background-color: #050505; }
-        body.stealth-mode::before, body.stealth-mode::after { display: none; }
+        body.stealth-mode .orb-wrap, body.stealth-mode .particles, body.stealth-mode .particles-2, body.stealth-mode .sparkle { display: none; }
         body.stealth-mode .navbar { background: rgba(10, 10, 10, 0.9); border-bottom: 1px solid #222; }
         body.stealth-mode .logo { background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; text-shadow: none; }
         body.stealth-mode .oyun-karti { background: #0a0a0c; border-color: #1a1a1a; box-shadow: none; }
@@ -269,6 +293,21 @@
     </style>
 </head>
 <body>
+
+    <!-- 🌌 ARKAPLAN KATMANLARI -->
+    <div class="orb-wrap">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+    <div class="particles"></div>
+    <div class="particles-2"></div>
+    <div class="sparkle" style="width:4px;height:4px;background:#00f2fe;top:12%;left:22%;box-shadow:0 0 6px 2px #00f2fe;animation-delay:0s;"></div>
+    <div class="sparkle" style="width:3px;height:3px;background:#f39c12;top:25%;left:75%;box-shadow:0 0 6px 2px #f39c12;animation-delay:1s;"></div>
+    <div class="sparkle" style="width:5px;height:5px;background:#fff;top:55%;left:8%;box-shadow:0 0 8px 3px rgba(255,255,255,0.8);animation-delay:2s;"></div>
+    <div class="sparkle" style="width:3px;height:3px;background:#ff007a;top:70%;left:82%;box-shadow:0 0 6px 2px #ff007a;animation-delay:0.5s;"></div>
+    <div class="sparkle" style="width:4px;height:4px;background:#00f2fe;top:42%;left:90%;box-shadow:0 0 6px 2px #00f2fe;animation-delay:3s;"></div>
+    <div class="sparkle" style="width:3px;height:3px;background:#f39c12;top:88%;left:38%;box-shadow:0 0 5px 2px #f39c12;animation-delay:1.5s;"></div>
 
     <!-- 🚀 1. AŞAMA: SOL AÇILIR SİDEBAR -->
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="sidebarKapat()"></div>
@@ -292,7 +331,12 @@
             <div class="sidebar-bolum-baslik">📜 Hukuk & Kurumsal</div>
             <a href="/aydinlatma-metni" class="sidebar-link">⚖️ Halka Açık Aydınlatma Metni</a>
             <a href="/kullanici-sozlesmesi" class="sidebar-link">🤝 Terzi İşi Kullanıcı Sözleşmesi</a>
-            <a href="/veri-gizlilik" class="sidebar-link">🔒 Veri & Gizlilik Politikası</a> 
+            <a href="/veri-gizlilik" class="sidebar-link">🔒 Veri & Gizlilik Politikası</a>
+        </div>
+
+        <div class="sidebar-bolum">
+            <div class="sidebar-bolum-baslik">📱 Sosyal Medya</div>
+            <a href="https://instagram.com/hangieasy" target="_blank" class="sidebar-link">📸 Instagram @hangieasy</a>
         </div>
 
         <div class="sidebar-bolum" style="border-bottom: none;">
@@ -463,7 +507,7 @@
 
     <script>
         // --- 🚀 GERİ SAYIM MOTORU ---
-        const countDownDate = new Date("May 10, 2026 20:00:00").getTime();
+        const countDownDate = new Date("May 15, 2026 20:00:00").getTime();
         const x = setInterval(function() {
             const now = new Date().getTime();
             const distance = countDownDate - now;
