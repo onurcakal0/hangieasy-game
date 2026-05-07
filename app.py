@@ -963,6 +963,10 @@ def kimim_ben():
     kullanicilar = Kullanici.query.all()
     liste = [f"{k.kullanici_adi} - {k.eposta}" for k in kullanicilar]
     return f"Sistemdeki Krallar: {liste}"
+@app.route('/robots.txt')
+def robots():
+    # Google botlarına "Bütün siteyi tarayabilirsin" emrini veriyoruz.
+    return "User-agent: *\nAllow: /"
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     socketio.run(app, host='0.0.0.0', port=port)
