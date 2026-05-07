@@ -286,15 +286,21 @@ def duello_lobisi(oda_kodu):
 
 @app.route('/odaya-katil', methods=['POST'])
 def odaya_katil():
-    oda_kodu = request.form.get('oda_kodu').strip()
-    
-    # Yayın var mı kontrolü
-    if oda_kodu not in aktif_yayinlar:
-        flash("Böyle bir yayın bulunamadı veya sona ermiş!", "error")
-        return redirect(url_for('dashboard')) # veya ana_sayfa
-        
-    # 🚀 YENİ VİZYON: Adamı normal oyuna DEĞİL, özel izleyici odasına gönderiyoruz!
-    return redirect(url_for('canli_yayin_izle', oda_kodu=oda_kodu))
+    oda_kodu = request.form.get('oda_kodu', '').strip()
+
+    # ⚔️ 1. ÖNCE DÜELLO ODASI MI?
+    if oda_kodu in aktif_odalar:
+        if 'kullanici_adi' not in session:
+            session['kullanici_adi'] = f"Misafir_{random.randint(1000, 9999)}"
+        return redirect(url_for('duello_lobisi', oda_kodu=oda_kodu))
+
+    # 🎥 2. SONRA YAYIN ODASI MI?
+    if oda_kodu in aktif_yayinlar:
+        return redirect(url_for('canli_yayin_izle', oda_kodu=oda_kodu))
+
+    # ❌ İKİSİ DE DEĞİLSE
+    flash("Böyle bir oda bulunamadı veya sona ermiş! Kodu kontrol et.", "error")
+    return redirect(url_for('dashboard'))
 @app.route('/canli-izle/<oda_kodu>')
 def canli_yayin_izle(oda_kodu):
     if oda_kodu not in aktif_yayinlar:
@@ -306,15 +312,46 @@ def canli_yayin_izle(oda_kodu):
     # İŞTE BURASI: Hazırladığın o neon tasarımlı izleyici HTML'ini çağırıyoruz!
     # (Parantez içine o HTML dosyasının adını tam olarak yaz, örn: 'izleyici_ekrani.html')
     return render_template('izleyici_ekrani.html', yayin_kodu=oda_kodu, oyun=oyun)
+@socketio.on('odaya_katil')
+def socket_odaya_katil(data):
+    """Düello lobisine socket bağlantısı. 2 oyuncu dolunca maçı başlatır."""
+    oda = data.get('oda')
+    oyuncu = session.get('kullanici_adi') or f"Misafir_{random.randint(1000,9999)}"
+
+    if oda not in aktif_odalar:
+        return
+
+    join_room(oda)
+
+    oyuncular = aktif_odalar[oda]['oyuncular']
+    if oyuncu not in oyuncular:
+        oyuncular.append(oyuncu)
+
+    # Lobi güncellemesi — kim geldi haber ver
+    emit('lobi_guncelle', {'oyuncular': oyuncular}, room=oda)
+
+    # İki oyuncu doldu → MAÇI BAŞLAT!
+    if len(oyuncular) >= 2:
+        emit('maci_baslat', {}, room=oda)
+
+
 @socketio.on('cevap_yolla')
 def cevap_yolla(data):
     oda = data.get('oda')
     oyuncu = session.get('kullanici_adi')
     puan = data.get('puan')
-    
+
     if oda in aktif_odalar:
         aktif_odalar[oda]['skorlar'][oyuncu] = puan
         emit('skor_guncelle', aktif_odalar[oda]['skorlar'], room=oda)
+
+        # İki oyuncu da bitirdiyse maç sonu
+        skorlar = aktif_odalar[oda]['skorlar']
+        oyun_id = aktif_odalar[oda]['oyun_id']
+        from sqlalchemy import text as _text
+        soru_sayisi = Soru.query.filter_by(oyun_id=oyun_id).count()
+        if len(skorlar) >= 2 and all(s >= soru_sayisi for s in skorlar.values()):
+            emit('mac_bitti', skorlar, room=oda)
 
 # --- 🎥 YAYINCI (STREAMER) MODU ---
 aktif_yayinlar = {}

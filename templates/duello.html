@@ -1,261 +1,334 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canlı Düello | {{ oyun.baslik }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: #0b0c10; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
-        
-        body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1f0b2e 0%, #0b0c10 80%); z-index: -1; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚔️ Düello | {{ oyun.baslik }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<style>
+:root { --mavi:#00f2fe; --kirmizi:#ff0055; --altin:#f39c12; --bg:#0b0c10; }
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Outfit',sans-serif;}
+body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden;}
 
-        /* LOBİ EKRANI */
-        #lobi-ekrani { text-align: center; margin-top: 100px; animation: fadeIn 0.5s; }
-        .oda-kodu-kutusu { background: rgba(0,242,254,0.1); border: 2px dashed #00f2fe; padding: 20px; border-radius: 15px; margin: 20px 0; font-size: 30px; font-weight: 900; color: #00f2fe; letter-spacing: 5px; }
-        .oyuncu-listesi { display: flex; justify-content: center; gap: 20px; margin-top: 30px; }
-        .oyuncu-kart { background: #1a1a24; padding: 15px 30px; border-radius: 10px; font-weight: 800; border: 1px solid #333; }
-        .btn-kopyala { background: #f39c12; color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; }
+/* ARKA PLAN */
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;}
+.orb-1{width:50vw;height:50vw;background:rgba(0,242,254,0.12);top:-10%;left:-10%;animation:orbF 14s infinite alternate;}
+.orb-2{width:50vw;height:50vw;background:rgba(255,0,85,0.12);bottom:-10%;right:-10%;animation:orbF 14s infinite alternate-reverse;}
+@keyframes orbF{0%{transform:translate(0,0) scale(1);}100%{transform:translate(40px,70px) scale(1.15);}}
 
-        /* OYUN EKRANI */
-        #oyun-ekrani { display: none; width: 100%; max-width: 900px; padding: 20px; margin-top: 20px; }
-        
-        /* CANLI SKOR BARLARI (YARIŞ EKRANI) */
-        .yaris-alani { background: rgba(25,25,35,0.8); padding: 20px; border-radius: 15px; border: 1px solid #444; margin-bottom: 30px; }
-        .yaris-kulvari { margin-bottom: 15px; }
-        .oyuncu-isim { font-size: 14px; font-weight: 800; margin-bottom: 5px; color: #aaa; text-transform: uppercase;}
-        
-        .bar-kapsayici { width: 100%; height: 25px; background: #111; border-radius: 15px; overflow: hidden; position: relative; border: 1px solid #333;}
-        .benim-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #00f2fe, #4facfe); transition: width 0.3s ease; }
-        .rakip-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ff0055, #ff4b2b); transition: width 0.3s ease; }
+/* LOBİ */
+#lobi{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;}
+.lobi-baslik{font-size:clamp(2rem,6vw,4rem);font-weight:900;background:linear-gradient(90deg,var(--mavi),var(--kirmizi));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px;}
+.lobi-altyazi{color:#666;font-size:15px;margin-bottom:40px;}
+.kod-kutusu{background:rgba(0,242,254,0.07);border:2px dashed var(--mavi);border-radius:20px;padding:25px 50px;font-size:clamp(2.5rem,7vw,5rem);font-weight:900;color:var(--mavi);letter-spacing:10px;margin-bottom:30px;animation:glow 2s ease-in-out infinite alternate;}
+@keyframes glow{from{box-shadow:0 0 20px rgba(0,242,254,0.2);}to{box-shadow:0 0 40px rgba(0,242,254,0.5);}}
+.oyuncu-listesi{display:flex;gap:20px;justify-content:center;margin-bottom:35px;flex-wrap:wrap;}
+.oyuncu-pill{padding:12px 28px;border-radius:50px;font-weight:700;font-size:14px;border:2px solid;transition:0.3s;}
+.pill-mavi{border-color:var(--mavi);color:var(--mavi);background:rgba(0,242,254,0.08);}
+.pill-kirmizi{border-color:var(--kirmizi);color:var(--kirmizi);background:rgba(255,0,85,0.08);}
+.pill-bos{border-color:#333;color:#555;background:rgba(255,255,255,0.03);}
+.btn-kopyala{background:linear-gradient(135deg,var(--altin),#e67e22);color:#000;border:none;padding:15px 35px;border-radius:50px;font-size:16px;font-weight:800;cursor:pointer;transition:0.3s;display:inline-flex;align-items:center;gap:10px;}
+.btn-kopyala:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(243,156,18,0.4);}
+.bekle-mesaj{margin-top:25px;color:#555;font-size:13px;letter-spacing:2px;animation:blink 1.4s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
 
-        /* SORU ALANI */
-        .soru-alani { text-align: center; }
-        .soru-resim { width: 100%; max-width: 400px; border-radius: 15px; border: 3px solid #f39c12; margin-bottom: 20px; box-shadow: 0 0 30px rgba(243,156,18,0.3);}
-        .secenekler-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn-secenek { background: #222; border: 2px solid #444; color: white; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 800; cursor: pointer; transition: 0.2s;}
-        .btn-secenek:hover { background: rgba(0,242,254,0.1); border-color: #00f2fe; }
+/* OYUN EKRANI — SPLIT */
+#oyun{display:none;position:relative;z-index:10;width:100%;min-height:100vh;}
 
-        #sonuc-ekrani { display: none; text-align: center; margin-top: 100px; }
-        .kazanan-yazi { font-size: 50px; font-weight: 900; color: #2ecc71; text-transform: uppercase; text-shadow: 0 0 30px rgba(46,204,113,0.5);}
+/* ÜST SKOR BARI */
+.skor-bari{display:flex;align-items:center;justify-content:space-between;padding:15px 25px;background:rgba(0,0,0,0.6);backdrop-filter:blur(15px);border-bottom:1px solid rgba(255,255,255,0.06);position:sticky;top:0;z-index:20;}
+.oyuncu-skor{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:120px;}
+.oyuncu-skor .isim{font-size:12px;text-transform:uppercase;letter-spacing:2px;}
+.oyuncu-skor .puan{font-size:28px;font-weight:900;}
+.skor-ben .isim{color:var(--mavi);}
+.skor-ben .puan{background:linear-gradient(90deg,var(--mavi),#4facfe);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.skor-rakip .isim{color:var(--kirmizi);}
+.skor-rakip .puan{background:linear-gradient(90deg,var(--kirmizi),#ff4b2b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.vs-orta{font-size:22px;font-weight:900;color:#444;}
 
-    </style>
+/* PROGRESS BAR */
+.progress-wrap{height:4px;background:#111;position:relative;}
+.progress-ben{height:100%;background:linear-gradient(90deg,var(--mavi),#4facfe);width:0%;transition:width 0.4s;float:left;}
+.progress-rakip{height:100%;background:linear-gradient(90deg,var(--kirmizi),#ff4b2b);width:0%;transition:width 0.4s;float:right;}
+
+/* SORU ALANI */
+.soru-alan{max-width:720px;margin:0 auto;padding:35px 20px;}
+.soru-no{font-size:12px;color:#555;text-transform:uppercase;letter-spacing:3px;margin-bottom:15px;}
+.soru-resim-wrap{text-align:center;margin-bottom:25px;}
+.soru-resim{max-width:100%;max-height:260px;border-radius:16px;border:2px solid rgba(255,255,255,0.08);object-fit:cover;}
+.secenekler{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px;}
+.btn-sec{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);color:#fff;padding:18px 15px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;transition:0.2s;text-align:left;}
+.btn-sec:hover{background:rgba(0,242,254,0.08);border-color:var(--mavi);}
+.btn-sec.dogru{background:rgba(46,204,113,0.15)!important;border-color:#2ecc71!important;color:#2ecc71!important;}
+.btn-sec.yanlis{background:rgba(231,76,60,0.15)!important;border-color:#e74c3c!important;color:#e74c3c!important;}
+.btn-sec:disabled{cursor:default;}
+
+/* SONUÇ */
+#sonuc{display:none;position:relative;z-index:10;min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;}
+.sonuc-emoji{font-size:90px;margin-bottom:20px;animation:bounce 0.8s ease;}
+@keyframes bounce{0%{transform:scale(0);}70%{transform:scale(1.2);}100%{transform:scale(1);}}
+.sonuc-yazi{font-size:clamp(2.5rem,7vw,5rem);font-weight:900;margin-bottom:15px;}
+.sonuc-detay{font-size:18px;color:#888;margin-bottom:35px;}
+.coin-kazanc{font-size:20px;font-weight:800;color:var(--altin);margin-bottom:40px;}
+.btn-ana{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--mavi),#4facfe);color:#000;padding:15px 40px;border-radius:50px;text-decoration:none;font-weight:900;font-size:16px;transition:0.3s;}
+.btn-ana:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,242,254,0.4);}
+
+@media(max-width:600px){
+  .secenekler{grid-template-columns:1fr;}
+  .skor-ben .isim,.skor-rakip .isim{font-size:10px;}
+  .skor-ben .puan,.skor-rakip .puan{font-size:22px;}
+}
+</style>
 </head>
 <body>
 
-    <div id="lobi-ekrani">
-        <h1 style="color: #fff;">⚔️ DÜELLO LOBİSİ</h1>
-        <p style="color: #aaa;">Arkadaşının kodu girip odaya katılmasını bekle...</p>
-        
-        <div class="oda-kodu-kutusu" id="kodu-goster">{{ oda_kodu }}</div>
-        
-        <button class="btn-kopyala" onclick="linkiKopyala()">🔗 Davet Linkini Kopyala</button>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
 
-        <div class="oyuncu-listesi" id="bekleyen-oyuncular">
-            </div>
+<!-- LOBİ -->
+<div id="lobi">
+  <div class="lobi-baslik">⚔️ DÜELLO</div>
+  <p class="lobi-altyazi">{{ oyun.baslik }}</p>
+
+  <div class="kod-kutusu" id="kodu-goster">{{ oda_kodu }}</div>
+
+  <button class="btn-kopyala" onclick="linkKopyala()">🔗 Davet Linkini Kopyala</button>
+
+  <div class="oyuncu-listesi" id="oyuncu-listesi">
+    <div class="oyuncu-pill pill-bos" id="slot-1">Oyuncu 1 Bekleniyor...</div>
+    <div class="oyuncu-pill pill-bos" id="slot-2">Oyuncu 2 Bekleniyor...</div>
+  </div>
+
+  <p class="bekle-mesaj" id="bekle-mesaj">Rakip bağlanmayı bekliyor...</p>
+</div>
+
+<!-- OYUN -->
+<div id="oyun">
+  <!-- Skor barı -->
+  <div class="skor-bari">
+    <div class="oyuncu-skor skor-ben">
+      <span class="isim" id="isim-ben">Sen</span>
+      <span class="puan" id="puan-ben">0</span>
     </div>
-
-    <div id="oyun-ekrani">
-        <div class="yaris-alani">
-            <div class="yaris-kulvari">
-                <div class="oyuncu-isim">Sen (<span id="benim-puan">0</span>)</div>
-                <div class="bar-kapsayici"><div class="benim-bar" id="benim-cubuk"></div></div>
-            </div>
-            <div class="yaris-kulvari">
-                <div class="oyuncu-isim">Rakip (<span id="rakip-puan">0</span>)</div>
-                <div class="bar-kapsayici"><div class="rakip-bar" id="rakip-cubuk"></div></div>
-            </div>
-        </div>
-
-        <div class="soru-alani">
-            <img src="" id="soru-resmi" class="soru-resim">
-            <div class="secenekler-grid" id="secenekler-alani"></div>
-        </div>
+    <div class="vs-orta">⚔️</div>
+    <div class="oyuncu-skor skor-rakip">
+      <span class="isim" id="isim-rakip">Rakip</span>
+      <span class="puan" id="puan-rakip">0</span>
     </div>
+  </div>
+  <!-- İlerleme çubukları -->
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-ben" id="prog-ben"></div>
+    <div class="progress-rakip" id="prog-rakip"></div>
+  </div>
 
-    <div id="sonuc-ekrani">
-        <div class="kazanan-yazi" id="mac-sonucu"></div>
-        <p style="margin-top:20px; font-size: 20px; color: #f39c12;" id="he-coin-mesaj"></p>
-        <a href="/" style="display:inline-block; margin-top: 30px; padding:15px 30px; background:#333; color:#fff; text-decoration:none; font-weight:800; border-radius:12px;">Ana Sayfaya Dön</a>
+  <!-- Soru alanı -->
+  <div class="soru-alan">
+    <div class="soru-no" id="soru-no">SORU 1</div>
+    <div class="soru-resim-wrap" id="resim-wrap" style="display:none;">
+      <img id="soru-resim" class="soru-resim" src="" alt="">
     </div>
+    <div class="secenekler" id="secenekler"></div>
+  </div>
+</div>
 
-    <script>
-        const socket = io();
-        const ODA_KODU = "{{ oda_kodu }}";
-        const OYUN_ID = "{{ oyun.id }}";
-        const BEN = "{{ session.kullanici_adi }}";
-        
-        let SORULAR = [];
-        let aktifSoruIndex = 0;
-        let benimSkorum = 0;
-        let soruKilitli = false;
+<!-- SONUÇ -->
+<div id="sonuc" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:40px 20px;position:relative;z-index:10;">
+  <div class="sonuc-emoji" id="sonuc-emoji">🏆</div>
+  <div class="sonuc-yazi" id="sonuc-yazi">KAZANDIN!</div>
+  <div class="sonuc-detay" id="sonuc-detay"></div>
+  <div class="coin-kazanc" id="coin-kazanc"></div>
+  <a href="/dashboard" class="btn-ana">🏠 Ana Sayfaya Dön</a>
+</div>
 
-        // Odaya Katılma Sinyali Gönder
-        socket.on('connect', () => {
-            socket.emit('odaya_katil', { oda: ODA_KODU });
-        });
+<script>
+const socket = io();
+const ODA  = "{{ oda_kodu }}";
+const OYUN = "{{ oyun.id }}";
+const BEN  = "{{ session.kullanici_adi }}";
 
-        // Lobi Güncellemesi (Biri gelince)
-        socket.on('lobi_guncelle', (data) => {
-            let liste = document.getElementById('bekleyen-oyuncular');
-            if(liste) {
-                liste.innerHTML = '';
-                data.oyuncular.forEach(oyuncu => {
-                    let renk = oyuncu === BEN ? '#00f2fe' : '#ff0055';
-                    liste.innerHTML += `<div class="oyuncu-kart" style="border-color:${renk};">${oyuncu}</div>`;
-                });
-            }
-        });
+let SORULAR = [];
+let soruIdx = 0;
+let benimPuan = 0;
+let rakipPuan = 0;
+let rakipIsim = "Rakip";
+let kilitli = false;
 
-        // 2 Kişi Gelince Maç Başlar!
-        socket.on('maci_baslat', () => {
-            document.getElementById('lobi-ekrani').style.display = 'none';
-            document.getElementById('oyun-ekrani').style.display = 'block';
-            
-            // Soruları çek ve ilk soruyu çiz
-            fetch(`/api/sorular/${OYUN_ID}`)
-                .then(res => res.json())
-                .then(data => {
-                    // 🚀 ZIRH 1: Veri boşsa sistemi kilitle
-                    if(!data || data.length === 0) {
-                        document.getElementById('secenekler-alani').innerHTML = "<h3 style='color:#fff;'>Teste soru eklenmemiş!</h3>";
-                        return;
-                    }
-                    SORULAR = data;
-                    soruyuCiz();
-                })
-                .catch(err => console.error("Veri Çekme Hatası:", err));
-        });
+// Bağlanınca lobiye gir
+socket.on('connect', () => {
+  socket.emit('odaya_katil', { oda: ODA });
+});
 
-        // 📡 SKORLAR GÜNCELLENDİĞİNDE
-        socket.on('skor_guncelle', (skorlar) => {
-            for (let oyuncu in skorlar) {
-                let puan = skorlar[oyuncu];
-                let yuzde = (puan / SORULAR.length) * 100;
+// Lobi güncellemesi
+socket.on('lobi_guncelle', (data) => {
+  const oyuncular = data.oyuncular || [];
+  const slot1 = document.getElementById('slot-1');
+  const slot2 = document.getElementById('slot-2');
 
-                if(oyuncu === BEN) {
-                    let benPuan = document.getElementById('benim-puan');
-                    let benCubuk = document.getElementById('benim-cubuk');
-                    if(benPuan) benPuan.innerText = puan;
-                    if(benCubuk) benCubuk.style.width = yuzde + '%';
-                } else {
-                    let rakipPuan = document.getElementById('rakip-puan');
-                    let rakipCubuk = document.getElementById('rakip-cubuk');
-                    if(rakipPuan) rakipPuan.innerText = puan;
-                    if(rakipCubuk) rakipCubuk.style.width = yuzde + '%';
-                }
-            }
+  if (oyuncular[0]) {
+    slot1.textContent = (oyuncular[0] === BEN ? '👑 Sen' : '⚔️ ' + oyuncular[0]);
+    slot1.className = 'oyuncu-pill ' + (oyuncular[0] === BEN ? 'pill-mavi' : 'pill-kirmizi');
+  }
+  if (oyuncular[1]) {
+    slot2.textContent = (oyuncular[1] === BEN ? '👑 Sen' : '⚔️ ' + oyuncular[1]);
+    slot2.className = 'oyuncu-pill ' + (oyuncular[1] === BEN ? 'pill-mavi' : 'pill-kirmizi');
+    document.getElementById('bekle-mesaj').textContent = '🔥 İki oyuncu hazır! Maç başlıyor...';
+  }
 
-            // Rakip %100 yaptıysa oyunu bitir!
-            let rakiplerinPuanlari = Object.values(skorlar);
-            if(Math.max(...rakiplerinPuanlari) >= SORULAR.length) {
-                maciBitir(skorlar);
-            }
-        });
+  // Rakip ismini bul
+  oyuncular.forEach(o => { if (o !== BEN) rakipIsim = o; });
+  document.getElementById('isim-ben').textContent = BEN;
+  document.getElementById('isim-rakip').textContent = rakipIsim;
+});
 
-        function soruyuCiz() {
-            // Sorular bittiyse rakibi bekleme ekranı
-            if(aktifSoruIndex >= SORULAR.length) {
-                document.getElementById('secenekler-alani').innerHTML = "<h3 style='color:#00f2fe; text-align:center;'>Rakibin bitirmesi bekleniyor... ⏳</h3>";
-                return; 
-            }
-            
-            soruKilitli = false;
-            let soru = SORULAR[aktifSoruIndex];
-            
-            // 🚀 ZIRH 2: Resim URL'sini güvene al ve kırık resim koruması ekle
-            let resimElem = document.getElementById('soru-resmi');
-            if(resimElem) {
-                let gelenResim = (soru.resim_url || "").split(',')[0]; // İlk resmi al
-                resimElem.src = gelenResim;
-                resimElem.onerror = function() { this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'; };
-            }
-            
-            let secAlan = document.getElementById('secenekler-alani');
-            secAlan.innerHTML = '';
-            
-            // 🚀 ZIRH 3: Seçenekleri doğru parçala ve karıştır
-            let seceneklerDizisi = (soru.secenekler || "").split(',');
-            let karisik = [...seceneklerDizisi].sort(() => Math.random() - 0.5);
-            
-            karisik.forEach(sec => {
-                let s = sec.trim();
-                if(s) {
-                    // Tırnak işaretlerini sabote edilmemesi için temizle
-                    let guvenliS = s.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                    secAlan.innerHTML += `<button class="btn-secenek" onclick="cevapVer(this, '${guvenliS}')">${s}</button>`;
-                }
-            });
-        }
+// Maç başlat
+socket.on('maci_baslat', () => {
+  document.getElementById('lobi').style.display = 'none';
+  document.getElementById('oyun').style.display = 'block';
 
-        function cevapVer(buton, secim) {
-            if(soruKilitli) return;
-            soruKilitli = true;
+  fetch(`/api/sorular/${OYUN}`)
+    .then(r => r.json())
+    .then(data => {
+      if (!data || !data.length) {
+        document.getElementById('secenekler').innerHTML = "<p style='color:#f39c12;text-align:center;'>Bu teste soru eklenmemiş!</p>";
+        return;
+      }
+      SORULAR = data;
+      soruGoster();
+    });
+});
 
-            // 🚀 ZIRH 4: Doğru cevap boş gelirse patlama koruması
-            let dogruCevap = (SORULAR[aktifSoruIndex].dogru_cevap || "").trim();
-            
-            if(secim === dogruCevap || dogruCevap === "Farketmez" || dogruCevap === "") {
-                buton.style.background = "#2ecc71";
-                buton.style.boxShadow = "0 0 15px rgba(46, 204, 113, 0.6)";
-                benimSkorum += 1;
-                
-                // SUNUCUYA HABER VER: Puan kazandım!
-                socket.emit('cevap_yolla', { oda: ODA_KODU, puan: benimSkorum });
-            } else {
-                buton.style.background = "#e74c3c";
-                buton.style.boxShadow = "0 0 15px rgba(231, 76, 60, 0.6)";
-            }
+// Skor güncelle (rakipten gelen)
+socket.on('skor_guncelle', (skorlar) => {
+  for (let oyuncu in skorlar) {
+    if (oyuncu !== BEN) {
+      rakipPuan = skorlar[oyuncu];
+      document.getElementById('puan-rakip').textContent = rakipPuan;
+      let yuzde = Math.min(100, (rakipPuan / Math.max(1, SORULAR.length)) * 100);
+      document.getElementById('prog-rakip').style.width = yuzde + '%';
+    }
+  }
+});
 
-            setTimeout(() => {
-                aktifSoruIndex++;
-                soruyuCiz();
-            }, 1000);
-        }
+// Maç bitti (her ikisi de bitince)
+socket.on('mac_bitti', (skorlar) => {
+  maciBitir(skorlar);
+});
 
-        function maciBitir(finalSkorlar) {
-            document.getElementById('oyun-ekrani').style.display = 'none';
-            document.getElementById('sonuc-ekrani').style.display = 'block';
+function soruGoster() {
+  if (soruIdx >= SORULAR.length) {
+    document.getElementById('secenekler').innerHTML =
+      "<p style='color:var(--mavi);text-align:center;font-size:18px;padding:30px;'>✅ Tüm sorular bitti!<br>Rakip bekleniyor...</p>";
+    return;
+  }
 
-            let rakipPuan = 0;
-            for (let o in finalSkorlar) { if(o !== BEN) rakipPuan = finalSkorlar[o]; }
+  kilitli = false;
+  const soru = SORULAR[soruIdx];
+  document.getElementById('soru-no').textContent = `SORU ${soruIdx + 1} / ${SORULAR.length}`;
 
-            let mesaj = document.getElementById('mac-sonucu');
-            let coinMesaj = document.getElementById('he-coin-mesaj');
+  // Resim
+  const resimUrl = (soru.resim_url || '').split(',')[0].trim();
+  const resimWrap = document.getElementById('resim-wrap');
+  if (resimUrl) {
+    const img = document.getElementById('soru-resim');
+    img.src = resimUrl;
+    img.onerror = () => resimWrap.style.display = 'none';
+    resimWrap.style.display = 'block';
+  } else {
+    resimWrap.style.display = 'none';
+  }
 
-            if(benimSkorum > rakipPuan) {
-                mesaj.innerText = "🏆 KAZANDIN!";
-                mesaj.style.color = "#2ecc71";
-                mesaj.style.textShadow = "0 0 20px rgba(46, 204, 113, 0.5)";
-                
-                // Kazanan parayı alır!
-                fetch('/api/odul_al', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({miktar: 50}) })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.status === 'success' && coinMesaj) {
-                        coinMesaj.innerText = `💰 ${data.kazanc} HE-Coin Kazandın! Patron çıldırdı!`;
-                        coinMesaj.style.color = "#facc15";
-                    }
-                });
-            } else if (benimSkorum < rakipPuan) {
-                mesaj.innerText = "💀 KAYBETTİN!";
-                mesaj.style.color = "#ff0055";
-                mesaj.style.textShadow = "0 0 20px rgba(255, 0, 85, 0.5)";
-                if(coinMesaj) coinMesaj.innerText = "Bir dahaki sefere daha hızlı ol!";
-            } else {
-                mesaj.innerText = "🤝 BERABERE!";
-                mesaj.style.color = "#f39c12";
-                if(coinMesaj) coinMesaj.innerText = "İki büyük vizyoner yenişemedi!";
-            }
-        }
+  // Seçenekler
+  const sec = document.getElementById('secenekler');
+  sec.innerHTML = '';
+  let secenek = (soru.secenekler || '').split(',').map(s => s.trim()).filter(Boolean);
+  secenek.sort(() => Math.random() - 0.5);
+  secenek.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-sec';
+    btn.textContent = s;
+    btn.onclick = () => cevapVer(btn, s);
+    sec.appendChild(btn);
+  });
+}
 
-        function linkiKopyala() {
-            let link = window.location.origin + "/duello/" + ODA_KODU;
-            navigator.clipboard.writeText(link);
-            alert("Link Kopyalandı! Arkadaşına gönder, arenaya gelsin.");
-        }
-    </script>
+function cevapVer(btn, secim) {
+  if (kilitli) return;
+  kilitli = true;
+
+  const dogru = (SORULAR[soruIdx].dogru_cevap || '').trim();
+  const tumButonlar = document.querySelectorAll('.btn-sec');
+
+  tumButonlar.forEach(b => {
+    b.disabled = true;
+    if (b.textContent === dogru) b.classList.add('dogru');
+  });
+
+  if (secim === dogru) {
+    btn.classList.add('dogru');
+    benimPuan++;
+    document.getElementById('puan-ben').textContent = benimPuan;
+    let yuzde = Math.min(100, (benimPuan / SORULAR.length) * 100);
+    document.getElementById('prog-ben').style.width = yuzde + '%';
+    socket.emit('cevap_yolla', { oda: ODA, puan: benimPuan });
+  } else {
+    btn.classList.add('yanlis');
+    socket.emit('cevap_yolla', { oda: ODA, puan: benimPuan });
+  }
+
+  setTimeout(() => {
+    soruIdx++;
+    soruGoster();
+  }, 1200);
+}
+
+function maciBitir(skorlar) {
+  document.getElementById('oyun').style.display = 'none';
+  const sonucDiv = document.getElementById('sonuc');
+  sonucDiv.style.display = 'flex';
+
+  let rakipSkor = 0;
+  for (let o in skorlar) { if (o !== BEN) rakipSkor = skorlar[o]; }
+
+  const emoji = document.getElementById('sonuc-emoji');
+  const yazi  = document.getElementById('sonuc-yazi');
+  const detay = document.getElementById('sonuc-detay');
+  const coin  = document.getElementById('coin-kazanc');
+
+  if (benimPuan > rakipSkor) {
+    emoji.textContent = '🏆';
+    yazi.textContent  = 'KAZANDIN!';
+    yazi.style.background = 'linear-gradient(90deg,#2ecc71,#00f2fe)';
+    yazi.style.webkitBackgroundClip = 'text';
+    yazi.style.webkitTextFillColor = 'transparent';
+    detay.textContent = `${benimPuan} - ${rakipSkor} | Rakibi ezdin!`;
+    fetch('/api/odul_al',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({miktar:50})})
+      .then(r=>r.json()).then(d=>{ if(d.status==='success') coin.textContent=`💰 +${d.kazanc} HE-Coin Kazandın!`; });
+  } else if (benimPuan < rakipSkor) {
+    emoji.textContent = '💀';
+    yazi.textContent  = 'KAYBETTİN!';
+    yazi.style.background = 'linear-gradient(90deg,#ff0055,#ff4b2b)';
+    yazi.style.webkitBackgroundClip = 'text';
+    yazi.style.webkitTextFillColor = 'transparent';
+    detay.textContent = `${benimPuan} - ${rakipSkor} | Bir dahaki sefere!`;
+    coin.textContent = '😤 Kaybeden coin almaz, çalış!';
+  } else {
+    emoji.textContent = '🤝';
+    yazi.textContent  = 'BERABERE!';
+    yazi.style.color  = '#f39c12';
+    detay.textContent = `${benimPuan} - ${rakipSkor} | İki vizyon eşit çıktı!`;
+  }
+}
+
+function linkKopyala() {
+  const link = window.location.origin + '/duello/' + ODA;
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.querySelector('.btn-kopyala');
+    btn.textContent = '✅ Kopyalandı!';
+    setTimeout(() => btn.innerHTML = '🔗 Davet Linkini Kopyala', 2000);
+  });
+}
+</script>
 </body>
 </html>
