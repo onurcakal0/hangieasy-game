@@ -220,6 +220,14 @@ function soruGoster() {
   if (soruIdx >= SORULAR.length) {
     document.getElementById('secenekler').innerHTML =
       "<p style='color:var(--mavi);text-align:center;font-size:18px;padding:30px;'>✅ Tüm sorular bitti!<br>Rakip bekleniyor...</p>";
+    // Sunucuya 'bitirdim' sinyali gönder
+    socket.emit('oyun_bitti', { oda: ODA, oyuncu: BEN, puan: benimPuan });
+    // 10 saniye içinde mac_bitti gelmediyse rakip bağlı değil demektir
+    setTimeout(() => {
+      if (document.getElementById('oyun').style.display !== 'none') {
+        maciBitir({ [BEN]: benimPuan });
+      }
+    }, 10000);
     return;
   }
 
@@ -271,10 +279,10 @@ function cevapVer(btn, secim) {
     document.getElementById('puan-ben').textContent = benimPuan;
     let yuzde = Math.min(100, (benimPuan / SORULAR.length) * 100);
     document.getElementById('prog-ben').style.width = yuzde + '%';
-    socket.emit('cevap_yolla', { oda: ODA, puan: benimPuan });
+    socket.emit('cevap_yolla', { oda: ODA, oyuncu: BEN, puan: benimPuan });
   } else {
     btn.classList.add('yanlis');
-    socket.emit('cevap_yolla', { oda: ODA, puan: benimPuan });
+    socket.emit('cevap_yolla', { oda: ODA, oyuncu: BEN, puan: benimPuan });
   }
 
   setTimeout(() => {

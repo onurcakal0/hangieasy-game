@@ -337,21 +337,39 @@ def socket_odaya_katil(data):
 
 @socketio.on('cevap_yolla')
 def cevap_yolla(data):
-    oda = data.get('oda')
-    oyuncu = session.get('kullanici_adi')
-    puan = data.get('puan')
+    oda    = data.get('oda')
+    oyuncu = data.get('oyuncu') or session.get('kullanici_adi', 'Bilinmeyen')
+    puan   = data.get('puan', 0)
 
-    if oda in aktif_odalar:
-        aktif_odalar[oda]['skorlar'][oyuncu] = puan
-        emit('skor_guncelle', aktif_odalar[oda]['skorlar'], room=oda)
+    if oda not in aktif_odalar:
+        return
 
-        # İki oyuncu da bitirdiyse maç sonu
-        skorlar = aktif_odalar[oda]['skorlar']
-        oyun_id = aktif_odalar[oda]['oyun_id']
-        from sqlalchemy import text as _text
-        soru_sayisi = Soru.query.filter_by(oyun_id=oyun_id).count()
-        if len(skorlar) >= 2 and all(s >= soru_sayisi for s in skorlar.values()):
-            emit('mac_bitti', skorlar, room=oda)
+    aktif_odalar[oda]['skorlar'][oyuncu] = puan
+    emit('skor_guncelle', aktif_odalar[oda]['skorlar'], room=oda)
+
+
+@socketio.on('oyun_bitti')
+def oyun_bitti_handler(data):
+    """Bir oyuncu tüm soruları bitirince çağrılır. İkisi de bitince mac_bitti."""
+    oda    = data.get('oda')
+    oyuncu = data.get('oyuncu') or session.get('kullanici_adi', 'Bilinmeyen')
+    puan   = data.get('puan', 0)
+
+    if oda not in aktif_odalar:
+        return
+
+    aktif_odalar[oda]['skorlar'][oyuncu] = puan
+
+    if 'bitenler' not in aktif_odalar[oda]:
+        aktif_odalar[oda]['bitenler'] = []
+    if oyuncu not in aktif_odalar[oda]['bitenler']:
+        aktif_odalar[oda]['bitenler'].append(oyuncu)
+
+    # İki oyuncu da bitirdiyse maç sonu
+    if len(aktif_odalar[oda]['bitenler']) >= 2:
+        emit('mac_bitti', aktif_odalar[oda]['skorlar'], room=oda)
+
+
 
 # --- 🎥 YAYINCI (STREAMER) MODU ---
 aktif_yayinlar = {}
