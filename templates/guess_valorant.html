@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guess The Valorant Agent | HangiEasy</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0c10;--card:rgba(20,21,30,0.85);--border:rgba(255,255,255,0.08);--primary:#ff4655;--cyan:#00f2fe;--green:#22c55e;--yellow:#f59e0b;--red:#ef4444;--text:#e2e8f0;--muted:#64748b;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Outfit',sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ORBS */
+.orb{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0;}
+.orb1{width:50vw;height:50vw;background:rgba(255,70,85,0.12);top:-10%;left:-10%;animation:of 14s infinite alternate ease-in-out;}
+.orb2{width:45vw;height:45vw;background:rgba(0,242,254,0.1);bottom:-10%;right:-10%;animation:of 18s infinite alternate-reverse ease-in-out;}
+@keyframes of{0%{transform:translate(0,0) scale(1);}100%{transform:translate(50px,80px) scale(1.2);}}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:14px 5%;background:rgba(11,12,16,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-logo{font-size:20px;font-weight:900;background:linear-gradient(90deg,var(--primary),#ff8800);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
+.nav-back{color:var(--muted);text-decoration:none;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;transition:.3s;}
+.nav-back:hover{color:var(--text);}
+.val-badge{background:rgba(255,70,85,0.12);border:1px solid rgba(255,70,85,0.3);color:var(--primary);padding:6px 16px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;}
+
+/* MAIN */
+main{position:relative;z-index:10;max-width:860px;margin:0 auto;padding:30px 20px 80px;}
+
+/* HEADER */
+.game-header{text-align:center;margin-bottom:30px;}
+.game-title{font-size:clamp(1.8rem,5vw,3rem);font-weight:900;letter-spacing:2px;background:linear-gradient(90deg,#fff,var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px;}
+.game-sub{color:var(--muted);font-size:13px;letter-spacing:1px;}
+.streak-bar{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:8px 18px;border-radius:20px;font-size:13px;margin-top:12px;}
+.streak-val{color:var(--yellow);font-weight:800;font-size:16px;}
+
+/* ATTRIBUTE HEADER */
+.attr-header{display:grid;grid-template-columns:2fr 1fr 1.2fr 1fr;gap:8px;margin-bottom:10px;padding:0 4px;}
+.attr-label{text-align:center;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:2px;}
+
+/* GUESS ROW */
+.guess-row{display:grid;grid-template-columns:2fr 1fr 1.2fr 1fr;gap:8px;margin-bottom:8px;animation:slideIn .4s ease-out;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.cell{padding:12px 8px;border-radius:12px;text-align:center;font-weight:800;font-size:13px;letter-spacing:.5px;text-transform:uppercase;border:1px solid transparent;position:relative;overflow:hidden;}
+.cell::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.06),transparent);pointer-events:none;}
+.cell.correct{background:rgba(34,197,94,0.2);border-color:rgba(34,197,94,0.5);color:#86efac;}
+.cell.wrong  {background:rgba(239,68,68,0.18);border-color:rgba(239,68,68,0.4);color:#fca5a5;}
+.cell.partial{background:rgba(245,158,11,0.18);border-color:rgba(245,158,11,0.4);color:#fcd34d;}
+
+/* YEAR ARROW */
+.year-arrow{font-size:10px;display:block;opacity:.7;margin-top:2px;}
+
+/* INPUT AREA */
+.input-wrap{background:var(--card);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:20px;position:relative;}
+.input-label{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.input-row{display:flex;gap:10px;}
+#agent-input{flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:12px;padding:14px 18px;color:#fff;font-size:15px;font-weight:600;outline:none;font-family:'Outfit',sans-serif;transition:.3s;}
+#agent-input:focus{border-color:var(--primary);box-shadow:0 0 20px rgba(255,70,85,0.2);}
+#agent-input::placeholder{color:var(--muted);}
+.guess-btn{padding:14px 28px;background:linear-gradient(135deg,var(--primary),#ff8800);color:#fff;border:none;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer;transition:.3s;letter-spacing:1px;white-space:nowrap;}
+.guess-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(255,70,85,0.4);}
+.guess-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+/* AUTOCOMPLETE */
+.autocomplete{position:absolute;top:100%;left:0;right:0;background:rgba(20,21,35,0.98);border:1px solid var(--border);border-radius:12px;margin-top:6px;overflow:hidden;z-index:200;max-height:220px;overflow-y:auto;display:none;box-shadow:0 20px 40px rgba(0,0,0,0.6);}
+.autocomplete::-webkit-scrollbar{width:4px;}
+.autocomplete::-webkit-scrollbar-track{background:transparent;}
+.autocomplete::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px;}
+.ac-item{padding:12px 18px;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;transition:.2s;}
+.ac-item:hover{background:rgba(255,70,85,0.15);color:#fff;}
+.ac-emoji{font-size:18px;}
+
+/* HINT LEGEND */
+.legend{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+.legend-dot{width:10px;height:10px;border-radius:3px;}
+.lg{background:var(--green);} .ly{background:var(--yellow);} .lr{background:var(--red);}
+
+/* WIN PANEL */
+.win-panel{display:none;text-align:center;background:linear-gradient(135deg,rgba(34,197,94,0.12),rgba(0,242,254,0.08));border:1px solid rgba(34,197,94,0.3);border-radius:24px;padding:40px 30px;margin-top:20px;animation:slideIn .5s ease-out;}
+.win-emoji{font-size:64px;margin-bottom:16px;display:block;}
+.win-title{font-size:2rem;font-weight:900;color:var(--green);margin-bottom:8px;}
+.win-agent{font-size:1.2rem;color:#fff;font-weight:700;margin-bottom:20px;}
+.win-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.btn-share{padding:14px 30px;background:linear-gradient(135deg,var(--green),#059669);color:#fff;border:none;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer;transition:.3s;}
+.btn-share:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(34,197,94,0.4);}
+.btn-retry{padding:14px 30px;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;transition:.3s;}
+.btn-retry:hover{background:rgba(255,255,255,0.1);}
+
+/* LOSE PANEL */
+.lose-panel{display:none;text-align:center;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:24px;padding:40px 30px;margin-top:20px;animation:slideIn .5s ease-out;}
+.lose-title{font-size:1.8rem;font-weight:900;color:var(--red);margin-bottom:8px;}
+.lose-answer{font-size:1.1rem;color:#fff;margin-bottom:20px;}
+
+/* GUESSES LEFT */
+.guesses-left{text-align:center;color:var(--muted);font-size:13px;margin-bottom:16px;}
+.guesses-left span{color:#fff;font-weight:800;}
+
+@media(max-width:500px){
+  .attr-header,.guess-row{grid-template-columns:1.5fr .8fr 1fr .8fr;gap:5px;}
+  .cell{font-size:11px;padding:10px 5px;}
+  .input-row{flex-direction:column;}
+  .guess-btn{width:100%;}
+}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<nav>
+  <a href="/" class="nav-logo">HangiEasy</a>
+  <div class="val-badge">VALORANT</div>
+  <a href="/dashboard" class="nav-back">← Dashboard</a>
+</nav>
+
+<main>
+  <div class="game-header">
+    <div class="game-title">GUESS THE AGENT</div>
+    <div class="game-sub">Guess today's Valorant Agent in 8 tries</div>
+    <div class="streak-bar">🔥 Streak: <span class="streak-val" id="streak-display">0</span> &nbsp;|&nbsp; 🎯 Best: <span class="streak-val" id="best-display">0</span></div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot lg"></div> Correct</div>
+    <div class="legend-item"><div class="legend-dot ly"></div> Close (Year)</div>
+    <div class="legend-item"><div class="legend-dot lr"></div> Wrong</div>
+  </div>
+
+  <!-- ATTRIBUTE HEADERS -->
+  <div class="attr-header">
+    <div class="attr-label">Agent</div>
+    <div class="attr-label">Gender</div>
+    <div class="attr-label">Role</div>
+    <div class="attr-label">Year</div>
+  </div>
+
+  <!-- GUESS ROWS -->
+  <div id="guesses-container"></div>
+
+  <!-- INPUT -->
+  <div class="input-wrap" id="input-section">
+    <div class="input-label">🔍 Enter an agent name</div>
+    <div class="input-row">
+      <div style="position:relative;flex:1;">
+        <input id="agent-input" type="text" placeholder="e.g. Jett, Reyna, Omen..." autocomplete="off">
+        <div class="autocomplete" id="autocomplete"></div>
+      </div>
+      <button class="guess-btn" id="guess-btn" onclick="submitGuess()">GUESS</button>
+    </div>
+  </div>
+
+  <div class="guesses-left" id="guesses-left">Guesses remaining: <span id="remaining">8</span> / 8</div>
+
+  <!-- WIN -->
+  <div class="win-panel" id="win-panel">
+    <span class="win-emoji">🎉</span>
+    <div class="win-title">GG! You got it!</div>
+    <div class="win-agent" id="win-agent-name"></div>
+    <div class="win-actions">
+      <button class="btn-share" onclick="shareResult()">📋 Share Result</button>
+      <button class="btn-retry" onclick="newGame()">🔄 New Game</button>
+    </div>
+  </div>
+
+  <!-- LOSE -->
+  <div class="lose-panel" id="lose-panel">
+    <div style="font-size:56px;margin-bottom:16px;">💀</div>
+    <div class="lose-title">Out of guesses!</div>
+    <div class="lose-answer">The agent was: <strong id="lose-agent-name" style="color:var(--primary)"></strong></div>
+    <button class="btn-retry" onclick="newGame()">🔄 Try Again</button>
+  </div>
+</main>
+
+<script>
+const AGENTS = [
+  {name:"Brimstone",gender:"Male",  role:"Controller",year:2020},
+  {name:"Viper",    gender:"Female",role:"Controller",year:2020},
+  {name:"Omen",     gender:"Male",  role:"Controller",year:2020},
+  {name:"Cypher",   gender:"Male",  role:"Sentinel",  year:2020},
+  {name:"Sova",     gender:"Male",  role:"Initiator", year:2020},
+  {name:"Sage",     gender:"Female",role:"Sentinel",  year:2020},
+  {name:"Phoenix",  gender:"Male",  role:"Duelist",   year:2020},
+  {name:"Jett",     gender:"Female",role:"Duelist",   year:2020},
+  {name:"Reyna",    gender:"Female",role:"Duelist",   year:2020},
+  {name:"Killjoy",  gender:"Female",role:"Sentinel",  year:2020},
+  {name:"Breach",   gender:"Male",  role:"Initiator", year:2020},
+  {name:"Skye",     gender:"Female",role:"Initiator", year:2021},
+  {name:"Yoru",     gender:"Male",  role:"Duelist",   year:2021},
+  {name:"Astra",    gender:"Female",role:"Controller",year:2021},
+  {name:"KAY/O",    gender:"Male",  role:"Initiator", year:2021},
+  {name:"Chamber",  gender:"Male",  role:"Sentinel",  year:2021},
+  {name:"Neon",     gender:"Female",role:"Duelist",   year:2022},
+  {name:"Fade",     gender:"Female",role:"Initiator", year:2022},
+  {name:"Harbor",   gender:"Male",  role:"Controller",year:2022},
+  {name:"Gekko",    gender:"Male",  role:"Initiator", year:2023},
+  {name:"Deadlock", gender:"Female",role:"Sentinel",  year:2023},
+  {name:"Iso",      gender:"Male",  role:"Duelist",   year:2023},
+  {name:"Clove",    gender:"Other", role:"Controller",year:2024},
+  {name:"Vyse",     gender:"Female",role:"Sentinel",  year:2024},
+  {name:"Tejo",     gender:"Male",  role:"Initiator", year:2025},
+  {name:"Waylay",   gender:"Female",role:"Duelist",   year:2025},
+];
+
+const AGENT_EMOJIS = {
+  Brimstone:"🚬",Viper:"🐍",Omen:"👻",Cypher:"🕵️",Sova:"🏹",Sage:"💚",
+  Phoenix:"🔥",Jett:"💨",Reyna:"👁️",Killjoy:"🤖",Breach:"💪",Skye:"🌿",
+  Yoru:"⚔️",Astra:"⭐",KAY_O:"🤖","KAY/O":"⚡",Chamber:"🔫",Neon:"⚡",
+  Fade:"🌑",Harbor:"🌊",Gekko:"🦎",Deadlock:"🧲",Iso:"🛡️",Clove:"🍀",
+  Vyse:"🕸️",Tejo:"💣",Waylay:"⚡"
+};
+
+const MAX_GUESSES = 8;
+let target, guesses, gameOver;
+
+function todaysSeed() {
+  const d = new Date();
+  return d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate();
+}
+
+function newGame() {
+  const idx = todaysSeed() % AGENTS.length;
+  target   = AGENTS[idx];
+  guesses  = [];
+  gameOver = false;
+  document.getElementById('guesses-container').innerHTML = '';
+  document.getElementById('win-panel').style.display  = 'none';
+  document.getElementById('lose-panel').style.display = 'none';
+  document.getElementById('input-section').style.display = 'block';
+  document.getElementById('guesses-left').style.display  = 'block';
+  document.getElementById('agent-input').value = '';
+  document.getElementById('guess-btn').disabled = false;
+  updateRemaining();
+  loadStreak();
+}
+
+function loadStreak() {
+  const s = parseInt(localStorage.getItem('val_streak')||'0');
+  const b = parseInt(localStorage.getItem('val_best')||'0');
+  document.getElementById('streak-display').textContent = s;
+  document.getElementById('best-display').textContent   = b;
+}
+
+function updateRemaining() {
+  document.getElementById('remaining').textContent = MAX_GUESSES - guesses.length;
+}
+
+function compare(guess) {
+  const rows = [];
+  // Name
+  rows.push({val:guess.name, status: guess.name===target.name?'correct':'wrong'});
+  // Gender
+  rows.push({val:guess.gender, status: guess.gender===target.gender?'correct':'wrong'});
+  // Role
+  rows.push({val:guess.role, status: guess.role===target.role?'correct':'wrong'});
+  // Year
+  let ySt, yArrow='';
+  if(guess.year===target.year){ySt='correct';}
+  else if(Math.abs(guess.year-target.year)<=1){ySt='partial'; yArrow=guess.year<target.year?'↑ Higher':'↓ Lower';}
+  else{ySt='wrong'; yArrow=guess.year<target.year?'↑ Higher':'↓ Lower';}
+  rows.push({val:guess.year, status:ySt, arrow:yArrow});
+  return rows;
+}
+
+function renderRow(cells) {
+  const row = document.createElement('div');
+  row.className = 'guess-row';
+  cells.forEach(c=>{
+    const cell = document.createElement('div');
+    cell.className = `cell ${c.status}`;
+    cell.innerHTML = c.val + (c.arrow?`<span class="year-arrow">${c.arrow}</span>`:'');
+    row.appendChild(cell);
+  });
+  document.getElementById('guesses-container').appendChild(row);
+}
+
+function submitGuess() {
+  if(gameOver) return;
+  const val = document.getElementById('agent-input').value.trim();
+  const agent = AGENTS.find(a=>a.name.toLowerCase()===val.toLowerCase());
+  if(!agent){ shakeInput(); return; }
+  if(guesses.find(g=>g.name.toLowerCase()===agent.name.toLowerCase())){
+    alert('Already guessed this agent!'); return;
+  }
+  guesses.push(agent);
+  const cells = compare(agent);
+  renderRow(cells);
+  document.getElementById('agent-input').value='';
+  document.getElementById('autocomplete').style.display='none';
+  updateRemaining();
+
+  if(agent.name===target.name){
+    endGame(true);
+  } else if(guesses.length>=MAX_GUESSES){
+    endGame(false);
+  }
+}
+
+function endGame(won) {
+  gameOver = true;
+  document.getElementById('input-section').style.display = 'none';
+  document.getElementById('guesses-left').style.display  = 'none';
+  if(won){
+    document.getElementById('win-agent-name').textContent = `${target.name} • ${target.role} • ${target.year}`;
+    document.getElementById('win-panel').style.display = 'block';
+    // streak
+    let s = parseInt(localStorage.getItem('val_streak')||'0') + 1;
+    let b = Math.max(s, parseInt(localStorage.getItem('val_best')||'0'));
+    localStorage.setItem('val_streak', s);
+    localStorage.setItem('val_best',   b);
+    loadStreak();
+  } else {
+    document.getElementById('lose-agent-name').textContent = target.name;
+    document.getElementById('lose-panel').style.display = 'block';
+    localStorage.setItem('val_streak','0');
+    loadStreak();
+  }
+}
+
+function shakeInput() {
+  const inp = document.getElementById('agent-input');
+  inp.style.borderColor='var(--red)';
+  inp.style.animation='none';
+  setTimeout(()=>{ inp.style.animation=''; inp.style.borderColor=''; },600);
+}
+
+function shareResult() {
+  const lines = guesses.map(g=>{
+    const cells = compare(g);
+    return cells.map(c=>c.status==='correct'?'🟩':c.status==='partial'?'🟨':'🟥').join('');
+  });
+  const won = guesses[guesses.length-1]?.name===target.name;
+  const txt = `HangiEasy — Guess The Agent\n${won?guesses.length+'/'+MAX_GUESSES:'X/'+MAX_GUESSES}\n\n${lines.join('\n')}\n\nhangieasy.com`;
+  navigator.clipboard.writeText(txt).then(()=>alert('Result copied! 📋'));
+}
+
+// AUTOCOMPLETE
+const inp = document.getElementById('agent-input');
+const ac  = document.getElementById('autocomplete');
+
+inp.addEventListener('input',()=>{
+  const q = inp.value.toLowerCase().trim();
+  if(!q){ ac.style.display='none'; return; }
+  const matches = AGENTS.filter(a=>a.name.toLowerCase().includes(q) && !guesses.find(g=>g.name===a.name));
+  if(!matches.length){ ac.style.display='none'; return; }
+  ac.innerHTML = matches.map(a=>`<div class="ac-item" onclick="selectAgent('${a.name}')"><span class="ac-emoji">${AGENT_EMOJIS[a.name]||'🎯'}</span>${a.name} <span style="color:var(--muted);font-size:11px;margin-left:auto;">${a.role} • ${a.year}</span></div>`).join('');
+  ac.style.display='block';
+});
+
+function selectAgent(name){
+  inp.value=name;
+  ac.style.display='none';
+  inp.focus();
+}
+
+inp.addEventListener('keydown',e=>{ if(e.key==='Enter') submitGuess(); if(e.key==='Escape') ac.style.display='none'; });
+document.addEventListener('click',e=>{ if(!inp.contains(e.target)&&!ac.contains(e.target)) ac.style.display='none'; });
+
+newGame();
+</script>
+</body>
+</html>

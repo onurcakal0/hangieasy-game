@@ -491,7 +491,11 @@ def dashboard():
 @app.route('/gizli-test-odasi')
 def gizli_oda():
     return redirect(url_for('dashboard'))
-# --- SENİN İÇİN GİZLİ TEST ODASI (Eski Ana Sayfan) ---
+
+@app.route('/guess-valorant')
+def guess_valorant():
+    return render_template('guess_valorant.html')
+
 
 @app.route('/test-olustur', methods=['GET', 'POST'])
 def test_olustur():
