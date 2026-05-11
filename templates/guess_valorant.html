@@ -212,13 +212,8 @@ const AGENT_EMOJIS = {
 const MAX_GUESSES = 8;
 let target, guesses, gameOver;
 
-function todaysSeed() {
-  const d = new Date();
-  return d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate();
-}
-
 function newGame() {
-  const idx = todaysSeed() % AGENTS.length;
+  const idx = Math.floor(Math.random() * AGENTS.length);
   target   = AGENTS[idx];
   guesses  = [];
   gameOver = false;
