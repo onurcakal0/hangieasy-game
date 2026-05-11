@@ -351,16 +351,24 @@
             </div>
         </div>
         
+        {% if kendi_profili_mi %}
         <h3 class="seksiyon-basligi">🎬 Ürettiğin İçerikler</h3>
+        {% else %}
+        <h3 class="seksiyon-basligi">🎬 Ürettiği İçerikler</h3>
+        {% endif %}
         
-        {% if kullanicinin_oyunlari|length == 0 %}
+        {% if oyunlar|length == 0 %}
             <div class="bos-durum">
+                {% if kendi_profili_mi %}
                 <h3>Henüz hiç test üretmemişsin patron. Dünyanın senin vizyonuna ihtiyacı var!</h3>
                 <a href="/test-olustur" class="basla-link">Hemen İlk Krallığını Kur ➔</a>
+                {% else %}
+                <h3>Bu kullanıcı henüz bir içerik üretmemiş.</h3>
+                {% endif %}
             </div>
         {% else %}
             <div class="oyun-grid">
-                {% for oyun in kullanicinin_oyunlari %}
+                {% for oyun in oyunlar %}
                 <div class="oyun-karti">
                     <img src="{{ oyun.resim_url }}" onerror="this.src='https://via.placeholder.com/400x200/151520/00f2fe?text=Oyun+Kapak'" alt="Oyun Kapak" class="oyun-resmi">
                     <div class="kart-icerik">
