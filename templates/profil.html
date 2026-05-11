@@ -233,8 +233,11 @@
     <nav class="navbar">
         <a href="/" class="logo">HangiEasy</a>
         <div class="kullanici-paneli">
+            <a href="/dashboard" class="profil-btn" style="background:rgba(255,255,255,0.1); color:#fff;">← Dashboard</a>
+            {% if kendi_profili_mi %}
             <a href="/test-olustur" class="profil-btn btn-yesil">+ Yeni Test Üret</a>
             <a href="/cikis" class="profil-btn btn-kirmizi">Çıkış Yap</a>
+            {% endif %}
         </div>
     </nav>
 
@@ -258,23 +261,37 @@
             
             <div class="profil-baslik-cam">
                <!-- 🚀 YENİ TIKLANABİLİR PROFİL FOTOĞRAFI ALANI -->
+               {% if kendi_profili_mi %}
                <div class="avatar-container" onclick="document.getElementById('pp-upload').click()">
+               {% else %}
+               <div class="avatar-container">
+               {% endif %}
                    {% if kullanici.profil_resmi %}
                        <img src="{{ kullanici.profil_resmi }}" alt="Avatar" class="avatar {{ kullanici.profil_cercevesi }}">
                    {% else %}
                        <div class="avatar {{ kullanici.profil_cercevesi }}">{{ kullanici.kullanici_adi[0]|upper }}</div>
                    {% endif %}
-                   <div class="pp-degistir-icon">📷</div>
+                   {% if kendi_profili_mi %}<div class="pp-degistir-icon">📷</div>{% endif %}
                </div>
                
+               {% if kendi_profili_mi %}
                <!-- 📸 ARKA PLANDA ÇALIŞAN GİZLİ YÜKLEME FORMU -->
                <form id="pp-form" action="/pp-guncelle" method="POST" enctype="multipart/form-data" style="display: none;">
                    <input type="file" id="pp-upload" name="profil_fotografi" accept="image/*" onchange="document.getElementById('pp-form').submit()">
                </form>
+               {% endif %}
 
                 <div class="profil-yazilar">
                     <h2>{{ kullanici.kullanici_adi }}</h2>
-                    <p>Yönetmen Koltuğu</p>
+                    <p>
+                        Takipçi: <span id="takipci-sayisi-gosterge">{{ takipci_sayisi }}</span> &bull; 
+                        Takip: {{ takip_edilen }}
+                    </p>
+                    {% if not kendi_profili_mi %}
+                        <button id="takip-btn" class="profil-btn {% if takip_ediyor_mu %}btn-kirmizi{% else %}btn-yesil{% endif %}" onclick="takipIslemi('{{ kullanici.kullanici_adi }}')" style="margin-top:10px; padding:8px 16px; font-size:12px;">
+                            {% if takip_ediyor_mu %}Takipten Çık{% else %}Takip Et{% endif %}
+                        </button>
+                    {% endif %}
                 </div>
             </div>
 
@@ -395,6 +412,29 @@
                     location.reload();
                 }
             });
+        }
+
+        // --- TAKİP SİSTEMİ AJAX ---
+        function takipIslemi(kullaniciAdi) {
+            fetch('/api/takip/' + kullaniciAdi, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    const btn = document.getElementById('takip-btn');
+                    document.getElementById('takipci-sayisi-gosterge').innerText = data.takipci_sayisi;
+                    
+                    if(data.durum === 'takip_edildi') {
+                        btn.innerText = 'Takipten Çık';
+                        btn.className = 'profil-btn btn-kirmizi';
+                    } else {
+                        btn.innerText = 'Takip Et';
+                        btn.className = 'profil-btn btn-yesil';
+                    }
+                } else {
+                    alert(data.mesaj);
+                }
+            })
+            .catch(error => console.error('Hata:', error));
         }
     </script>
 </body>

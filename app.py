@@ -69,6 +69,11 @@ db = SQLAlchemy(app)
 
 # --- MODELLER ---
 # --- MODELLER ---
+takipciler = db.Table('takipciler',
+    db.Column('takip_eden_id', db.Integer, db.ForeignKey('kullanici.id')),
+    db.Column('takip_edilen_id', db.Integer, db.ForeignKey('kullanici.id'))
+)
+
 class Kullanici(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     
@@ -93,6 +98,14 @@ class Kullanici(db.Model):
     gunluk_test_sayaci = db.Column(db.Integer, default=0)
     gunluk_odul_alindi = db.Column(db.Boolean, default=False)
     boss_bileti_alindi = db.Column(db.Boolean, default=False)  # Boss Arenası bilet kontrolü
+
+    takip_ettikleri = db.relationship(
+        'Kullanici', secondary=takipciler,
+        primaryjoin=(takipciler.c.takip_eden_id == id),
+        secondaryjoin=(takipciler.c.takip_edilen_id == id),
+        backref=db.backref('takipcileri', lazy='dynamic'), lazy='dynamic')
+    
+    bildirimler = db.relationship('Bildirim', backref='kullanici', lazy=True)
 class Oyun(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     baslik = db.Column(db.String(100), nullable=False)
@@ -118,6 +131,14 @@ class Istatistik(db.Model):
     oyun_id = db.Column(db.Integer, db.ForeignKey('oyun.id'), nullable=False)
     secenek_ismi = db.Column(db.String(100), nullable=False)
     sampiyonluk_sayisi = db.Column(db.Integer, default=1)
+
+class Bildirim(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    kullanici_id = db.Column(db.Integer, db.ForeignKey('kullanici.id'), nullable=False)
+    mesaj = db.Column(db.String(255), nullable=False)
+    okundu = db.Column(db.Boolean, default=False)
+    tarih = db.Column(db.DateTime, default=datetime.utcnow)
+
     
 # Veritabanını kuran kodun (Burası doğru, kalsın)
 with app.app_context():
@@ -242,11 +263,105 @@ def profil():
         taclanan_sampiyon = sum(getattr(oyun, 'bitirilme_sayisi', 0) for oyun in kullanicinin_oyunlari)
 
     return render_template('profil.html', 
-                           kullanici=aktif,
-                           aktif_test_sayisi=aktif_test_sayisi,
-                           global_etkilesim=global_etkilesim,
-                           taclanan_sampiyon=taclanan_sampiyon,
-                           kullanicinin_oyunlari=kullanicinin_oyunlari)
+        kullanici=aktif,
+        oyunlar=kullanicinin_oyunlari,
+        aktif_test_sayisi=aktif_test_sayisi,
+        global_etkilesim=global_etkilesim,
+        taclanan_sampiyon=taclanan_sampiyon,
+        takip_edilen=aktif.takip_ettikleri.count(),
+        takipci_sayisi=aktif.takipcileri.count(),
+        kendi_profili_mi=True
+    )
+
+@app.route('/profil/<kullanici_adi>')
+def baska_profil(kullanici_adi):
+    if session.get('kullanici_adi') == kullanici_adi:
+        return redirect(url_for('profil'))
+        
+    hedef_kullanici = Kullanici.query.filter_by(kullanici_adi=kullanici_adi).first_or_404()
+    
+    kullanicinin_oyunlari = Oyun.query.filter_by(olusturan_id=hedef_kullanici.id).all()
+    aktif_test_sayisi = len(kullanicinin_oyunlari)
+    global_etkilesim = sum(getattr(oyun, 'oynanma_sayisi', 0) for oyun in kullanicinin_oyunlari)
+    
+    try:
+        taclanan_sampiyon = Skor.query.join(Oyun).filter(Oyun.olusturan_id == hedef_kullanici.id).count()
+    except Exception:
+        taclanan_sampiyon = sum(getattr(oyun, 'bitirilme_sayisi', 0) for oyun in kullanicinin_oyunlari)
+        
+    aktif_kullanici = None
+    takip_ediyor_mu = False
+    
+    if 'kullanici_adi' in session and not session['kullanici_adi'].startswith('Misafir_'):
+        aktif_kullanici = Kullanici.query.filter_by(kullanici_adi=session['kullanici_adi']).first()
+        if aktif_kullanici:
+            takip_ediyor_mu = aktif_kullanici.takip_ettikleri.filter(takipciler.c.takip_edilen_id == hedef_kullanici.id).count() > 0
+
+    return render_template('profil.html',
+        kullanici=hedef_kullanici,
+        oyunlar=kullanicinin_oyunlari,
+        aktif_test_sayisi=aktif_test_sayisi,
+        global_etkilesim=global_etkilesim,
+        taclanan_sampiyon=taclanan_sampiyon,
+        takip_edilen=hedef_kullanici.takip_ettikleri.count(),
+        takipci_sayisi=hedef_kullanici.takipcileri.count(),
+        kendi_profili_mi=False,
+        takip_ediyor_mu=takip_ediyor_mu
+    )
+
+@app.route('/api/takip/<kullanici_adi>', methods=['POST'])
+def takip_et(kullanici_adi):
+    if 'kullanici_adi' not in session or session['kullanici_adi'].startswith('Misafir_'):
+        return jsonify({"status": "error", "mesaj": "Giriş yapmanız gerekiyor!"}), 401
+        
+    aktif_kullanici = Kullanici.query.filter_by(kullanici_adi=session['kullanici_adi']).first()
+    hedef_kullanici = Kullanici.query.filter_by(kullanici_adi=kullanici_adi).first_or_404()
+    
+    if aktif_kullanici.id == hedef_kullanici.id:
+        return jsonify({"status": "error", "mesaj": "Kendinizi takip edemezsiniz!"}), 400
+        
+    takip_ediyor = aktif_kullanici.takip_ettikleri.filter(takipciler.c.takip_edilen_id == hedef_kullanici.id).count() > 0
+    
+    if takip_ediyor:
+        aktif_kullanici.takip_ettikleri.remove(hedef_kullanici)
+        durum = "takipten_cikarildi"
+    else:
+        aktif_kullanici.takip_ettikleri.append(hedef_kullanici)
+        durum = "takip_edildi"
+        # Bildirim oluştur
+        bildirim = Bildirim(
+            kullanici_id=hedef_kullanici.id,
+            mesaj=f"@{aktif_kullanici.kullanici_adi} seni takip etmeye başladı!"
+        )
+        db.session.add(bildirim)
+        
+    db.session.commit()
+    return jsonify({
+        "status": "success", 
+        "durum": durum, 
+        "takipci_sayisi": hedef_kullanici.takipcileri.count()
+    })
+
+@app.route('/api/bildirimler')
+def bildirimleri_getir():
+    if 'kullanici_adi' not in session or session['kullanici_adi'].startswith('Misafir_'):
+        return jsonify({"bildirimler": []})
+        
+    aktif_kullanici = Kullanici.query.filter_by(kullanici_adi=session['kullanici_adi']).first()
+    if not aktif_kullanici:
+         return jsonify({"bildirimler": []})
+         
+    okunmamislar = Bildirim.query.filter_by(kullanici_id=aktif_kullanici.id, okundu=False).all()
+    
+    sonuclar = [{"id": b.id, "mesaj": b.mesaj} for b in okunmamislar]
+    
+    # Görüntülenenleri okundu yap
+    for b in okunmamislar:
+        b.okundu = True
+    db.session.commit()
+    
+    return jsonify({"bildirimler": sonuclar})
+
 @app.route('/api/ai_analiz', methods=['POST'])
 def ai_analiz():
     data = request.json

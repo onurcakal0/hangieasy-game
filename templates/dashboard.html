@@ -493,7 +493,7 @@
             <div class="modal-icerik-alani">
                 <div class="modal-meta">
                     <span class="meta-rozet rozet-coin">💰 Ödül: 10 - 50 🪙</span>
-                    <span id="modal-yazar" class="meta-rozet rozet-kisi">👤 Üretici: Onur</span>
+                    <a id="modal-yazar" class="meta-rozet rozet-kisi" href="#" style="text-decoration:none;">👤 Üretici: Onur</a>
                     <span id="modal-tarih" class="meta-rozet rozet-tarih">📅 Yakın Zamanda</span>
                 </div>
                 
@@ -600,7 +600,9 @@
             document.getElementById('modal-baslik').innerText = element.getAttribute('data-baslik');
             document.getElementById('modal-aciklama').innerText = element.getAttribute('data-aciklama');
             document.getElementById('modal-resim').src = element.getAttribute('data-resim');
-            document.getElementById('modal-yazar').innerText = '👤 Üretici: ' + element.getAttribute('data-yazar');
+            const yazarAd = element.getAttribute('data-yazar');
+            document.getElementById('modal-yazar').innerText = '👤 Üretici: ' + yazarAd;
+            document.getElementById('modal-yazar').href = '/profil/' + yazarAd;
             document.getElementById('modal-tarih').innerText = '📅 ' + element.getAttribute('data-tarih');
             
             document.getElementById('modal-btn-tek').href = element.getAttribute('data-link-tek');
@@ -656,6 +658,39 @@
                 stealthIkon.innerText = '🏎️'; stealthYazi.innerText = 'RGB';
             }
         }
+    </script>
+    <!-- BİLDİRİM TOAST -->
+    <div id="bildirim-toast" style="position:fixed;bottom:30px;left:30px;background:linear-gradient(45deg,#ff0055,#00f2fe);color:#fff;padding:15px 25px;border-radius:12px;font-weight:800;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,0.5);transform:translateY(150px);opacity:0;transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);z-index:9999;">
+        🔔 Bildirim!
+    </div>
+
+    <script>
+        function bildirimGoster(mesaj) {
+            const toast = document.getElementById('bildirim-toast');
+            toast.innerText = '🔔 ' + mesaj;
+            toast.style.transform = 'translateY(0)';
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.transform = 'translateY(150px)';
+                toast.style.opacity = '0';
+            }, 4000);
+        }
+
+        // Backend'den okunmamış bildirimleri çekip göster
+        setInterval(() => {
+            fetch('/api/bildirimler')
+            .then(res => res.json())
+            .then(data => {
+                if (data.bildirimler && data.bildirimler.length > 0) {
+                    data.bildirimler.forEach((bildirim, index) => {
+                        setTimeout(() => {
+                            bildirimGoster(bildirim.mesaj);
+                        }, index * 4500); // Eğer birden fazla bildirim varsa 4.5 sn arayla göster
+                    });
+                }
+            })
+            .catch(err => console.error(err));
+        }, 10000); // 10 saniyede bir kontrol et
     </script>
 </body>
 </html>
