@@ -133,13 +133,15 @@
         .cta-pulse::after { content:''; position:absolute; inset:-4px; border-radius:64px; border:2px solid var(--primary); opacity:0; animation:ctaPulse 2.5s ease-out infinite; }
         @keyframes ctaPulse { 0%{opacity:0.6; transform:scale(1);} 100%{opacity:0; transform:scale(1.15);} }
 
-        @media(max-width:600px) {
-            .countdown-container{gap:12px;} .time-box{min-width:calc(50% - 12px); padding:20px 10px;}
-            .stats-bant{gap:15px;} .stat-ayrac{display:none;}
+        @media(max-width:768px) {
+            .countdown-container{gap:12px; flex-wrap: wrap; justify-content: center;} .time-box{min-width:calc(50% - 12px); padding:20px 10px;}
+            .stats-bant{gap:15px; flex-wrap: wrap; justify-content: center;} .stat-ayrac{display:none;}
             .stat-sayi{font-size:28px;}
-            section.hero{padding-top:140px;}
-            .cta-wrap{flex-direction:column; align-items:center; gap:14px;}
-            .cta-btn{padding:16px 32px; font-size:0.95rem; width:85%; justify-content:center;}
+            section.hero{padding-top:100px; padding-left: 15px; padding-right: 15px;}
+            .hero-title{font-size: 2.5rem; line-height: 1.2;}
+            .hero-subtitle{font-size: 1.1rem; padding: 0 10px;}
+            .cta-wrap{flex-direction:column; align-items:center; gap:14px; width: 100%;}
+            .cta-btn{padding:16px 20px; font-size:0.95rem; width:100%; justify-content:center;}
         }
     </style>
 </head>

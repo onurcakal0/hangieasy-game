@@ -95,11 +95,16 @@ main{position:relative;z-index:10;max-width:860px;margin:0 auto;padding:30px 20p
 .guesses-left{text-align:center;color:var(--muted);font-size:13px;margin-bottom:16px;}
 .guesses-left span{color:#fff;font-weight:800;}
 
-@media(max-width:500px){
-  .attr-header,.guess-row{grid-template-columns:1.5fr .8fr 1fr .8fr;gap:5px;}
-  .cell{font-size:11px;padding:10px 5px;}
+@media(max-width:768px){
+  .attr-header,.guess-row{grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;}
+  .cell{font-size:10px;padding:8px 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
   .input-row{flex-direction:column;}
   .guess-btn{width:100%;}
+  nav { padding: 12px 15px; }
+  .nav-logo { font-size: 20px; }
+  .hero-title { font-size: 2.2rem; }
+  main { padding: 0 15px 50px; }
+  .win-title, .lose-title { font-size: 1.5rem; }
 }
 </style>
 </head>

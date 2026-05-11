@@ -290,6 +290,22 @@
         body.stealth-mode .vizyon-kutusu::before { background: #333; color: #fff;}
         body.stealth-mode .vizyon-kutusu h4 { color: #fff; }
         body.stealth-mode .dashboard-countdown { background: rgba(10,10,10,0.9); border-color: #333; }
+
+        /* 📱 MOBİL UYUM */
+        @media (max-width: 768px) {
+            .navbar { padding: 12px 15px; }
+            .logo { font-size: 20px; }
+            .karsilama h1 { font-size: 28px; }
+            .karsilama p { font-size: 14px; }
+            .icerik { margin-left: 0; padding: 80px 15px 30px; }
+            .oyun-grid { grid-template-columns: 1fr; gap: 20px; }
+            .kart-icerik { padding: 15px; }
+            .modal-buton-grubu { flex-direction: column; gap: 10px; }
+            .btn-aksiyon { font-size: 12px; padding: 12px; }
+            .dashboard-countdown { margin-top: 15px; flex-direction: column; text-align: center; }
+            .kullanici-paneli { flex-wrap: wrap; justify-content: center; gap: 8px; }
+            .kullanici-paneli a { font-size: 11px; padding: 6px 10px; }
+        }
     </style>
 </head>
 <body>

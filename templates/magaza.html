@@ -87,8 +87,15 @@ main{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:0 20px 
 .show-toast{transform:translateX(-50%) translateY(0) !important;opacity:1 !important;}
 
 @media(max-width:768px){
-  nav{padding:14px 20px;}
-  .grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
+  nav { padding:14px 20px; flex-wrap: wrap; gap: 15px; justify-content: center; }
+  .nav-right { flex-wrap: wrap; justify-content: center; gap: 10px; }
+  header.hero { padding: 40px 15px; }
+  .hero-title { font-size: 2rem; }
+  .hero-sub { font-size: 0.95rem; }
+  .grid { grid-template-columns: 1fr !important; gap: 15px; }
+  .item-card { padding: 20px 15px; }
+  .section-title { font-size: 1.3rem; }
+  .ticket-icon { font-size: 48px; }
 }
 </style>
 </head>

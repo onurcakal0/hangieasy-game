@@ -226,6 +226,24 @@
             transition: 0.3s; cursor: pointer;
         }
         .btn-onayla:hover { box-shadow: 0 8px 20px rgba(243,156,18,0.5); transform: translateY(-2px); }
+
+        /* 📱 MOBİL UYUM */
+        @media (max-width: 768px) {
+            .navbar { padding: 12px 15px; }
+            .logo { font-size: 20px; }
+            .kullanici-paneli { flex-wrap: wrap; justify-content: center; gap: 8px; }
+            .profil-btn { font-size: 11px; padding: 6px 10px; }
+            .icerik { padding: 20px 15px; }
+            .profil-ust-alan { grid-template-columns: 1fr; gap: 20px; }
+            .analitik-paneli { grid-template-columns: 1fr; gap: 15px; }
+            .buyume-paneli { grid-template-columns: 1fr !important; gap: 20px; }
+            .oyun-grid { grid-template-columns: 1fr; gap: 20px; }
+            .onay-banner { flex-direction: column; text-align: center; }
+            .banner-sol { flex-direction: column; }
+            .btn-onayla { width: 100%; }
+            .seksiyon-basligi { font-size: 20px; }
+            .modal-ic { width: 95%; padding: 20px; }
+        }
     </style>
 </head>
 <body>
