@@ -782,10 +782,13 @@ def api_sorular(oyun_id):
 # Şirket stratejisi gereği ödeme altyapısı onaylanana kadar uyku modundalar.
 # ==========================================
 
-# @app.route('/magaza')
-# def magaza():
-#     flash("Mağaza sistemimiz efsanevi güncellemeler için kısa süreliğine bakıma alınmıştır. Çok yakında buradayız!", "info")
-#     return redirect(url_for('index'))
+@app.route('/magaza')
+def magaza():
+    if 'kullanici_adi' not in session or session['kullanici_adi'].startswith('Misafir_'):
+        return redirect(url_for('giris'))
+    kullanici = Kullanici.query.filter_by(kullanici_adi=session['kullanici_adi']).first()
+    return render_template('magaza.html', kullanici=kullanici)
+
 
 # --- 💳 STRIPE GERÇEK ÖDEME AKIŞI ---
 # @app.route('/odeme-baslat/<paket>')

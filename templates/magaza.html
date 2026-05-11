@@ -1,197 +1,260 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Mağaza | Onur Çakal A.Ş.</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background: #080A10; color: #fff; min-height: 100vh; overflow-x: hidden; }
-        
-        /* Üst Menü */
-        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 30px 5%; background: rgba(8, 10, 16, 0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .logo { font-size: 24px; font-weight: 900; letter-spacing: 1px; color: #fff; }
-        .logo span { color: #8B5CF6; }
-        .cuzdan { background: rgba(250, 204, 21, 0.1); border: 1px solid rgba(250, 204, 21, 0.3); padding: 10px 20px; border-radius: 50px; font-weight: 700; color: #facc15; display: flex; align-items: center; gap: 8px; }
-        
-        /* Konteyner ve Başlıklar */
-        .container { max-width: 1200px; margin: 0 auto; padding: 50px 20px; }
-        .kategori-baslik { font-size: 28px; font-weight: 900; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 15px; }
-        .kategori-baslik::after { content: ""; height: 2px; flex: 1; background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mağaza | HangiEasy</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0c10;--card:rgba(20,21,30,0.7);--border:rgba(255,255,255,0.06);--primary:#f39c12;--secondary:#ff007a;--cyan:#00f2fe;--text:#e2e8f0;--muted:#64748b;--coin:#eab308;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Outfit',sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
 
-        /* Kart Grid Sistemi */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-bottom: 60px; }
-        
-        /* Standart Paket Kartı */
-        .kart { background: #131722; border-radius: 20px; padding: 30px 20px; text-align: center; position: relative; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease; }
-        .kart:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.2); }
-        
-        /* Özel Kart Stilleri */
-        .kart.populer { border-color: #8B5CF6; background: linear-gradient(180deg, rgba(139, 92, 246, 0.05) 0%, #131722 100%); }
-        .kart.populer:hover { box-shadow: 0 15px 40px rgba(139, 92, 246, 0.2); }
-        .kart.vip { border-color: #facc15; background: linear-gradient(180deg, rgba(250, 204, 21, 0.05) 0%, #131722 100%); }
-        .kart.vip:hover { box-shadow: 0 15px 40px rgba(250, 204, 21, 0.2); }
-        
-        /* Bilet Kart Stili */
-        .kart.bilet { background: repeating-linear-gradient(45deg, #131722, #131722 10px, #1a1f2e 10px, #1a1f2e 20px); border: 2px dashed #3B82F6; border-radius: 15px; }
-        .kart.bilet:hover { box-shadow: 0 15px 40px rgba(59, 130, 246, 0.2); }
+/* ORBS & PARTICLES */
+.orb{position:fixed;border-radius:50%;filter:blur(140px);pointer-events:none;z-index:0;}
+.orb1{width:60vw;height:60vw;background:rgba(243,156,18,0.12);top:-15%;left:-10%;animation:of 15s infinite alternate ease-in-out;}
+.orb2{width:50vw;height:50vw;background:rgba(255,0,122,0.1);bottom:-10%;right:-10%;animation:of 20s infinite alternate-reverse ease-in-out;}
+@keyframes of{0%{transform:translate(0,0) scale(1);}100%{transform:translate(60px,80px) scale(1.15);}}
+.particles{position:fixed;inset:0;pointer-events:none;z-index:1;background-image:radial-gradient(1.5px 1.5px at 20px 30px,rgba(255,255,255,0.5),transparent),radial-gradient(2px 2px at 150px 10px,var(--primary),transparent),radial-gradient(1px 1px at 60px 130px,var(--secondary),transparent);background-size:250px 250px;animation:drift 80s linear infinite;}
+@keyframes drift{from{background-position:0 0;}to{background-position:1000px 1000px;}}
 
-        /* Rozetler */
-        .rozet { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); padding: 5px 15px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
-        .rozet.purple { background: #8B5CF6; color: white; box-shadow: 0 0 15px rgba(139, 92, 246, 0.5); }
-        .rozet.gold { background: #facc15; color: black; box-shadow: 0 0 15px rgba(250, 204, 21, 0.5); }
-        .rozet.blue { background: #3B82F6; color: white; }
+/* NAVBAR */
+nav{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:16px 5%;background:rgba(11,12,16,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-logo{font-size:22px;font-weight:900;background:linear-gradient(90deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;letter-spacing:1px;}
+.nav-right{display:flex;align-items:center;gap:15px;}
+.balance-badge{display:flex;align-items:center;gap:8px;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);color:var(--coin);padding:8px 18px;border-radius:20px;font-weight:800;font-size:14px;box-shadow:0 0 15px rgba(234,179,8,0.15);}
+.balance-badge span{font-size:18px;line-height:1;}
+.nav-back{color:var(--muted);text-decoration:none;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;transition:.3s;padding:8px 16px;background:rgba(255,255,255,0.05);border-radius:20px;}
+.nav-back:hover{color:var(--text);background:rgba(255,255,255,0.1);}
 
-        /* Yazı ve Butonlar */
-        .isim { color: #94a3b8; font-size: 14px; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        .miktar { font-size: 38px; font-weight: 900; color: #fff; margin-bottom: 5px; }
-        .fiyat { color: #64748b; font-size: 16px; margin-bottom: 25px; font-weight: 500; }
-        
-        .btn { display: block; width: 100%; padding: 14px 0; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 15px; transition: 0.3s; }
-        .btn.standart { background: #1e293b; color: #fff; }
-        .btn.standart:hover { background: #334155; }
-        .btn.purple { background: #8B5CF6; color: #fff; }
-        .btn.purple:hover { background: #7c3aed; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
-        .btn.gold { background: #facc15; color: #000; }
-        .btn.gold:hover { background: #eab308; box-shadow: 0 0 20px rgba(250, 204, 21, 0.4); }
-        .btn.blue { background: #3B82F6; color: #fff; }
-        .btn.blue:hover { background: #2563eb; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+/* HERO */
+header.hero{position:relative;z-index:10;text-align:center;padding:60px 20px;max-width:800px;margin:0 auto;}
+.hero-title{font-size:clamp(2.5rem,6vw,4rem);font-weight:900;letter-spacing:2px;margin-bottom:10px;background:linear-gradient(90deg,#fff,var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero-sub{color:var(--muted);font-size:1.1rem;line-height:1.6;}
 
-        .geri-btn { color: #64748b; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; margin-top: 20px; transition: 0.2s; }
-        .geri-btn:hover { color: #fff; }
-    </style>
+/* STORE SECTIONS */
+main{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:0 20px 80px;}
+.store-section{margin-bottom:60px;}
+.section-title{display:flex;align-items:center;gap:12px;font-size:1.6rem;font-weight:800;margin-bottom:25px;color:#fff;}
+.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:25px;}
+
+/* ITEM CARD */
+.item-card{background:var(--card);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:24px;padding:25px;text-align:center;transition:all .4s cubic-bezier(0.175,0.885,0.32,1.275);position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.item-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.03),transparent);pointer-events:none;}
+.item-card:hover{transform:translateY(-8px);border-color:rgba(243,156,18,0.3);box-shadow:0 15px 35px rgba(0,0,0,0.4),0 0 20px rgba(243,156,18,0.1);}
+
+.item-visual{height:120px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;position:relative;}
+
+/* TICKET VISUAL */
+.ticket-icon{font-size:64px;filter:drop-shadow(0 10px 20px rgba(255,0,122,0.4));animation:float 4s ease-in-out infinite;}
+
+/* AVATAR VISUAL */
+.avatar-demo{width:90px;height:90px;border-radius:50%;background:#1a1a24;display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;z-index:2;box-shadow:0 10px 20px rgba(0,0,0,0.5);}
+
+/* FRAME VISUAL */
+.frame-demo{position:absolute;inset:-15px;border-radius:50%;border:4px solid transparent;z-index:1;}
+.frame-neon{border-color:var(--cyan);box-shadow:0 0 15px var(--cyan),inset 0 0 15px var(--cyan);}
+.frame-fire{border-color:var(--primary);box-shadow:0 0 20px var(--primary),inset 0 0 20px var(--primary);}
+.frame-boss{border-color:var(--secondary);box-shadow:0 0 25px var(--secondary),inset 0 0 25px var(--secondary);}
+
+/* TITLE VISUAL */
+.title-demo{padding:10px 20px;border-radius:8px;font-weight:900;font-size:18px;letter-spacing:1px;text-transform:uppercase;}
+.title-ceo{background:linear-gradient(45deg,#f59e0b,#d97706);color:#000;box-shadow:0 0 20px rgba(245,158,11,0.4);}
+.title-hacker{background:rgba(34,197,94,0.1);color:#22c55e;border:1px dashed #22c55e;}
+.title-legend{background:linear-gradient(90deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 10px rgba(255,0,122,0.5));}
+
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+
+.item-info{flex:1;}
+.item-name{font-size:1.2rem;font-weight:800;margin-bottom:8px;}
+.item-desc{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:20px;}
+
+.buy-btn{width:100%;padding:14px;background:rgba(255,255,255,0.03);border:1px solid var(--border);color:#fff;border-radius:14px;font-weight:800;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.3s;}
+.buy-btn:hover{background:var(--primary);border-color:var(--primary);color:#000;box-shadow:0 5px 15px rgba(243,156,18,0.4);}
+.price{color:var(--coin);font-size:16px;}
+.buy-btn:hover .price{color:#000;}
+
+/* TOAST */
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:linear-gradient(45deg,var(--primary),var(--secondary));color:#fff;padding:16px 30px;border-radius:50px;font-weight:800;font-size:14px;box-shadow:0 15px 30px rgba(255,0,122,0.4);opacity:0;transition:all .4s cubic-bezier(0.175,0.885,0.32,1.275);z-index:9999;}
+.show-toast{transform:translateX(-50%) translateY(0) !important;opacity:1 !important;}
+
+@media(max-width:768px){
+  nav{padding:14px 20px;}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
+}
+</style>
 </head>
 <body>
 
-    <div class="navbar">
-        <div class="logo">Hangieasy<span>.</span> Store</div>
-        <div class="cuzdan">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 18V6"></path></svg>
-            {{ bakiye }} HE-Coin
-        </div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="particles"></div>
+
+<nav>
+  <a href="/" class="nav-logo">HangiEasy</a>
+  <div class="nav-right">
+    <div class="balance-badge">
+      <span>🪙</span> <b id="user-coin">{{ kullanici.he_coin }}</b>
     </div>
+    <a href="/dashboard" class="nav-back">← Dashboard</a>
+  </div>
+</nav>
 
-    <div class="container">
-        
-        <!-- BİLETLER BÖLÜMÜ -->
-        <div class="kategori-baslik">🎫 Turnuva Biletleri</div>
-        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-            
-            <div class="kart bilet">
-                <div class="rozet blue">Tek Giriş</div>
-                <div class="isim">Boss Arenası Bileti</div>
-                <div class="miktar">250 🪙</div>
-                <div class="fiyat">25.00 TL</div>
-                <a href="/odeme-baslat/boss_bilet" class="btn blue">Bileti Al</a>
-            </div>
+<header class="hero">
+  <h1 class="hero-title">Kozmetik Mağazası</h1>
+  <p class="hero-sub">Oyunlarda kazandığın HE-Coin'leri harca. Profilini özelleştir, rakiplerine tarzını göster. Ekipmanlarını kuşan ve arenaya in.</p>
+</header>
 
-            <div class="kart bilet" style="border-color: #8B5CF6;">
-                <div class="rozet purple">Avantajlı</div>
-                <div class="isim">Sezonluk Pass (5 Giriş)</div>
-                <div class="miktar">1.250 🪙</div>
-                <div class="fiyat">100.00 TL</div>
-                <a href="/odeme-baslat/turnuva_pass" class="btn purple">Pass Satın Al</a>
-            </div>
-
+<main>
+  <!-- ÇERÇEVELER -->
+  <section class="store-section">
+    <h2 class="section-title">✨ Profil Çerçeveleri</h2>
+    <div class="grid">
+      <div class="item-card">
+        <div class="item-visual">
+          <div class="avatar-demo">😎<div class="frame-demo frame-neon"></div></div>
         </div>
-
-        <!-- COIN PAKETLERİ BÖLÜMÜ -->
-        <div class="kategori-baslik">💎 HE-Coin Paketleri</div>
-        <div class="grid">
-            
-            <div class="kart">
-                <div class="isim">Stajyer</div>
-                <div class="miktar">100 🪙</div>
-                <div class="fiyat">15.00 TL</div>
-                <a href="/odeme-baslat/stajyer" class="btn standart">Satın Al</a>
-            </div>
-
-            <div class="kart">
-                <div class="isim">Başlangıç</div>
-                <div class="miktar">500 🪙</div>
-                <div class="fiyat">50.00 TL</div>
-                <a href="/odeme-baslat/baslangic" class="btn standart">Satın Al</a>
-            </div>
-
-            <div class="kart populer">
-                <div class="rozet purple">En Çok Satan</div>
-                <div class="isim">Profesyonel</div>
-                <div class="miktar" style="color: #8B5CF6;">2.500 🪙</div>
-                <div class="fiyat">150.00 TL</div>
-                <a href="/odeme-baslat/pro" class="btn purple">Satın Al</a>
-            </div>
-
-            <div class="kart">
-                <div class="isim">Mega Paket</div>
-                <div class="miktar">5.000 🪙</div>
-                <div class="fiyat">250.00 TL</div>
-                <a href="/odeme-baslat/mega" class="btn standart">Satın Al</a>
-            </div>
-
-            <div class="kart vip">
-                <div class="rozet gold">Sınırsız Güç</div>
-                <div class="isim">CEO Özel</div>
-                <div class="miktar" style="color: #facc15;">10.000 🪙</div>
-                <div class="fiyat">450.00 TL</div>
-                <a href="/odeme-baslat/ceo" class="btn gold">Hemen Yükle</a>
-            </div>
-
+        <div class="item-info">
+          <h3 class="item-name">Siber Komuta</h3>
+          <p class="item-desc">Neon mavi parıltısı ile teknolojinin zirvesini temsil eden efsanevi çerçeve.</p>
         </div>
-        <!-- KOZMETİK BÖLÜMÜ -->
-        <div class="kategori-baslik" style="margin-top: 50px;">🎨 Profil Kozmetikleri</div>
-        <div class="grid">
-            
-            <div class="kart" style="border-color: #00f2fe; background: rgba(0, 242, 254, 0.05);">
-                <div class="isim" style="color: #00f2fe;">Neon Siber Çerçeve</div>
-                <div class="miktar">500 🪙</div>
-                <p style="font-size: 11px; color: #94a3b8; margin-bottom: 20px;">Siberpunk rüzgarını profilinde estir.</p>
-                <button onclick="cerceveAl('neon_siber')" class="btn" style="background: rgba(0, 242, 254, 0.2); color: #00f2fe; border: 1px solid #00f2fe; width: 100%;">Satın Al</button>
-            </div>
+        <button class="buy-btn" onclick="buyItem('Siber Komuta Çerçevesi', 1500)">
+          Satın Al <span class="price">1500 🪙</span>
+        </button>
+      </div>
 
-            <div class="kart" style="border-color: #ff0055; background: rgba(255, 0, 85, 0.05);">
-                <div class="rozet purple" style="background: #ff0055;">Popüler</div>
-                <div class="isim" style="color: #ff0055;">Kızıl Ejder Çerçeve</div>
-                <div class="miktar">1.000 🪙</div>
-                <p style="font-size: 11px; color: #94a3b8; margin-bottom: 20px;">Rakiplerine korku salan agresif aura.</p>
-                <button onclick="cerceveAl('kizil_ejder')" class="btn" style="background: rgba(255, 0, 85, 0.2); color: #ff0055; border: 1px solid #ff0055; width: 100%;">Satın Al</button>
-            </div>
-
-            <div class="kart" style="border-color: #facc15; background: rgba(250, 204, 21, 0.05);">
-                <div class="rozet gold">VIP PRESTİJ</div>
-                <div class="isim" style="color: #facc15;">Altın CEO Çerçeve</div>
-                <div class="miktar">2.500 🪙</div>
-                <p style="font-size: 11px; color: #94a3b8; margin-bottom: 20px;">Zenginliğin ve gücün mutlak simgesi.</p>
-                <button onclick="cerceveAl('altin_ceo')" class="btn gold" style="width: 100%;">Hemen Al</button>
-            </div>
-
+      <div class="item-card">
+        <div class="item-visual">
+          <div class="avatar-demo">🔥<div class="frame-demo frame-fire"></div></div>
         </div>
+        <div class="item-info">
+          <h3 class="item-name">Cehennem Ateşi</h3>
+          <p class="item-desc">Rakiplerine korku salan, alev alev yanan dinamik bir görünüm.</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('Cehennem Ateşi Çerçevesi', 2000)">
+          Satın Al <span class="price">2000 🪙</span>
+        </button>
+      </div>
 
-        <!-- SAYFANIN EN ALTINA KOYALANACAK JAVASCRIPT -->
-        <script>
-            function cerceveAl(cerceve_id) {
-                if(confirm("Bu çerçeveyi almak istediğine emin misin?")) {
-                    fetch('/api/cerceve_al/' + cerceve_id, { method: 'POST' })
-                    .then(res => res.json())
-                    .then(data => {
-                        if(data.status === 'success') {
-                            alert("Kozmetik başarıyla satın alındı! Profilini kontrol et.");
-                            location.reload();
-                        } else if(data.status === 'yetersiz') {
-                            alert("Bakiye Yetersiz! Önce HE-Coin satın almalısın.");
-                        } else {
-                            alert("Bir hata oluştu patron!");
-                        }
-                    });
-                }
-            }
-        </script>
-
-        <a href="/" class="geri-btn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            Ana Sayfaya Dön
-        </a>
+      <div class="item-card">
+        <div class="item-visual">
+          <div class="avatar-demo">👑<div class="frame-demo frame-boss"></div></div>
+        </div>
+        <div class="item-info">
+          <h3 class="item-name">Patronun İmzası</h3>
+          <p class="item-desc">Sadece elit oyuncuların taşıyabileceği mor/pembe VIP çerçevesi.</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('Patronun İmzası Çerçevesi', 5000)">
+          Satın Al <span class="price">5000 🪙</span>
+        </button>
+      </div>
     </div>
+  </section>
+
+  <!-- TAKMA ADLAR -->
+  <section class="store-section">
+    <h2 class="section-title">🏷️ Özel Takma Adlar</h2>
+    <div class="grid">
+      <div class="item-card">
+        <div class="item-visual">
+          <div class="title-demo title-hacker">SİBER KORSAN</div>
+        </div>
+        <div class="item-info">
+          <h3 class="item-name">Siber Korsan</h3>
+          <p class="item-desc">Profilinde isminin altında görünecek hacker temalı nadir unvan.</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('Siber Korsan Unvanı', 800)">
+          Satın Al <span class="price">800 🪙</span>
+        </button>
+      </div>
+
+      <div class="item-card">
+        <div class="item-visual">
+          <div class="title-demo title-ceo">THE CEO</div>
+        </div>
+        <div class="item-info">
+          <h3 class="item-name">Şirket Sahibi</h3>
+          <p class="item-desc">Altın renkli parlak tasarımıyla patron olduğunu herkese kanıtla.</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('The CEO Unvanı', 2500)">
+          Satın Al <span class="price">2500 🪙</span>
+        </button>
+      </div>
+
+      <div class="item-card">
+        <div class="item-visual">
+          <div class="title-demo title-legend">EFSANE</div>
+        </div>
+        <div class="item-info">
+          <h3 class="item-name">Yaşayan Efsane</h3>
+          <p class="item-desc">Gradient renkli ve ışık saçan, server'ın en korkulan unvanı.</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('Efsane Unvanı', 10000)">
+          Satın Al <span class="price">10000 🪙</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- BİLETLER -->
+  <section class="store-section">
+    <h2 class="section-title">🎫 Arena Biletleri</h2>
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr));">
+      
+      <div class="item-card" style="border-color:rgba(255,0,122,0.3);background:linear-gradient(180deg, rgba(255,0,122,0.05), transparent);">
+        <div class="item-visual">
+          <div class="ticket-icon">🎟️</div>
+        </div>
+        <div class="item-info">
+          <h3 class="item-name">Haftalık Turnuva Bileti</h3>
+          <p class="item-desc">Büyük ödüllü hafta sonu turnuvasına giriş hakkı. 128 kişilik eleme usulü kapışma.</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('Turnuva Bileti', 500)">
+          Satın Al <span class="price">500 🪙</span>
+        </button>
+      </div>
+
+      <div class="item-card" style="border-color:rgba(243,156,18,0.3);background:linear-gradient(180deg, rgba(243,156,18,0.05), transparent);">
+        <div class="item-visual">
+          <div class="ticket-icon" style="filter:drop-shadow(0 10px 20px rgba(243,156,18,0.4));">☠️</div>
+        </div>
+        <div class="item-info">
+          <h3 class="item-name">Boss Arenası Anahtarı</h3>
+          <p class="item-desc">50.000 Coin havuzlu ölüm kalım arenasına giriş sağlar. Tek hata, tüm emeği siler.</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('Boss Arenası Anahtarı', 250)">
+          Satın Al <span class="price">250 🪙</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<div id="toast">✅ İşlem başarılı!</div>
+
+<script>
+let toastTimer;
+
+function buyItem(itemName, price) {
+  const currentCoin = parseInt(document.getElementById('user-coin').innerText);
+  
+  // Fake satın alma deneyimi - Countdown öncesi olduğu için mağaza kapalı mesajı
+  const toast = document.getElementById('toast');
+  toast.innerHTML = `⚠️ <b>${itemName}</b> mağaza açıldığında (geri sayım bittikten sonra) alınabilecek!`;
+  toast.style.background = 'linear-gradient(45deg, #f39c12, #e67e22)';
+  toast.style.boxShadow = '0 15px 30px rgba(243,156,18,0.4)';
+  
+  toast.classList.add('show-toast');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove('show-toast');
+  }, 4000);
+}
+</script>
 
 </body>
 </html>
