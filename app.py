@@ -106,6 +106,10 @@ class Kullanici(db.Model):
         backref=db.backref('takipcileri', lazy='dynamic'), lazy='dynamic')
     
     bildirimler = db.relationship('Bildirim', backref='kullanici', lazy=True)
+    
+    # --- MAĞAZA ENVANTERİ ---
+    sahip_olunan_cerceveler = db.Column(db.Text, default="") # Örn: "siber_komuta,cehennem_atesi"
+    sahip_olunan_unvanlar = db.Column(db.Text, default="") # Örn: "siber_korsan,ceo"
 class Oyun(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     baslik = db.Column(db.String(100), nullable=False)
@@ -159,6 +163,8 @@ with app.app_context():
         "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS son_gorev_tarihi VARCHAR(20) DEFAULT ''",
         "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS gunluk_test_sayaci INTEGER DEFAULT 0",
         "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS gunluk_odul_alindi BOOLEAN DEFAULT FALSE",
+        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS sahip_olunan_cerceveler TEXT DEFAULT ''",
+        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS sahip_olunan_unvanlar TEXT DEFAULT ''"
     ]
     with db.engine.connect() as conn:
         for sql in migrasyonlar:
@@ -788,6 +794,59 @@ def magaza():
         return redirect(url_for('giris'))
     kullanici = Kullanici.query.filter_by(kullanici_adi=session['kullanici_adi']).first()
     return render_template('magaza.html', kullanici=kullanici)
+
+@app.route('/api/satin_al', methods=['POST'])
+def satin_al():
+    if 'kullanici_adi' not in session or session['kullanici_adi'].startswith('Misafir_'):
+        return jsonify({"status": "error", "mesaj": "Giriş yapmanız gerekiyor!"}), 401
+        
+    data = request.json
+    urun_id = data.get('urun_id')
+    fiyat = data.get('fiyat')
+    urun_tipi = data.get('urun_tipi') # 'cerceve', 'unvan', 'bilet' vb.
+    
+    if not all([urun_id, fiyat, urun_tipi]):
+        return jsonify({"status": "error", "mesaj": "Eksik bilgi!"}), 400
+        
+    kullanici = Kullanici.query.filter_by(kullanici_adi=session['kullanici_adi']).first()
+    
+    if kullanici.he_coin < int(fiyat):
+        return jsonify({"status": "error", "mesaj": "Yetersiz HE-Coin bakiyesi!"}), 400
+        
+    # Eğer bu ürüne zaten sahipse engelle (Biletler hariç, biletler tekrar alınabilir)
+    if urun_tipi == 'cerceve':
+        envanter = kullanici.sahip_olunan_cerceveler.split(',') if kullanici.sahip_olunan_cerceveler else []
+        if urun_id in envanter:
+            return jsonify({"status": "error", "mesaj": "Bu çerçeveye zaten sahipsiniz!"}), 400
+        envanter.append(urun_id)
+        kullanici.sahip_olunan_cerceveler = ','.join(envanter)
+        kullanici.profil_cercevesi = urun_id # Otomatik kuşan
+        
+    elif urun_tipi == 'unvan':
+        envanter = kullanici.sahip_olunan_unvanlar.split(',') if kullanici.sahip_olunan_unvanlar else []
+        if urun_id in envanter:
+            return jsonify({"status": "error", "mesaj": "Bu unvana zaten sahipsiniz!"}), 400
+        envanter.append(urun_id)
+        kullanici.sahip_olunan_unvanlar = ','.join(envanter)
+        kullanici.rutbe = urun_id # Otomatik kuşan
+        
+    elif urun_tipi == 'boss_bileti':
+        if kullanici.boss_bileti_alindi:
+             return jsonify({"status": "error", "mesaj": "Zaten aktif bir Boss Arenası biletin var!"}), 400
+        kullanici.boss_bileti_alindi = True
+    
+    # Parayı düş
+    kullanici.he_coin -= int(fiyat)
+    
+    # Bildirim oluştur
+    bildirim = Bildirim(
+        kullanici_id=kullanici.id,
+        mesaj=f"Sistem: {fiyat} 🪙 karşılığında yeni eşya aldın. Envanterini kontrol et!"
+    )
+    db.session.add(bildirim)
+    
+    db.session.commit()
+    return jsonify({"status": "success", "mesaj": "Satın alma başarılı!", "kalan_coin": kullanici.he_coin})
 
 
 # --- 💳 STRIPE GERÇEK ÖDEME AKIŞI ---

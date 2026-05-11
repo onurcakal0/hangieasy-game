@@ -349,7 +349,42 @@
                     <button class="btn" style="background: #334155; color: #94a3b8; margin-top: 15px; cursor: not-allowed;">Görev Devam Ediyor...</button>
                 {% endif %}
             </div>
+            </div>
         </div>
+
+        {% if kendi_profili_mi %}
+        <h3 class="seksiyon-basligi">🎒 Envanterim</h3>
+        <div class="buyume-paneli" style="margin-bottom: 40px; grid-template-columns: 1fr 1fr;">
+            <div class="vip-kart">
+                <div class="vip-baslik">✨ Çerçevelerim</div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                    {% if kullanici.sahip_olunan_cerceveler %}
+                        {% for cerceve in kullanici.sahip_olunan_cerceveler.split(',') %}
+                            {% if cerceve %}
+                            <div style="background:rgba(255,255,255,0.1); padding:8px 12px; border-radius:8px; font-size:13px; font-weight:700;">{{ cerceve }}</div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p style="color:#8b93a8; font-size:13px;">Henüz hiç çerçeven yok. Mağazaya göz at!</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="vip-kart">
+                <div class="vip-baslik">🏷️ Unvanlarım</div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                    {% if kullanici.sahip_olunan_unvanlar %}
+                        {% for unvan in kullanici.sahip_olunan_unvanlar.split(',') %}
+                            {% if unvan %}
+                            <div style="background:rgba(255,255,255,0.1); padding:8px 12px; border-radius:8px; font-size:13px; font-weight:700;">{{ unvan }}</div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p style="color:#8b93a8; font-size:13px;">Henüz hiç unvanın yok. Mağazaya göz at!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
         
         {% if kendi_profili_mi %}
         <h3 class="seksiyon-basligi">🎬 Ürettiğin İçerikler</h3>

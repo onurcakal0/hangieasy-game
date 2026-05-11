@@ -59,12 +59,17 @@ main{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:0 20px 
 .frame-neon{border-color:var(--cyan);box-shadow:0 0 15px var(--cyan),inset 0 0 15px var(--cyan);}
 .frame-fire{border-color:var(--primary);box-shadow:0 0 20px var(--primary),inset 0 0 20px var(--primary);}
 .frame-boss{border-color:var(--secondary);box-shadow:0 0 25px var(--secondary),inset 0 0 25px var(--secondary);}
+.frame-toxic{border-color:#22c55e;box-shadow:0 0 15px #22c55e,inset 0 0 15px #22c55e;}
+.frame-ice{border-color:#e0f2fe;box-shadow:0 0 20px #bae6fd,inset 0 0 20px #bae6fd;}
 
 /* TITLE VISUAL */
 .title-demo{padding:10px 20px;border-radius:8px;font-weight:900;font-size:18px;letter-spacing:1px;text-transform:uppercase;}
 .title-ceo{background:linear-gradient(45deg,#f59e0b,#d97706);color:#000;box-shadow:0 0 20px rgba(245,158,11,0.4);}
 .title-hacker{background:rgba(34,197,94,0.1);color:#22c55e;border:1px dashed #22c55e;}
 .title-legend{background:linear-gradient(90deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 10px rgba(255,0,122,0.5));}
+.title-ghost{background:rgba(255,255,255,0.05);color:#cbd5e1;border:1px solid #475569;}
+.title-god{background:linear-gradient(135deg, #fbbf24, #f59e0b);color:#fff;text-shadow:0 0 10px rgba(255,255,255,0.8);}
+
 
 @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
 
@@ -121,7 +126,7 @@ main{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:0 20px 
           <h3 class="item-name">Siber Komuta</h3>
           <p class="item-desc">Neon mavi parıltısı ile teknolojinin zirvesini temsil eden efsanevi çerçeve.</p>
         </div>
-        <button class="buy-btn" onclick="buyItem('Siber Komuta Çerçevesi', 1500)">
+        <button class="buy-btn" onclick="buyItem('frame-neon', 1500, 'cerceve', 'Siber Komuta')">
           Satın Al <span class="price">1500 🪙</span>
         </button>
       </div>
@@ -134,7 +139,7 @@ main{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:0 20px 
           <h3 class="item-name">Cehennem Ateşi</h3>
           <p class="item-desc">Rakiplerine korku salan, alev alev yanan dinamik bir görünüm.</p>
         </div>
-        <button class="buy-btn" onclick="buyItem('Cehennem Ateşi Çerçevesi', 2000)">
+        <button class="buy-btn" onclick="buyItem('frame-fire', 2000, 'cerceve', 'Cehennem Ateşi')">
           Satın Al <span class="price">2000 🪙</span>
         </button>
       </div>
@@ -147,8 +152,34 @@ main{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:0 20px 
           <h3 class="item-name">Patronun İmzası</h3>
           <p class="item-desc">Sadece elit oyuncuların taşıyabileceği mor/pembe VIP çerçevesi.</p>
         </div>
-        <button class="buy-btn" onclick="buyItem('Patronun İmzası Çerçevesi', 5000)">
+        <button class="buy-btn" onclick="buyItem('frame-boss', 5000, 'cerceve', 'Patronun İmzası')">
           Satın Al <span class="price">5000 🪙</span>
+        </button>
+      </div>
+
+      <div class="item-card">
+        <div class="item-visual">
+          <div class="avatar-demo">🧪<div class="frame-demo frame-toxic"></div></div>
+        </div>
+        <div class="item-info">
+          <h3 class="item-name">Zehirli Duman</h3>
+          <p class="item-desc">Rakiplerini toksik yeşil aurası ile boğan tehlikeli çerçeve.</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('frame-toxic', 1200, 'cerceve', 'Zehirli Duman')">
+          Satın Al <span class="price">1200 🪙</span>
+        </button>
+      </div>
+
+      <div class="item-card">
+        <div class="item-visual">
+          <div class="avatar-demo">❄️<div class="frame-demo frame-ice"></div></div>
+        </div>
+        <div class="item-info">
+          <h3 class="item-name">Mutlak Sıfır</h3>
+          <p class="item-desc">Dondurucu soğukluğu hissettiren, buzdan yapılmış saf çerçeve.</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('frame-ice', 1800, 'cerceve', 'Mutlak Sıfır')">
+          Satın Al <span class="price">1800 🪙</span>
         </button>
       </div>
     </div>
@@ -166,7 +197,7 @@ main{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:0 20px 
           <h3 class="item-name">Siber Korsan</h3>
           <p class="item-desc">Profilinde isminin altında görünecek hacker temalı nadir unvan.</p>
         </div>
-        <button class="buy-btn" onclick="buyItem('Siber Korsan Unvanı', 800)">
+        <button class="buy-btn" onclick="buyItem('Siber Korsan', 800, 'unvan', 'Siber Korsan')">
           Satın Al <span class="price">800 🪙</span>
         </button>
       </div>
@@ -179,7 +210,7 @@ main{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:0 20px 
           <h3 class="item-name">Şirket Sahibi</h3>
           <p class="item-desc">Altın renkli parlak tasarımıyla patron olduğunu herkese kanıtla.</p>
         </div>
-        <button class="buy-btn" onclick="buyItem('The CEO Unvanı', 2500)">
+        <button class="buy-btn" onclick="buyItem('Şirket Sahibi', 2500, 'unvan', 'Şirket Sahibi')">
           Satın Al <span class="price">2500 🪙</span>
         </button>
       </div>
@@ -192,8 +223,34 @@ main{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:0 20px 
           <h3 class="item-name">Yaşayan Efsane</h3>
           <p class="item-desc">Gradient renkli ve ışık saçan, server'ın en korkulan unvanı.</p>
         </div>
-        <button class="buy-btn" onclick="buyItem('Efsane Unvanı', 10000)">
+        <button class="buy-btn" onclick="buyItem('Yaşayan Efsane', 10000, 'unvan', 'Yaşayan Efsane')">
           Satın Al <span class="price">10000 🪙</span>
+        </button>
+      </div>
+
+      <div class="item-card">
+        <div class="item-visual">
+          <div class="title-demo title-ghost">GİZLİ AJAN</div>
+        </div>
+        <div class="item-info">
+          <h3 class="item-name">Gizli Ajan</h3>
+          <p class="item-desc">Gölgelerde saklanan, radar dışı oyuncuların tercihi.</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('Gizli Ajan', 600, 'unvan', 'Gizli Ajan')">
+          Satın Al <span class="price">600 🪙</span>
+        </button>
+      </div>
+
+      <div class="item-card">
+        <div class="item-visual">
+          <div class="title-demo title-god">OYUNUN İLAHI</div>
+        </div>
+        <div class="item-info">
+          <h3 class="item-name">Oyunun İlahı</h3>
+          <p class="item-desc">Tartışmasız en iyi. Serverın hakimi olduğunu göster.</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('Oyunun İlahı', 25000, 'unvan', 'Oyunun İlahı')">
+          Satın Al <span class="price">25000 🪙</span>
         </button>
       </div>
     </div>
@@ -212,7 +269,7 @@ main{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:0 20px 
           <h3 class="item-name">Haftalık Turnuva Bileti</h3>
           <p class="item-desc">Büyük ödüllü hafta sonu turnuvasına giriş hakkı. 128 kişilik eleme usulü kapışma.</p>
         </div>
-        <button class="buy-btn" onclick="buyItem('Turnuva Bileti', 500)">
+        <button class="buy-btn" onclick="buyItem('haftalik_turnuva', 500, 'bilet', 'Turnuva Bileti')">
           Satın Al <span class="price">500 🪙</span>
         </button>
       </div>
@@ -225,7 +282,7 @@ main{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:0 20px 
           <h3 class="item-name">Boss Arenası Anahtarı</h3>
           <p class="item-desc">50.000 Coin havuzlu ölüm kalım arenasına giriş sağlar. Tek hata, tüm emeği siler.</p>
         </div>
-        <button class="buy-btn" onclick="buyItem('Boss Arenası Anahtarı', 250)">
+        <button class="buy-btn" onclick="buyItem('boss_arena', 250, 'boss_bileti', 'Boss Arenası Anahtarı')">
           Satın Al <span class="price">250 🪙</span>
         </button>
       </div>
@@ -239,20 +296,32 @@ main{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:0 20px 
 <script>
 let toastTimer;
 
-function buyItem(itemName, price) {
-  const currentCoin = parseInt(document.getElementById('user-coin').innerText);
-  
-  // Fake satın alma deneyimi - Countdown öncesi olduğu için mağaza kapalı mesajı
-  const toast = document.getElementById('toast');
-  toast.innerHTML = `⚠️ <b>${itemName}</b> mağaza açıldığında (geri sayım bittikten sonra) alınabilecek!`;
-  toast.style.background = 'linear-gradient(45deg, #f39c12, #e67e22)';
-  toast.style.boxShadow = '0 15px 30px rgba(243,156,18,0.4)';
-  
-  toast.classList.add('show-toast');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    toast.classList.remove('show-toast');
-  }, 4000);
+function buyItem(urun_id, fiyat, urun_tipi, gorunen_isim) {
+  fetch('/api/satin_al', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ urun_id: urun_id, fiyat: fiyat, urun_tipi: urun_tipi })
+  })
+  .then(res => res.json())
+  .then(data => {
+    const toast = document.getElementById('toast');
+    if (data.status === 'success') {
+      document.getElementById('user-coin').innerText = data.kalan_coin;
+      toast.innerHTML = `✅ <b>${gorunen_isim}</b> satın alındı! Envanterine eklendi.`;
+      toast.style.background = 'linear-gradient(45deg, #22c55e, #059669)';
+      toast.style.boxShadow = '0 15px 30px rgba(34,197,94,0.4)';
+    } else {
+      toast.innerHTML = `⚠️ ${data.mesaj}`;
+      toast.style.background = 'linear-gradient(45deg, #ef4444, #b91c1c)';
+      toast.style.boxShadow = '0 15px 30px rgba(239,68,68,0.4)';
+    }
+    
+    toast.classList.add('show-toast');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.remove('show-toast');
+    }, 4000);
+  });
 }
 </script>
 
