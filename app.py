@@ -258,6 +258,14 @@ def profil():
         aktif.referans_kodu = f"{isim_kismi}{rastgele_sayi}"
         db.session.commit() # Kasaya kaydet ki bir daha None olmasın!
 
+    # 🔄 GÜNLÜK SIFIRLAMA KONTROLÜ — Her profil ziyaretinde günü kontrol et
+    bugun = datetime.now().strftime('%Y-%m-%d')
+    if aktif.son_gorev_tarihi != bugun:
+        aktif.gunluk_test_sayaci = 0
+        aktif.gunluk_odul_alindi = False
+        aktif.son_gorev_tarihi = bugun
+        db.session.commit()
+
     kullanicinin_oyunlari = Oyun.query.filter_by(olusturan_id=aktif.id).all()
     
     aktif_test_sayisi = len(kullanicinin_oyunlari)
