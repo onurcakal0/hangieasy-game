@@ -409,6 +409,11 @@
             <div class="cuzdan-kapsulu" style="cursor: default; border-color: rgba(255,255,255,0.1);">
                 <div class="cuzdan-bakiye" style="border-radius: 30px;">🪙 {{ bakiye }} HE-Coin</div>
             </div>
+            {% if kullanici and kullanici.boss_bileti_alindi %}
+            <div class="cuzdan-kapsulu" style="cursor: default; border-color: rgba(255,0,85,0.4); background: rgba(255,0,85,0.08);">
+                <div class="cuzdan-bakiye" style="border-radius: 30px; color: #ff5588;">🎫 Boss Bileti</div>
+            </div>
+            {% endif %}
             <a href="/boss-arenasi" class="profil-btn" style="background: #ff0000; color: white; border: 1px solid #cc0000; box-shadow: 0 0 15px rgba(255,0,0,0.6); animation: pulse 2s infinite;">👹 BOSS</a>
             {% else %}
             <!-- 🛑 MAĞAZA GEÇİCİ OLARAK GİZLENDİ:

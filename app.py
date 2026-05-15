@@ -615,7 +615,13 @@ def coming_soon():
 def dashboard():
     # Tüm testleri oynanma sayısına göre sırala (en popüler üstte)
     oyunlar = Oyun.query.order_by(Oyun.oynanma_sayisi.desc()).all()
-    return render_template('dashboard.html', oyunlar=oyunlar)
+    
+    kullanici = None
+    kadi = session.get('kullanici_adi')
+    if kadi and not kadi.startswith('Misafir_'):
+        kullanici = Kullanici.query.filter_by(kullanici_adi=kadi).first()
+    
+    return render_template('dashboard.html', oyunlar=oyunlar, kullanici=kullanici)
 
 @app.route('/gizli-test-odasi')
 def gizli_oda():
@@ -855,6 +861,25 @@ def satin_al():
     
     db.session.commit()
     return jsonify({"status": "success", "mesaj": "Satın alma başarılı!", "kalan_coin": kullanici.he_coin})
+
+@app.route('/api/bilet_kullan', methods=['POST'])
+def bilet_kullan():
+    if 'kullanici_adi' not in session or session['kullanici_adi'].startswith('Misafir_'):
+        return jsonify({"status": "error", "mesaj": "Giriş yapmanız gerekiyor!"}), 401
+    
+    kullanici = Kullanici.query.filter_by(kullanici_adi=session['kullanici_adi']).first()
+    
+    data = request.json
+    tip = data.get('tip', 'boss')
+    
+    if tip == 'boss':
+        if not kullanici.boss_bileti_alindi:
+            return jsonify({"status": "error", "mesaj": "Aktif bir Boss biletin yok!"}), 400
+        kullanici.boss_bileti_alindi = False
+        db.session.commit()
+        return jsonify({"status": "success", "mesaj": "Boss bileti kullanıldı!"})
+    
+    return jsonify({"status": "error", "mesaj": "Geçersiz bilet tipi!"}), 400
 
 
 # --- 💳 STRIPE GERÇEK ÖDEME AKIŞI ---

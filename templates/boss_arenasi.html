@@ -316,6 +316,7 @@
                 <span>Boss uyanınca sana haber vereceğiz. Hazır ol patron.</span>
             </div>
         </div>
+        <button onclick="biletiKullan()" class="geri-btn" style="background: linear-gradient(135deg, #ff0055, #cc0000); color: #fff; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 20px; font-weight: 800; font-size: 14px;">🎫 Biletimi Kullan (İade Et)</button>
         {% endif %}
 
         <!-- Bildirim -->
@@ -354,6 +355,21 @@
 
         // Buton onclick düzeltmesi
         document.querySelector('.bildir-btn').onclick = bildirimiKaydet;
+
+        // Bilet kullanma fonksiyonu
+        function biletiKullan() {
+            if (!confirm('Boss bileti iade edilecek. Emin misiniz?')) return;
+            fetch('/api/bilet_kullan', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tip: 'boss'}) })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Biletin iade edildi!');
+                    location.reload();
+                } else {
+                    alert(data.mesaj);
+                }
+            });
+        }
     </script>
 
 </body>

@@ -77,6 +77,21 @@
             font-size: 48px; font-weight: 900; box-shadow: 0 0 30px rgba(243, 156, 18, 0.5);
             border: 4px solid #0b0c10; object-fit: cover; transition: 0.3s;
         }
+        /* 🎨 MAĞAZA ÇERÇEVELERİ */
+        .avatar-container .cerceve-ring {
+            position: absolute; inset: -8px; border-radius: 50%; border: 4px solid transparent; z-index: 1;
+            pointer-events: none; transition: 0.3s;
+        }
+        .cerceve-frame-neon { border-color: #00f2fe; box-shadow: 0 0 20px #00f2fe, inset 0 0 20px #00f2fe; animation: neonPulse 2s ease-in-out infinite alternate; }
+        .cerceve-frame-fire { border-color: #f39c12; box-shadow: 0 0 25px #f39c12, inset 0 0 25px #f39c12; animation: firePulse 1.5s ease-in-out infinite alternate; }
+        .cerceve-frame-boss { border-color: #ff007a; box-shadow: 0 0 30px #ff007a, inset 0 0 30px #ff007a; animation: bossPulse 2s ease-in-out infinite alternate; }
+        .cerceve-frame-toxic { border-color: #22c55e; box-shadow: 0 0 20px #22c55e, inset 0 0 20px #22c55e; animation: toxicPulse 2.5s ease-in-out infinite alternate; }
+        .cerceve-frame-ice { border-color: #e0f2fe; box-shadow: 0 0 20px #bae6fd, inset 0 0 20px #bae6fd; animation: icePulse 3s ease-in-out infinite alternate; }
+        @keyframes neonPulse { from { box-shadow: 0 0 15px #00f2fe, inset 0 0 15px #00f2fe; } to { box-shadow: 0 0 30px #00f2fe, inset 0 0 30px #00f2fe; } }
+        @keyframes firePulse { from { box-shadow: 0 0 20px #f39c12, inset 0 0 20px #f39c12; } to { box-shadow: 0 0 35px #e67e22, inset 0 0 35px #e67e22; } }
+        @keyframes bossPulse { from { box-shadow: 0 0 20px #ff007a, inset 0 0 20px #ff007a; } to { box-shadow: 0 0 40px #ff007a, inset 0 0 40px #ff007a; } }
+        @keyframes toxicPulse { from { box-shadow: 0 0 15px #22c55e, inset 0 0 15px #22c55e; } to { box-shadow: 0 0 28px #4ade80, inset 0 0 28px #4ade80; } }
+        @keyframes icePulse { from { box-shadow: 0 0 15px #bae6fd, inset 0 0 15px #bae6fd; } to { box-shadow: 0 0 30px #e0f2fe, inset 0 0 30px #e0f2fe; } }
         .pp-degistir-icon {
             position: absolute; bottom: -5px; right: -5px; background: rgba(11, 12, 16, 0.9);
             border: 2px solid #00f2fe; border-radius: 50%; width: 35px; height: 35px;
@@ -85,6 +100,12 @@
         }
         .avatar-container:hover .avatar { filter: brightness(0.7); }
         .avatar-container:hover .pp-degistir-icon { opacity: 1; transform: scale(1.1); }
+
+        .unvan-rozet {
+            display: inline-block; margin-top: 8px; padding: 5px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 800; letter-spacing: 0.5px;
+            background: rgba(243, 156, 18, 0.1); color: #f39c12; border: 1px solid rgba(243, 156, 18, 0.3);
+        }
 
         .profil-yazilar h2 { font-size: 28px; font-weight: 900; color: #fff; letter-spacing: 1px; margin-bottom: 5px; text-transform: uppercase;}
         .profil-yazilar p { color: #00f2fe; font-size: 14px; font-weight: 600; letter-spacing: 0.5px;}
@@ -285,9 +306,12 @@
                <div class="avatar-container">
                {% endif %}
                    {% if kullanici.profil_resmi %}
-                       <img src="{{ kullanici.profil_resmi }}" alt="Avatar" class="avatar {{ kullanici.profil_cercevesi }}">
+                       <img src="{{ kullanici.profil_resmi }}" alt="Avatar" class="avatar">
                    {% else %}
-                       <div class="avatar {{ kullanici.profil_cercevesi }}">{{ kullanici.kullanici_adi[0]|upper }}</div>
+                       <div class="avatar">{{ kullanici.kullanici_adi[0]|upper }}</div>
+                   {% endif %}
+                   {% if kullanici.profil_cercevesi and kullanici.profil_cercevesi != 'standart' %}
+                       <div class="cerceve-ring cerceve-{{ kullanici.profil_cercevesi }}"></div>
                    {% endif %}
                    {% if kendi_profili_mi %}<div class="pp-degistir-icon">📷</div>{% endif %}
                </div>
@@ -301,7 +325,10 @@
 
                 <div class="profil-yazilar">
                     <h2>{{ kullanici.kullanici_adi }}</h2>
-                    <p>
+                    {% if kullanici.sahip_olunan_unvanlar %}
+                        <div class="unvan-rozet">Nam-ı Değer: {{ kullanici.sahip_olunan_unvanlar.split(',')[-1] }}</div>
+                    {% endif %}
+                    <p style="margin-top:8px;">
                         Takipçi: <span id="takipci-sayisi-gosterge">{{ takipci_sayisi }}</span> &bull; 
                         Takip: {{ takip_edilen }}
                     </p>
