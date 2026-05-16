@@ -631,6 +631,11 @@ def gizli_oda():
 def guess_valorant():
     return render_template('guess_valorant.html')
 
+@app.route('/guess-lol')
+def guess_lol():
+    return render_template('guess_lol.html')
+
+
 
 @app.route('/test-olustur', methods=['GET', 'POST'])
 def test_olustur():

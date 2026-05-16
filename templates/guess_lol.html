@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guess The LoL Champion | HangiEasy</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0c10;--card:rgba(20,21,30,0.85);--border:rgba(255,255,255,0.08);--primary:#c89b3c;--blue:#0ac8b9;--green:#22c55e;--yellow:#f59e0b;--red:#ef4444;--text:#e2e8f0;--muted:#64748b;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Outfit',sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.orb{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0;}
+.orb1{width:50vw;height:50vw;background:rgba(200,155,60,0.12);top:-10%;left:-10%;animation:of 14s infinite alternate ease-in-out;}
+.orb2{width:45vw;height:45vw;background:rgba(10,200,185,0.1);bottom:-10%;right:-10%;animation:of 18s infinite alternate-reverse ease-in-out;}
+@keyframes of{0%{transform:translate(0,0) scale(1);}100%{transform:translate(50px,80px) scale(1.2);}}
+nav{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:14px 5%;background:rgba(11,12,16,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-logo{font-size:20px;font-weight:900;background:linear-gradient(90deg,var(--primary),#0ac8b9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
+.nav-back{color:var(--muted);text-decoration:none;font-size:13px;font-weight:600;transition:.3s;}
+.nav-back:hover{color:var(--text);}
+.lol-badge{background:rgba(200,155,60,0.12);border:1px solid rgba(200,155,60,0.3);color:var(--primary);padding:6px 16px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;}
+main{position:relative;z-index:10;max-width:900px;margin:0 auto;padding:30px 20px 80px;}
+.game-header{text-align:center;margin-bottom:30px;}
+.game-title{font-size:clamp(1.8rem,5vw,3rem);font-weight:900;letter-spacing:2px;background:linear-gradient(90deg,#fff,var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px;}
+.game-sub{color:var(--muted);font-size:13px;letter-spacing:1px;}
+.streak-bar{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:8px 18px;border-radius:20px;font-size:13px;margin-top:12px;}
+.streak-val{color:var(--yellow);font-weight:800;font-size:16px;}
+.attr-header{display:grid;grid-template-columns:2fr 1fr 1.2fr 1fr 1fr;gap:8px;margin-bottom:10px;padding:0 4px;}
+.attr-label{text-align:center;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:2px;}
+.guess-row{display:grid;grid-template-columns:2fr 1fr 1.2fr 1fr 1fr;gap:8px;margin-bottom:8px;animation:slideIn .4s ease-out;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.cell{padding:12px 8px;border-radius:12px;text-align:center;font-weight:800;font-size:12px;letter-spacing:.5px;text-transform:uppercase;border:1px solid transparent;position:relative;overflow:hidden;}
+.cell::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.06),transparent);pointer-events:none;}
+.cell.correct{background:rgba(34,197,94,0.2);border-color:rgba(34,197,94,0.5);color:#86efac;}
+.cell.wrong{background:rgba(239,68,68,0.18);border-color:rgba(239,68,68,0.4);color:#fca5a5;}
+.cell.partial{background:rgba(245,158,11,0.18);border-color:rgba(245,158,11,0.4);color:#fcd34d;}
+.year-arrow{font-size:10px;display:block;opacity:.7;margin-top:2px;}
+.input-wrap{background:var(--card);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:20px;position:relative;}
+.input-label{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.input-row{display:flex;gap:10px;}
+#champ-input{flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:12px;padding:14px 18px;color:#fff;font-size:15px;font-weight:600;outline:none;font-family:'Outfit',sans-serif;transition:.3s;}
+#champ-input:focus{border-color:var(--primary);box-shadow:0 0 20px rgba(200,155,60,0.2);}
+#champ-input::placeholder{color:var(--muted);}
+.guess-btn{padding:14px 28px;background:linear-gradient(135deg,var(--primary),#0ac8b9);color:#000;border:none;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer;transition:.3s;letter-spacing:1px;white-space:nowrap;}
+.guess-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(200,155,60,0.4);}
+.guess-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.autocomplete{position:absolute;top:100%;left:0;right:0;background:rgba(20,21,35,0.98);border:1px solid var(--border);border-radius:12px;margin-top:6px;overflow:hidden;z-index:200;max-height:220px;overflow-y:auto;display:none;box-shadow:0 20px 40px rgba(0,0,0,0.6);}
+.autocomplete::-webkit-scrollbar{width:4px;}
+.autocomplete::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px;}
+.ac-item{padding:12px 18px;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;transition:.2s;}
+.ac-item:hover{background:rgba(200,155,60,0.15);color:#fff;}
+.legend{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+.legend-dot{width:10px;height:10px;border-radius:3px;}
+.lg{background:var(--green);} .ly{background:var(--yellow);} .lr{background:var(--red);}
+.win-panel{display:none;text-align:center;background:linear-gradient(135deg,rgba(34,197,94,0.12),rgba(10,200,185,0.08));border:1px solid rgba(34,197,94,0.3);border-radius:24px;padding:40px 30px;margin-top:20px;animation:slideIn .5s ease-out;}
+.win-emoji{font-size:64px;margin-bottom:16px;display:block;}
+.win-title{font-size:2rem;font-weight:900;color:var(--green);margin-bottom:8px;}
+.win-agent{font-size:1.2rem;color:#fff;font-weight:700;margin-bottom:20px;}
+.win-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.btn-share{padding:14px 30px;background:linear-gradient(135deg,var(--green),#059669);color:#fff;border:none;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer;transition:.3s;}
+.btn-share:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(34,197,94,0.4);}
+.btn-retry{padding:14px 30px;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border);border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;transition:.3s;}
+.btn-retry:hover{background:rgba(255,255,255,0.1);}
+.lose-panel{display:none;text-align:center;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:24px;padding:40px 30px;margin-top:20px;animation:slideIn .5s ease-out;}
+.lose-title{font-size:1.8rem;font-weight:900;color:var(--red);margin-bottom:8px;}
+.lose-answer{font-size:1.1rem;color:#fff;margin-bottom:20px;}
+.guesses-left{text-align:center;color:var(--muted);font-size:13px;margin-bottom:16px;}
+.guesses-left span{color:#fff;font-weight:800;}
+@media(max-width:768px){
+  .attr-header,.guess-row{grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:4px;}
+  .cell{font-size:9px;padding:8px 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .input-row{flex-direction:column;}
+  .guess-btn{width:100%;}
+  nav{padding:12px 15px;}
+  main{padding:0 15px 50px;}
+}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<nav>
+  <a href="/" class="nav-logo">HangiEasy</a>
+  <div class="lol-badge">LEAGUE OF LEGENDS</div>
+  <a href="/dashboard" class="nav-back">← Dashboard</a>
+</nav>
+<main>
+  <div class="game-header">
+    <div class="game-title">GUESS THE CHAMPION</div>
+    <div class="game-sub">Guess the League of Legends Champion in 8 tries</div>
+    <div class="streak-bar">🔥 Streak: <span class="streak-val" id="streak-display">0</span> &nbsp;|&nbsp; 🎯 Best: <span class="streak-val" id="best-display">0</span></div>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot lg"></div> Correct</div>
+    <div class="legend-item"><div class="legend-dot ly"></div> Close (Year)</div>
+    <div class="legend-item"><div class="legend-dot lr"></div> Wrong</div>
+  </div>
+  <div class="attr-header">
+    <div class="attr-label">Champion</div>
+    <div class="attr-label">Gender</div>
+    <div class="attr-label">Role</div>
+    <div class="attr-label">Range</div>
+    <div class="attr-label">Year</div>
+  </div>
+  <div id="guesses-container"></div>
+  <div class="input-wrap" id="input-section">
+    <div class="input-label">🔍 Enter a champion name</div>
+    <div class="input-row">
+      <div style="position:relative;flex:1;">
+        <input id="champ-input" type="text" placeholder="e.g. Yasuo, Ahri, Jinx..." autocomplete="off">
+        <div class="autocomplete" id="autocomplete"></div>
+      </div>
+      <button class="guess-btn" id="guess-btn" onclick="submitGuess()">GUESS</button>
+    </div>
+  </div>
+  <div class="guesses-left" id="guesses-left">Guesses remaining: <span id="remaining">8</span> / 8</div>
+  <div class="win-panel" id="win-panel">
+    <span class="win-emoji">🏆</span>
+    <div class="win-title">GG! You got it!</div>
+    <div class="win-agent" id="win-name"></div>
+    <div class="win-actions">
+      <button class="btn-share" onclick="shareResult()">📋 Share Result</button>
+      <button class="btn-retry" onclick="newGame()">🔄 New Game</button>
+    </div>
+  </div>
+  <div class="lose-panel" id="lose-panel">
+    <div style="font-size:56px;margin-bottom:16px;">💀</div>
+    <div class="lose-title">Out of guesses!</div>
+    <div class="lose-answer">The champion was: <strong id="lose-name" style="color:var(--primary)"></strong></div>
+    <button class="btn-retry" onclick="newGame()">🔄 Try Again</button>
+  </div>
+</main>
+<script src="/static/lol_champs.js"></script>
+<script>
+const MAX=8;let target,guesses,gameOver;
+function newGame(){target=CHAMPS[Math.floor(Math.random()*CHAMPS.length)];guesses=[];gameOver=false;
+document.getElementById('guesses-container').innerHTML='';document.getElementById('win-panel').style.display='none';
+document.getElementById('lose-panel').style.display='none';document.getElementById('input-section').style.display='block';
+document.getElementById('guesses-left').style.display='block';document.getElementById('champ-input').value='';
+document.getElementById('guess-btn').disabled=false;updateRem();loadStreak();}
+function loadStreak(){const s=parseInt(localStorage.getItem('lol_streak')||'0'),b=parseInt(localStorage.getItem('lol_best')||'0');
+document.getElementById('streak-display').textContent=s;document.getElementById('best-display').textContent=b;}
+function updateRem(){document.getElementById('remaining').textContent=MAX-guesses.length;}
+function compare(g){const r=[];
+r.push({val:g.name,status:g.name===target.name?'correct':'wrong'});
+r.push({val:g.gender,status:g.gender===target.gender?'correct':'wrong'});
+r.push({val:g.role,status:g.role===target.role?'correct':'wrong'});
+r.push({val:g.range,status:g.range===target.range?'correct':'wrong'});
+let ys,ya='';if(g.year===target.year)ys='correct';else if(Math.abs(g.year-target.year)<=1){ys='partial';ya=g.year<target.year?'↑':'↓';}
+else{ys='wrong';ya=g.year<target.year?'↑':'↓';}
+r.push({val:g.year,status:ys,arrow:ya});return r;}
+function renderRow(cells){const row=document.createElement('div');row.className='guess-row';
+cells.forEach(c=>{const d=document.createElement('div');d.className='cell '+c.status;
+d.innerHTML=c.val+(c.arrow?'<span class="year-arrow">'+c.arrow+'</span>':'');row.appendChild(d);});
+document.getElementById('guesses-container').appendChild(row);}
+function submitGuess(){if(gameOver)return;const v=document.getElementById('champ-input').value.trim();
+const ch=CHAMPS.find(c=>c.name.toLowerCase()===v.toLowerCase());if(!ch){shakeInput();return;}
+if(guesses.find(g=>g.name.toLowerCase()===ch.name.toLowerCase())){alert('Already guessed!');return;}
+guesses.push(ch);renderRow(compare(ch));document.getElementById('champ-input').value='';
+document.getElementById('autocomplete').style.display='none';updateRem();
+if(ch.name===target.name)endGame(true);else if(guesses.length>=MAX)endGame(false);}
+function endGame(won){gameOver=true;document.getElementById('input-section').style.display='none';
+document.getElementById('guesses-left').style.display='none';
+if(won){document.getElementById('win-name').textContent=target.name+' • '+target.role+' • '+target.year;
+document.getElementById('win-panel').style.display='block';
+let s=parseInt(localStorage.getItem('lol_streak')||'0')+1,b=Math.max(s,parseInt(localStorage.getItem('lol_best')||'0'));
+localStorage.setItem('lol_streak',s);localStorage.setItem('lol_best',b);loadStreak();}
+else{document.getElementById('lose-name').textContent=target.name;
+document.getElementById('lose-panel').style.display='block';localStorage.setItem('lol_streak','0');loadStreak();}}
+function shakeInput(){const i=document.getElementById('champ-input');i.style.borderColor='var(--red)';
+setTimeout(()=>i.style.borderColor='',600);}
+function shareResult(){const lines=guesses.map(g=>compare(g).map(c=>c.status==='correct'?'🟩':c.status==='partial'?'🟨':'🟥').join('')).join('\n');
+const w=guesses[guesses.length-1]?.name===target.name;
+navigator.clipboard.writeText('HangiEasy — Guess The LoL Champ\n'+(w?guesses.length+'/'+MAX:'X/'+MAX)+'\n\n'+lines+'\n\nhangieasy.com').then(()=>alert('Copied! 📋'));}
+const inp=document.getElementById('champ-input'),ac=document.getElementById('autocomplete');
+inp.addEventListener('input',()=>{const q=inp.value.toLowerCase().trim();if(!q){ac.style.display='none';return;}
+const m=CHAMPS.filter(c=>c.name.toLowerCase().includes(q)&&!guesses.find(g=>g.name===c.name));
+if(!m.length){ac.style.display='none';return;}
+ac.innerHTML=m.slice(0,8).map(c=>'<div class="ac-item" onclick="selChamp(\''+c.name+'\')">⚔️ '+c.name+' <span style="color:var(--muted);font-size:11px;margin-left:auto;">'+c.role+' • '+c.year+'</span></div>').join('');
+ac.style.display='block';});
+function selChamp(n){inp.value=n;ac.style.display='none';inp.focus();}
+inp.addEventListener('keydown',e=>{if(e.key==='Enter')submitGuess();if(e.key==='Escape')ac.style.display='none';});
+document.addEventListener('click',e=>{if(!inp.contains(e.target)&&!ac.contains(e.target))ac.style.display='none';});
+newGame();
+</script>
+</body>
+</html>
