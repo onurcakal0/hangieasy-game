@@ -317,18 +317,60 @@
 
         /* 📱 MOBİL UYUM */
         @media (max-width: 768px) {
-            .navbar { padding: 12px 15px; }
-            .logo { font-size: 20px; }
-            .karsilama h1 { font-size: 28px; }
-            .karsilama p { font-size: 14px; }
-            .icerik { margin-left: 0; padding: 80px 15px 30px; }
-            .oyun-grid { grid-template-columns: 1fr; gap: 20px; }
+            /* NAVBAR */
+            .navbar { padding: 10px 12px; gap: 8px; }
+            .logo { font-size: 18px; }
+            .arama-kiti { order: 3; flex: 0 0 100%; min-width: 100%; max-width: 100%; margin-top: 4px; }
+            .arama-kiti input { padding: 8px 16px; font-size: 12px; }
+            .sag-menu { gap: 6px; }
+            .profil-btn { padding: 6px 10px; font-size: 10px; }
+            .stealth-btn { padding: 5px 8px; font-size: 10px; }
+            .cuzdan-kapsulu { border-radius: 20px; }
+            .cuzdan-kapsulu input[name="oda_kodu"] { width: 70px !important; font-size: 11px !important; padding: 6px 8px !important; }
+            .cuzdan-kapsulu button[type="submit"] { padding: 7px 10px !important; font-size: 10px !important; }
+
+            /* USER BAR */
+            .user-bar { padding: 6px 12px; top: auto; position: relative; justify-content: center; gap: 6px; }
+            .ub-pill { padding: 5px 10px; font-size: 10px; }
+
+            /* COUNTDOWN */
+            .dashboard-countdown { padding: 20px 15px; }
+            .dc-title { font-size: 12px; letter-spacing: 1px; }
+            .dc-subtitle { font-size: 11px; margin-bottom: 14px; }
+            .dc-timer { gap: 8px; }
+            .dc-box { min-width: 60px; padding: 10px 12px; border-radius: 12px; }
+            .dc-box span { font-size: 22px; }
+            .dc-box .label { font-size: 8px; letter-spacing: 1px; }
+            .dc-sep { font-size: 16px; }
+
+            /* SLIDER / GURUR */
+            .gurur-vitrini { padding: 15px; }
+            .gurur-baslik { font-size: 14px; flex-direction: column; gap: 5px; }
+            .slide-baslik { font-size: 20px; }
+
+            /* OYUN GRID */
+            .icerik { padding: 20px 15px 30px; }
+            .vitrin-basligi { font-size: 18px; }
+            .oyun-grid { grid-template-columns: 1fr; gap: 15px; }
             .kart-icerik { padding: 15px; }
-            .modal-buton-grubu { flex-direction: column; gap: 10px; }
+            .kart-baslik { font-size: 14px; }
+            .kart-aciklama { font-size: 12px; }
+
+            /* ÖZEL OYUNLAR */
+            .ozel-oyunlar { padding: 0 15px 30px; }
+            .ozel-baslik { font-size: 18px; }
+            .ozel-grid { grid-template-columns: 1fr; gap: 15px; }
+            .ozel-kart { padding: 24px 20px; }
+            .ozel-ikon { font-size: 36px; margin-bottom: 10px; }
+            .ozel-kart h3 { font-size: 15px; }
+
+            /* MODAL */
+            .modal-kutu { width: 95%; margin: 20px auto; border-radius: 16px; }
+            .modal-kapak { height: 180px; }
+            .modal-icerik-alani { padding: 15px; }
+            .modal-baslik { font-size: 18px; }
+            .modal-buton-grubu { flex-direction: column; gap: 8px; }
             .btn-aksiyon { font-size: 12px; padding: 12px; }
-            .dashboard-countdown { margin-top: 15px; flex-direction: column; text-align: center; }
-            .kullanici-paneli { flex-wrap: wrap; justify-content: center; gap: 8px; }
-            .kullanici-paneli a { font-size: 11px; padding: 6px 10px; }
         }
     </style>
 </head>
