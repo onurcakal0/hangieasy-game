@@ -116,16 +116,40 @@
 
         /* 🚀 GERİ SAYIM BANNER CSS'İ (DASHBOARD İÇİN) */
         .dashboard-countdown {
-            background: rgba(255, 51, 102, 0.05);
-            border-bottom: 1px solid rgba(255, 51, 102, 0.2);
-            padding: 25px 20px; text-align: center; position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(243,156,18,0.04), rgba(255,0,122,0.04));
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            padding: 30px 20px; text-align: center; position: relative; overflow: hidden;
         }
-        .dc-title { color: #fff; font-size: 18px; font-weight: 900; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
-        .dc-subtitle { color: #f39c12; font-size: 13px; margin-bottom: 15px; font-weight: 600; }
-        .dc-timer { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
-        .dc-box { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 12px; min-width: 70px; }
-        .dc-box span { display: block; font-size: 24px; font-weight: 800; background: linear-gradient(90deg, #00f2fe, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .dc-box .label { font-size: 10px; color: #888; text-transform: uppercase; margin-top: 2px; letter-spacing: 1px; }
+        .dashboard-countdown::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,#f39c12,#ff007a,transparent); }
+        .dc-title { color: #fff; font-size: 15px; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 2px; }
+        .dc-subtitle { color: #888; font-size: 12px; margin-bottom: 18px; font-weight: 400; }
+        .dc-timer { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; align-items: center; }
+        .dc-box { background: rgba(255,255,255,0.03); backdrop-filter:blur(15px); border: 1px solid rgba(255,255,255,0.06); padding: 14px 18px; border-radius: 16px; min-width: 75px; transition:.3s; }
+        .dc-box:hover { transform:translateY(-4px); border-color:rgba(243,156,18,0.2); box-shadow:0 10px 25px rgba(0,0,0,0.3); }
+        .dc-box span { display: block; font-size: 28px; font-weight: 900; background: linear-gradient(135deg, #f39c12, #ff007a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height:1; }
+        .dc-box .label { font-size: 9px; color: #555; text-transform: uppercase; margin-top: 6px; letter-spacing: 2px; font-weight:600; }
+        .dc-sep { font-size:22px; color:rgba(255,255,255,0.12); font-weight:300; }
+
+        /* USER SUB-BAR */
+        .user-bar { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:8px 4%; background:rgba(10,10,15,0.6); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,0.03); position:sticky; top:60px; z-index:99; flex-wrap:wrap; }
+        .ub-pill { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03); color:#aaa; white-space:nowrap; transition:.3s; text-decoration:none; }
+        .ub-pill:hover { border-color:rgba(243,156,18,0.3); background:rgba(255,255,255,0.06); color:#fff; }
+        .ub-coin { border-color:rgba(243,156,18,0.25); color:#f39c12; }
+        .ub-ticket { border-color:rgba(255,0,85,0.3); color:#ff5588; background:rgba(255,0,85,0.06); }
+        .ub-boss { border-color:rgba(255,0,0,0.4); color:#ff4444; background:rgba(255,0,0,0.08); animation:pulse 2s infinite; }
+
+        /* ÖZEL OYUNLAR SEKSİYONU */
+        .ozel-oyunlar { padding: 0 4% 40px; position:relative; z-index:10; }
+        .ozel-baslik { font-size:22px; font-weight:900; color:#fff; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+        .ozel-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+        .ozel-kart { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:20px; padding:30px 25px; transition:.4s; cursor:pointer; text-decoration:none; color:#fff; position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:center; text-align:center; }
+        .ozel-kart::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--c1,#ff4655),var(--c2,#ff8800)); opacity:0; transition:.3s; }
+        .ozel-kart:hover { transform:translateY(-8px); border-color:rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); box-shadow:0 20px 50px rgba(0,0,0,0.4); }
+        .ozel-kart:hover::before { opacity:1; }
+        .ozel-ikon { font-size:48px; margin-bottom:15px; }
+        .ozel-kart h3 { font-size:16px; font-weight:800; margin-bottom:8px; letter-spacing:.5px; }
+        .ozel-kart p { font-size:12px; color:#778; line-height:1.6; margin-bottom:15px; }
+        .ozel-tag { display:inline-flex; padding:5px 12px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
 
         /* ---------------- 📱 SOL AÇILIR MENÜ (SİDEBAR) ---------------- */
         .sidebar-overlay {
@@ -375,7 +399,7 @@
     </div>
 
 
-    <!-- 2. AŞAMA: NAVBAR -->
+    <!-- 2. AŞAMA: NAVBAR (TEMİZLENMİŞ) -->
     <nav class="navbar">
         <div class="sol-grup">
             <button class="menu-btn" onclick="sidebarAc()">☰</button>
@@ -387,43 +411,16 @@
         </div>
         
         <div class="sag-menu">
-            <div class="dil-secici">
-                <button id="stealth-salteri" class="stealth-btn" onclick="stealthModunuTetikle()">
-                    <span id="stealth-ikon">🏎️</span> <span id="stealth-yazi">RGB</span>
-                </button>
+            <button id="stealth-salteri" class="stealth-btn" onclick="stealthModunuTetikle()">
+                <span id="stealth-ikon">🏎️</span> <span id="stealth-yazi">RGB</span>
+            </button>
             <div class="cuzdan-kapsulu" style="border-color: #00f2fe; overflow: hidden; padding: 0;">
                 <form action="/odaya-katil" method="POST" style="display: flex; align-items: center; margin: 0;">
-                    <input type="text" name="oda_kodu" placeholder="Oda Kodu Gir" style="background: transparent; border: none; color: white; padding: 8px 12px; width: 110px; outline: none; font-size: 12px; font-weight: 600;" required autocomplete="off">
-                    <button type="submit" style="background: linear-gradient(45deg, #00f2fe, #4facfe); border: none; padding: 9px 15px; color: #000; font-weight: 900; cursor: pointer; font-size: 12px; text-transform: uppercase;">KATIL ⚡</button>
+                    <input type="text" name="oda_kodu" placeholder="Oda Kodu" style="background: transparent; border: none; color: white; padding: 8px 12px; width: 90px; outline: none; font-size: 12px; font-weight: 600;" required autocomplete="off">
+                    <button type="submit" style="background: linear-gradient(45deg, #00f2fe, #4facfe); border: none; padding: 9px 15px; color: #000; font-weight: 900; cursor: pointer; font-size: 11px; text-transform: uppercase;">KATIL⚡</button>
                 </form>
             </div>
-            </div>
-
-            {% if session.kullanici_adi %}
-            <!-- 🛑 MAĞAZA GEÇİCİ OLARAK GİZLENDİ:
-            <a href="/magaza" class="cuzdan-kapsulu">
-                <div class="cuzdan-bakiye">🪙 {{ bakiye }}</div>
-                <div class="cuzdan-magaza">Mağaza</div>
-            </a>
-            -->
-            <!-- BAKIYE EKRANI (Mağaza Linki Olmadan) -->
-            <div class="cuzdan-kapsulu" style="cursor: default; border-color: rgba(255,255,255,0.1);">
-                <div class="cuzdan-bakiye" style="border-radius: 30px;">🪙 {{ bakiye }} HE-Coin</div>
-            </div>
-            {% if kullanici and kullanici.boss_bileti_alindi %}
-            <div class="cuzdan-kapsulu" style="cursor: default; border-color: rgba(255,0,85,0.4); background: rgba(255,0,85,0.08);">
-                <div class="cuzdan-bakiye" style="border-radius: 30px; color: #ff5588;">🎫 Boss Bileti</div>
-            </div>
-            {% endif %}
-            <a href="/boss-arenasi" class="profil-btn" style="background: #ff0000; color: white; border: 1px solid #cc0000; box-shadow: 0 0 15px rgba(255,0,0,0.6); animation: pulse 2s infinite;">👹 BOSS</a>
-            {% else %}
-            <!-- 🛑 MAĞAZA GEÇİCİ OLARAK GİZLENDİ:
-            <a href="/magaza" class="profil-btn btn-sari" style="padding: 8px 15px;">Mağaza</a>
-            -->
-            {% endif %}
-
             {% if 'kullanici_adi' in session %}
-                <a href="/test-olustur" class="profil-btn btn-yesil">{{ t.yeni_test }}</a>
                 <a href="/profil" class="profil-btn btn-sari">{{ t.studyo }}</a>
                 <a href="/cikis" class="profil-btn btn-kirmizi">{{ t.cikis }}</a>
             {% else %}
@@ -433,14 +430,29 @@
         </div>
     </nav>
 
-    <!-- 🚀 EFSANE GERİ SAYIM ALANI (DASHBOARD'A EKLENDİ) -->
+    <!-- USER SUB-BAR -->
+    {% if session.kullanici_adi %}
+    <div class="user-bar">
+        <span class="ub-pill ub-coin">🪙 {{ bakiye }} HE-Coin</span>
+        {% if kullanici and kullanici.boss_bileti_alindi %}
+        <span class="ub-pill ub-ticket">🎫 Boss Bileti</span>
+        {% endif %}
+        <a href="/boss-arenasi" class="ub-pill ub-boss">👹 BOSS</a>
+        <a href="/test-olustur" class="ub-pill" style="border-color:rgba(0,176,155,0.3);color:#00b09b;">＋ {{ t.yeni_test }}</a>
+    </div>
+    {% endif %}
+
+    <!-- 🚀 GERİ SAYIM -->
     <div class="dashboard-countdown">
-        <h2 class="dc-title">HANGIEASY 2.0 GLOBAL YAYIN İÇİN GERİ SAYIM BAŞLADI</h2>
-        <p class="dc-subtitle">Mağaza ve yepyeni özelliklerin kilidi açılıyor, hazır ol!</p>
+        <h2 class="dc-title">⏳ HangiEasy 2.0 Lansman Geri Sayımı</h2>
+        <p class="dc-subtitle">Mağaza ve yepyeni özelliklerin kilidi açılıyor</p>
         <div class="dc-timer" id="dc-timer">
             <div class="dc-box"><span id="days">00</span><div class="label">Gün</div></div>
+            <div class="dc-sep">:</div>
             <div class="dc-box"><span id="hours">00</span><div class="label">Saat</div></div>
+            <div class="dc-sep">:</div>
             <div class="dc-box"><span id="minutes">00</span><div class="label">Dakika</div></div>
+            <div class="dc-sep">:</div>
             <div class="dc-box"><span id="seconds">00</span><div class="label">Saniye</div></div>
         </div>
     </div>
@@ -508,6 +520,25 @@
                 </div>
             </div>
             {% endfor %}
+        </div>
+    </div>
+
+    <!-- ⚔️ ÖZEL OYUNLAR SEKSİYONU -->
+    <div class="ozel-oyunlar">
+        <div class="ozel-baslik">⚔️ Özel Oyunlar</div>
+        <div class="ozel-grid">
+            <a href="/guess-valorant" class="ozel-kart" style="--c1:#ff4655;--c2:#ff8800;">
+                <div class="ozel-ikon">🔫</div>
+                <h3>Guess The Valorant Agent</h3>
+                <p>26 Valorant ajanından birini tahmin et! 8 hakkın var, ipuçlarını takip et.</p>
+                <span class="ozel-tag" style="background:rgba(255,70,85,0.12);color:#ff4655;border:1px solid rgba(255,70,85,0.3);">Valorant</span>
+            </a>
+            <a href="/guess-lol" class="ozel-kart" style="--c1:#c89b3c;--c2:#0ac8b9;">
+                <div class="ozel-ikon">⚔️</div>
+                <h3>Guess The LoL Champion</h3>
+                <p>172 League of Legends şampiyonundan birini tahmin et! Rol, menzil ve yıl ipuçlarıyla.</p>
+                <span class="ozel-tag" style="background:rgba(200,155,60,0.12);color:#c89b3c;border:1px solid rgba(200,155,60,0.3);">League of Legends</span>
+            </a>
         </div>
     </div>
 
