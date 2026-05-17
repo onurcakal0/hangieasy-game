@@ -217,26 +217,130 @@
     </a>
 </section>
 
+<!-- ====== MARQUEE TICKER ====== -->
+<div style="overflow:hidden;border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04);padding:16px 0;position:relative;z-index:10;">
+    <div style="display:flex;gap:60px;animation:marquee 25s linear infinite;white-space:nowrap;">
+        <span style="color:#444;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;">⚡ ANLIK REKABET</span>
+        <span style="color:#444;font-size:13px;font-weight:700;letter-spacing:3px;">🎭 OMU BUMU</span>
+        <span style="color:#444;font-size:13px;font-weight:700;letter-spacing:3px;">⚔️ 1V1 DÜELLO</span>
+        <span style="color:#444;font-size:13px;font-weight:700;letter-spacing:3px;">💀 BOSS ARENASI</span>
+        <span style="color:#444;font-size:13px;font-weight:700;letter-spacing:3px;">🏆 HE-COIN</span>
+        <span style="color:#444;font-size:13px;font-weight:700;letter-spacing:3px;">🎯 TEST ÜRET</span>
+        <span style="color:#444;font-size:13px;font-weight:700;letter-spacing:3px;">⚡ ANLIK REKABET</span>
+        <span style="color:#444;font-size:13px;font-weight:700;letter-spacing:3px;">🎭 OMU BUMU</span>
+        <span style="color:#444;font-size:13px;font-weight:700;letter-spacing:3px;">⚔️ 1V1 DÜELLO</span>
+        <span style="color:#444;font-size:13px;font-weight:700;letter-spacing:3px;">💀 BOSS ARENASI</span>
+    </div>
+</div>
+<style>@keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}</style>
+
 <!-- ====== FEATURES ====== -->
 <section class="features" id="ozellikler">
     <div style="text-align:center;">
         <div class="sec-badge">⚡ Özellikler</div>
         <div class="sec-title">Neden HangiEasy?</div>
-        <div class="sec-sub">Tek platformda tüm rekabet deneyimi</div>
+        <div class="sec-sub">Kartlara tıklayarak detayları keşfet</div>
     </div>
     <div class="feat-grid">
-        <div class="feat-card"><div class="feat-icon">⚡</div><h3>Anlık Rekabet</h3><p>Canlı yayınlarda izleyicilerle eş zamanlı yarış. Yayıncı soruyu geçince ekranın da geçer.</p></div>
-        <div class="feat-card"><div class="feat-icon">🎭</div><h3>Omu Bumu & Turnuva</h3><p>Seçimini yap, karşındaki ile kapış. Kim daha fazla oy alır? Arena seni bekliyor.</p></div>
-        <div class="feat-card"><div class="feat-icon">⚔️</div><h3>1v1 Düello</h3><p>Arkadaşını veya yabancıyı karşına al. Aynı soruyu kim daha hızlı çözer?</p></div>
-        <div class="feat-card"><div class="feat-icon">💀</div><h3>Boss Arenası</h3><p>Haftalık büyük boss. 50 soru, 1 can, 50.000 HE-Coin ödül havuzu.</p></div>
-        <div class="feat-card"><div class="feat-icon">🏆</div><h3>HE-Coin Ekonomisi</h3><p>Her testte kazan, mağazada harca. Çerçeveler, özel unvanlar ve çok daha fazlası.</p></div>
-        <div class="feat-card"><div class="feat-icon">🎯</div><h3>Kendi Testini Üret</h3><p>Soruları yükle, görselleri ekle, topluluğunla paylaş. Yaratıcılığın sınırı yok.</p></div>
+        <div class="feat-card reveal" onclick="toggleDemo(this)" data-demo="canli">
+            <div class="feat-icon">⚡</div><h3>Anlık Rekabet</h3><p>Canlı yayınlarda izleyicilerle eş zamanlı yarış.</p>
+            <div class="feat-demo"><div class="demo-mock"><div class="demo-bar"><div class="demo-fill" style="width:78%;background:linear-gradient(90deg,var(--primary),var(--secondary));"></div></div><span style="font-size:11px;color:#888;">SEN: 78 puan • Rakip: 62 puan</span><div style="margin-top:8px;font-size:20px;">🏆 1. Sıradasın!</div></div></div>
+        </div>
+        <div class="feat-card reveal" onclick="toggleDemo(this)" data-demo="omu">
+            <div class="feat-icon">🎭</div><h3>Omu Bumu & Turnuva</h3><p>Seçimini yap, karşındaki ile kapış.</p>
+            <div class="feat-demo"><div class="demo-mock"><div style="display:flex;gap:10px;justify-content:center;"><div class="demo-option" style="border-color:var(--primary);">🍕 Pizza<br><span style="color:var(--primary);font-size:18px;font-weight:900;">64%</span></div><div class="demo-option">🍔 Burger<br><span style="color:var(--secondary);font-size:18px;font-weight:900;">36%</span></div></div></div></div>
+        </div>
+        <div class="feat-card reveal" onclick="toggleDemo(this)" data-demo="duello">
+            <div class="feat-icon">⚔️</div><h3>1v1 Düello</h3><p>Arkadaşını karşına al. Kim daha hızlı?</p>
+            <div class="feat-demo"><div class="demo-mock"><div style="display:flex;justify-content:space-between;align-items:center;"><div style="text-align:center;"><div style="font-size:28px;">👑</div><div style="color:var(--cyan);font-weight:800;">SEN</div><div style="font-size:24px;font-weight:900;">8</div></div><div style="font-size:20px;color:#444;">⚔️</div><div style="text-align:center;"><div style="font-size:28px;">💀</div><div style="color:var(--secondary);font-weight:800;">RAKİP</div><div style="font-size:24px;font-weight:900;">5</div></div></div></div></div>
+        </div>
+        <div class="feat-card reveal" onclick="toggleDemo(this)" data-demo="boss">
+            <div class="feat-icon">💀</div><h3>Boss Arenası</h3><p>50 soru, 1 can, 50.000 HE-Coin ödül havuzu.</p>
+            <div class="feat-demo"><div class="demo-mock"><div style="font-size:40px;animation:bossBounce 1s ease infinite;">💀</div><div style="font-size:11px;color:#888;margin-top:5px;">SORU 47/50</div><div class="demo-bar" style="margin-top:8px;"><div class="demo-fill" style="width:94%;background:linear-gradient(90deg,#ff0000,#ff4444);"></div></div><div style="color:#ff4444;font-size:12px;font-weight:800;margin-top:5px;">❤️ 1 CAN KALDI</div></div></div>
+        </div>
+        <div class="feat-card reveal" onclick="toggleDemo(this)" data-demo="coin">
+            <div class="feat-icon">🏆</div><h3>HE-Coin Ekonomisi</h3><p>Kazan, biriktir, harca. Mağaza seni bekliyor.</p>
+            <div class="feat-demo"><div class="demo-mock"><div style="font-size:28px;font-weight:900;color:var(--primary);">🪙 12,450</div><div style="font-size:11px;color:#888;">HE-Coin Bakiye</div><div style="display:flex;gap:6px;margin-top:10px;justify-content:center;"><span style="background:rgba(0,242,254,0.1);border:1px solid rgba(0,242,254,0.3);padding:4px 10px;border-radius:8px;font-size:10px;color:var(--cyan);">🖼️ Neon Çerçeve</span><span style="background:rgba(243,156,18,0.1);border:1px solid rgba(243,156,18,0.3);padding:4px 10px;border-radius:8px;font-size:10px;color:var(--primary);">🏷️ Oyun İlahı</span></div></div></div>
+        </div>
+        <div class="feat-card reveal" onclick="toggleDemo(this)" data-demo="test">
+            <div class="feat-icon">🎯</div><h3>Kendi Testini Üret</h3><p>Soruları yükle, görselleri ekle, paylaş.</p>
+            <div class="feat-demo"><div class="demo-mock"><div style="font-size:12px;color:var(--cyan);font-weight:800;margin-bottom:6px;">+ YENİ TEST OLUŞTUR</div><div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:8px;font-size:11px;color:#888;text-align:left;">📝 Başlık: Futbol Efsaneleri<br>🎮 Mod: Klasik Quiz<br>📸 4 Soru Eklendi</div><div style="margin-top:8px;font-size:10px;color:var(--primary);font-weight:800;">✅ Yayınla →</div></div></div>
+        </div>
     </div>
 </section>
 
+<style>
+.feat-demo{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.4,0,.2,1),opacity .4s,margin .4s;opacity:0;margin-top:0;}
+.feat-card.active .feat-demo{max-height:250px;opacity:1;margin-top:18px;}
+.demo-mock{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px;text-align:center;}
+.demo-bar{height:8px;background:rgba(255,255,255,0.06);border-radius:10px;overflow:hidden;}
+.demo-fill{height:100%;border-radius:10px;transition:width 1s ease;}
+.demo-option{flex:1;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;font-size:13px;font-weight:700;text-align:center;}
+@keyframes bossBounce{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+.feat-card{cursor:pointer;}
+.feat-card.active{border-color:rgba(243,156,18,0.3);box-shadow:0 20px 50px rgba(243,156,18,0.08);}
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+</style>
+
+<!-- ====== HOW IT WORKS ====== -->
+<section style="padding:120px 5% 100px;position:relative;z-index:10;max-width:1000px;margin:0 auto;">
+    <div style="text-align:center;">
+        <div class="sec-badge">🚀 Nasıl Çalışır?</div>
+        <div class="sec-title">3 Adımda Başla</div>
+        <div class="sec-sub">Kayıt ol, oyna, kazan</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0;position:relative;padding-left:40px;">
+        <div style="position:absolute;left:18px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--primary),var(--secondary),var(--cyan));"></div>
+        <div class="reveal" style="position:relative;padding:30px;margin-bottom:30px;">
+            <div style="position:absolute;left:-32px;top:30px;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;box-shadow:0 0 15px rgba(243,156,18,0.4);">1</div>
+            <h3 style="font-size:20px;font-weight:800;margin-bottom:8px;">Hesabını Oluştur</h3>
+            <p style="color:#778;font-size:14px;line-height:1.7;">E-posta adresinle 30 saniyede kayıt ol. Referans koduyla arkadaşını getir, 100 HE-Coin kazan.</p>
+        </div>
+        <div class="reveal" style="position:relative;padding:30px;margin-bottom:30px;">
+            <div style="position:absolute;left:-32px;top:30px;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--secondary),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;box-shadow:0 0 15px rgba(255,0,122,0.4);">2</div>
+            <h3 style="font-size:20px;font-weight:800;margin-bottom:8px;">Teste Katıl veya Oluştur</h3>
+            <p style="color:#778;font-size:14px;line-height:1.7;">Yüzlerce hazır testten birini çöz ya da kendi testini oluşturup topluluğunla paylaş.</p>
+        </div>
+        <div class="reveal" style="position:relative;padding:30px;">
+            <div style="position:absolute;left:-32px;top:30px;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),#4facfe);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;box-shadow:0 0 15px rgba(0,242,254,0.4);">3</div>
+            <h3 style="font-size:20px;font-weight:800;margin-bottom:8px;">Kazan & Yüksel</h3>
+            <p style="color:#778;font-size:14px;line-height:1.7;">HE-Coin biriktir, rütbeni yükselt, mağazadan kozmetik eşyalar al. CEO olmaya kaç test kaldı?</p>
+        </div>
+    </div>
+</section>
+
+<!-- ====== NUMBERS ====== -->
+<section style="padding:80px 5%;position:relative;z-index:10;">
+    <div style="max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center;">
+        <div class="reveal" style="background:var(--card);border:1px solid rgba(255,255,255,0.05);border-radius:20px;padding:35px 15px;">
+            <div style="font-size:36px;margin-bottom:8px;">🎮</div>
+            <div style="font-size:clamp(1.8rem,3vw,2.5rem);font-weight:900;color:#fff;" data-count="172">0</div>
+            <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:2px;margin-top:4px;">Toplam Karakter</div>
+        </div>
+        <div class="reveal" style="background:var(--card);border:1px solid rgba(255,255,255,0.05);border-radius:20px;padding:35px 15px;">
+            <div style="font-size:36px;margin-bottom:8px;">⚔️</div>
+            <div style="font-size:clamp(1.8rem,3vw,2.5rem);font-weight:900;color:#fff;" data-count="500">0</div>
+            <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:2px;margin-top:4px;">Düello Oynandı</div>
+        </div>
+        <div class="reveal" style="background:var(--card);border:1px solid rgba(255,255,255,0.05);border-radius:20px;padding:35px 15px;">
+            <div style="font-size:36px;margin-bottom:8px;">🪙</div>
+            <div style="font-size:clamp(1.8rem,3vw,2.5rem);font-weight:900;color:#fff;" data-count="50000">0</div>
+            <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:2px;margin-top:4px;">HE-Coin Dağıtıldı</div>
+        </div>
+        <div class="reveal" style="background:var(--card);border:1px solid rgba(255,255,255,0.05);border-radius:20px;padding:35px 15px;">
+            <div style="font-size:36px;margin-bottom:8px;">🏆</div>
+            <div style="font-size:clamp(1.8rem,3vw,2.5rem);font-weight:900;color:#fff;" data-count="6">0</div>
+            <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:2px;margin-top:4px;">Oyun Modu</div>
+        </div>
+    </div>
+</section>
+<style>@media(max-width:768px){section [style*="grid-template-columns:repeat(4"]{grid-template-columns:repeat(2,1fr)!important;}}</style>
+
 <!-- ====== ABOUT ====== -->
 <section id="about" class="about">
-    <div class="about-box">
+    <div class="about-box reveal">
         <h2>Biz Kimiz?</h2>
         <p>Sınırları reddeden, sıradanlığı bozan ve dijital dünyada yeni bir standart belirleyen bir ekibiz. HangiEasy sadece bir platform değil; teknolojiyle harmanlanmış bir vizyonun, yeni nesil interaktif eğlencenin başlangıç noktasıdır.</p>
         <a href="https://onurcakal.com" target="_blank" class="founder-btn">✦ Kurucu &amp; CTO: Mustafa Onur Çakal</a>
@@ -245,21 +349,58 @@
 
 <div class="footer"><p>© 2026 HangiEasy — Tüm Hakları Saklıdır.</p></div>
 
+<!-- FLOATING EMOJIS -->
+<div id="float-emojis" style="position:fixed;inset:0;pointer-events:none;z-index:3;overflow:hidden;"></div>
+
 <script>
+    // COUNTDOWN
     const hedef = new Date("May 20, 2026 20:00:00").getTime();
-    const timer = setInterval(() => {
-        const fark = hedef - Date.now();
-        if (fark < 0) {
-            clearInterval(timer);
-            document.querySelector(".cd-wrap").innerHTML = "<div style='font-size:2.5rem;font-weight:900;color:#fff;'>🚀 HangiEasy Canlı!</div>";
-            return;
-        }
-        const pad = n => String(Math.floor(n)).padStart(2,'0');
-        document.getElementById("days").textContent    = pad(fark/864e5);
-        document.getElementById("hours").textContent   = pad((fark%864e5)/36e5);
-        document.getElementById("minutes").textContent = pad((fark%36e5)/6e4);
-        document.getElementById("seconds").textContent = pad((fark%6e4)/1e3);
+    setInterval(() => {
+        const f = hedef - Date.now();
+        if (f < 0) { document.querySelector(".cd-wrap").innerHTML = "<div style='font-size:2.5rem;font-weight:900;'>🚀 HangiEasy Canlı!</div>"; return; }
+        const p = n => String(Math.floor(n)).padStart(2,'0');
+        document.getElementById("days").textContent=p(f/864e5);
+        document.getElementById("hours").textContent=p((f%864e5)/36e5);
+        document.getElementById("minutes").textContent=p((f%36e5)/6e4);
+        document.getElementById("seconds").textContent=p((f%6e4)/1e3);
     }, 1000);
+
+    // FEATURE DEMO TOGGLE
+    function toggleDemo(el) {
+        const wasActive = el.classList.contains('active');
+        document.querySelectorAll('.feat-card.active').forEach(c => c.classList.remove('active'));
+        if (!wasActive) el.classList.add('active');
+    }
+
+    // SCROLL REVEAL
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+    // ANIMATED COUNTERS
+    const cObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (!e.isIntersecting) return;
+            const el = e.target, end = parseInt(el.dataset.count);
+            let cur = 0; const step = Math.max(1, Math.floor(end / 60));
+            const t = setInterval(() => { cur += step; if (cur >= end) { cur = end; clearInterval(t); } el.textContent = cur.toLocaleString(); }, 30);
+            cObs.unobserve(el);
+        });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('[data-count]').forEach(el => cObs.observe(el));
+
+    // FLOATING EMOJIS
+    const emojis = ['⚡','🎯','🏆','💀','⚔️','🪙','🎭','🔥'];
+    function spawnEmoji() {
+        const e = document.createElement('div');
+        e.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        e.style.cssText = `position:absolute;font-size:${16+Math.random()*14}px;left:${Math.random()*100}%;bottom:-30px;opacity:0.15;animation:floatUp ${8+Math.random()*10}s linear forwards;`;
+        document.getElementById('float-emojis').appendChild(e);
+        setTimeout(() => e.remove(), 20000);
+    }
+    setInterval(spawnEmoji, 3000);
 </script>
+<style>@keyframes floatUp{0%{transform:translateY(0) rotate(0);opacity:0;}10%{opacity:0.15;}90%{opacity:0.1;}100%{transform:translateY(-110vh) rotate(360deg);opacity:0;}}</style>
 </body>
 </html>
