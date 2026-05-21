@@ -31,21 +31,24 @@
         let kilitli = false;
         let yapayZekaSecimleri = []; // 🧠 AI analizi için cevapları tutuyoruz
 
-        window.onload = () => {
-            fetch(`/api/sorular/${OYUN_ID}`)
-                .then(res => res.json())
-                .then(data => {
-                    // 🚀 ZIRH 1: Veri gelmezse çökme
-                    if (!data || data.length === 0) {
-                        let butonKutusu = document.getElementById('buton-kutusu');
-                        if(butonKutusu) butonKutusu.innerHTML = "<h3 style='color:white; text-align:center;'>Bu teste henüz soru eklenmemiş patron!</h3>";
-                        return;
-                    }
-                    SORULAR = data;
-                    soruyuGetir();
-                })
-                .catch(err => console.error("Veri Çekme Hatası:", err));
-        };
+        // Sayfa yüklendiğinde hemen soruları çek (window.onload beklemeye gerek yok çünkü script body'nin sonunda)
+        fetch(`/api/sorular/${OYUN_ID}`)
+            .then(res => res.json())
+            .then(data => {
+                // 🚀 ZIRH 1: Veri gelmezse çökme
+                if (!data || data.length === 0) {
+                    let butonKutusu = document.getElementById('buton-kutusu');
+                    if(butonKutusu) butonKutusu.innerHTML = "<h3 style='color:white; text-align:center;'>Bu teste henüz soru eklenmemiş patron!</h3>";
+                    return;
+                }
+                SORULAR = data;
+                soruyuGetir();
+            })
+            .catch(err => {
+                console.error("Veri Çekme Hatası:", err);
+                let butonKutusu = document.getElementById('buton-kutusu');
+                if(butonKutusu) butonKutusu.innerHTML = "<h3 style='color:red; text-align:center;'>API Bağlantı Hatası!</h3>";
+            });
 
         function soruyuGetir() {
             if (aktifIndex >= SORULAR.length) return oyunuBitir();
@@ -61,7 +64,10 @@
                 if(resimElem) {
                     resimElem.src = resimUrl;
                     resimElem.style.display = 'block';
-                    resimElem.onerror = function() { this.src='https://via.placeholder.com/400x200/151520/FFFFFF?text=Resim+Yok'; };
+                    resimElem.onerror = function() { 
+                        this.onerror = null; // Sonsuz döngüyü engelle!
+                        this.src='https://via.placeholder.com/400x200/151520/FFFFFF?text=Resim+Yok'; 
+                    };
                 }
             } else {
                 if(resimElem) resimElem.style.display = 'none'; // Soru resmi yoksa kutuyu gizle, sadece yazı kalsın
