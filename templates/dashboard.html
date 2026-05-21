@@ -484,10 +484,10 @@
     </div>
     {% endif %}
 
-    <!-- 🚀 GERİ SAYIM -->
+    <!-- 🚀 DUYURU + GERİ SAYIM -->
     <div class="dashboard-countdown">
-        <h2 class="dc-title">⏳ HangiEasy 2.0 Lansman Geri Sayımı</h2>
-        <p class="dc-subtitle">Mağaza ve yepyeni özelliklerin kilidi açılıyor</p>
+        <h2 class="dc-title">📣 HangiEasy 2.0 — Büyük Lansman</h2>
+        <p class="dc-subtitle">Mağaza, özel turnuvalar ve çok daha fazlası geliyor!</p>
         <div class="dc-timer" id="dc-timer">
             <div class="dc-box"><span id="days">00</span><div class="label">Gün</div></div>
             <div class="dc-sep">:</div>
@@ -496,6 +496,12 @@
             <div class="dc-box"><span id="minutes">00</span><div class="label">Dakika</div></div>
             <div class="dc-sep">:</div>
             <div class="dc-box"><span id="seconds">00</span><div class="label">Saniye</div></div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px;">
+            <span style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(243,156,18,0.08);border:1px solid rgba(243,156,18,0.2);color:#f39c12;">🛍️ Mağaza Açılıyor</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(0,242,254,0.08);border:1px solid rgba(0,242,254,0.2);color:#00f2fe;">🏆 Turnuva Sistemi</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(255,0,122,0.08);border:1px solid rgba(255,0,122,0.2);color:#ff007a;">👑 Sıralama Tablosu</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);color:#22c55e;">🎮 Yeni Oyun Modları</span>
         </div>
     </div>
 
@@ -612,7 +618,7 @@
 
     <script>
         // --- 🚀 GERİ SAYIM MOTORU ---
-        const countDownDate = new Date("May 20, 2026 20:00:00").getTime();
+        const countDownDate = new Date("June 15, 2026 20:00:00").getTime();
         const x = setInterval(function() {
             const now = new Date().getTime();
             const distance = countDownDate - now;
