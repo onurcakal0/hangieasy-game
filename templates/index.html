@@ -79,7 +79,7 @@
                 if(s) {
                     let guvenliS = s.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                     if(butonKutusu) {
-                        butonKutusu.innerHTML += `<button class="btn-secenek" onclick="cevapKontrol(this, '${guvenliS}')">${s}</button>`;
+                        butonKutusu.innerHTML += `<button class="secenek-btn" onclick="cevapKontrol(this, '${guvenliS}')">${s}</button>`;
                     }
                 }
             });
@@ -100,7 +100,7 @@
             } else {
                 buton.classList.add('yanlis');
                 // Doğruyu bul ve yeşil yak
-                let butonlar = document.querySelectorAll('.btn-secenek');
+                let butonlar = document.querySelectorAll('.secenek-btn');
                 butonlar.forEach(b => {
                     if(b.innerText === dogruCevap) b.classList.add('dogru');
                 });
@@ -128,7 +128,7 @@
                             <p id="ai-analiz-metni" style="color: #aaa; font-size: 14px; line-height: 1.6;"></p>
                         </div>
 
-                        <button class="btn-secenek" style="background: #00f2fe; color: black; border:none; box-shadow: 0 0 15px rgba(0,242,254,0.5);" onclick="location.href='/'">🏠 ANA SAYFAYA DÖN</button>
+                        <button class="secenek-btn" style="background: #00f2fe; color: black; border:none; box-shadow: 0 0 15px rgba(0,242,254,0.5);" onclick="location.href='/'">🏠 ANA SAYFAYA DÖN</button>
                     </div>
                 `;
             }
