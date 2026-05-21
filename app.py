@@ -758,6 +758,12 @@ def soru_ekle(oyun_id):
                     yeni = Soru(oyun_id=oyun.id, resim_url=url, secenekler=isimler[i], dogru_cevap="Farketmez")
                     db.session.add(yeni)
                     
+        elif oyun.oyun_modu == 'klasik_test':
+            soru_metni = request.form.get('soru_metni', 'Metin yok')
+            # resim_url alanını soru metnini tutmak için kullanıyoruz
+            yeni = Soru(oyun_id=oyun.id, resim_url=soru_metni, secenekler=request.form.get('secenekler'), dogru_cevap=request.form.get('dogru_cevap'))
+            db.session.add(yeni)
+
         else: # Normal Test
             resim_url = guvenli_yukle(request.files.get('soru_resmi'))
             yeni = Soru(oyun_id=oyun.id, resim_url=resim_url, secenekler=request.form.get('secenekler'), dogru_cevap=request.form.get('dogru_cevap'))
@@ -782,7 +788,8 @@ def oyun_sayfasi(oyun_id):
         'butce_savasi': 'butce_savasi.html',
         'piksel_avcisi': 'piksel_avcisi.html',
         'casus_kim': 'casus_kim.html',
-        'sesli_quiz': 'sesli_quiz.html'
+        'sesli_quiz': 'sesli_quiz.html',
+        'klasik_test': 'klasik_test.html'
     }
     if oyun.oynanma_sayisi is None:
         oyun.oynanma_sayisi = 0

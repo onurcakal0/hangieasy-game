@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ oyun_basligi }} | QuizHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: #0b0c10; color: #ffffff; 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; position: relative; overflow: hidden;
+        }
+
+        /* Yüksek Kalite Arka Plan Animasyonu */
+        body::before, body::after {
+            content: ''; position: absolute; width: 60vw; height: 60vw;
+            border-radius: 50%; filter: blur(140px); z-index: -1;
+            animation: orbFloat 20s infinite alternate ease-in-out;
+        }
+        body::before { background: rgba(0, 242, 254, 0.15); top: -20%; left: -20%; }
+        body::after { background: rgba(255, 0, 122, 0.15); bottom: -20%; right: -20%; animation-delay: -10s; }
+        
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(60px, -60px) scale(1.2); }
+        }
+
+        /* Cam Efektli (Glassmorphism) Oyun Kutusu */
+        .oyun-kutusu {
+            background: rgba(20, 20, 30, 0.6);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 800px;
+            padding: 50px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Üst Bilgi (Skor ve Sayaç) */
+        .ust-bilgi {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+        }
+
+        .soru-sayaci {
+            background: rgba(0, 242, 254, 0.1);
+            color: #00f2fe;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .skor-kutusu {
+            font-size: 20px;
+            font-weight: 900;
+            color: #facc15;
+            text-shadow: 0 0 15px rgba(250,204,21,0.4);
+        }
+
+        /* Soru Metni (Ultra Premium Tipografi) */
+        .soru-metni {
+            font-size: 32px;
+            font-weight: 900;
+            line-height: 1.4;
+            color: #ffffff;
+            margin: 20px 0;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            /* Gradient Yazı Efekti */
+            background: linear-gradient(135deg, #ffffff 0%, #a8b2c1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Seçenekler Gridi */
+        .secenekler {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+        }
+
+        @media (max-width: 600px) {
+            .secenekler { grid-template-columns: 1fr; }
+            .oyun-kutusu { padding: 30px 20px; }
+            .soru-metni { font-size: 24px; min-height: 80px; }
+        }
+
+        /* Neon Etkileşimli Butonlar */
+        .btn-secenek {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-secenek:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #00f2fe;
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* Buton İçindeki Şık Harf (A, B, C, D) */
+        .btn-secenek .harf {
+            position: absolute;
+            left: 20px;
+            font-weight: 900;
+            color: rgba(255,255,255,0.2);
+            font-size: 24px;
+        }
+
+        /* Durum Renkleri */
+        .dogru { 
+            background: rgba(46, 204, 113, 0.2) !important; 
+            border-color: #2ecc71 !important; 
+            box-shadow: 0 0 30px rgba(46, 204, 113, 0.4) !important;
+            color: #2ecc71 !important;
+        }
+        
+        .yanlis { 
+            background: rgba(231, 76, 60, 0.2) !important; 
+            border-color: #e74c3c !important; 
+            box-shadow: 0 0 30px rgba(231, 76, 60, 0.4) !important;
+            color: #e74c3c !important;
+        }
+
+        /* Animasyonlar */
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .animasyon-giris {
+            animation: fadeInScale 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        /* Bitiş Ekranı Butonu */
+        .btn-anasayfa {
+            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.4);
+            transition: 0.3s;
+        }
+        .btn-anasayfa:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 242, 254, 0.6); }
+
+    </style>
+</head>
+<body>
+
+    <div class="oyun-kutusu" id="oyun-alani">
+        <!-- İçerik Javascript ile Doldurulacak -->
+        <h2 style="color:white;">Yükleniyor...</h2>
+    </div>
+
+    <script>
+        const OYUN_ID = "{{ aktif_oyun }}";
+        const OYUN_BASLIGI = "{{ oyun_basligi }}";
+        
+        let SORULAR = [];
+        let aktifIndex = 0;
+        let skor = 0;
+        let kilitli = false;
+        let yapayZekaSecimleri = []; 
+
+        const harfler = ["A", "B", "C", "D", "E", "F"];
+
+        // Sayfa yüklendiğinde soruları çek
+        fetch(`/api/sorular/${OYUN_ID}`)
+            .then(res => res.json())
+            .then(data => {
+                let alan = document.getElementById('oyun-alani');
+                if (!data || data.length === 0) {
+                    alan.innerHTML = "<h3 style='color:red;'>Bu teste henüz soru eklenmemiş!</h3>";
+                    return;
+                }
+                SORULAR = data;
+                soruyuGetir();
+            })
+            .catch(err => {
+                console.error("Veri Çekme Hatası:", err);
+                document.getElementById('oyun-alani').innerHTML = "<h3 style='color:red;'>API Bağlantı Hatası!</h3>";
+            });
+
+        function soruyuGetir() {
+            if (aktifIndex >= SORULAR.length) return oyunuBitir();
+
+            kilitli = false;
+            let soru = SORULAR[aktifIndex];
+            let alan = document.getElementById('oyun-alani');
+            
+            // Soru Metni: resim_url içine kaydetmiştik!
+            // Satır atlamaları (newline) <br> tagine çeviriyoruz
+            let soruMetni = (soru.resim_url || "Soru metni bulunamadı.").replace(/\n/g, '<br>');
+
+            // Seçenekleri virgülle böl ve karıştır
+            let seceneklerDizisi = (soru.secenekler || "").split(',');
+            let karisik = [...seceneklerDizisi].sort(() => Math.random() - 0.5);
+
+            // Butonların HTML'ini oluştur
+            let butonlarHTML = '';
+            karisik.forEach((sec, i) => {
+                let s = sec.trim();
+                if(s) {
+                    let guvenliS = s.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    let harf = harfler[i] || "•";
+                    butonlarHTML += `<button class="btn-secenek" onclick="cevapKontrol(this, '${guvenliS}')"><span class="harf">${harf}</span><span style="z-index:1;">${s}</span></button>`;
+                }
+            });
+
+            // Ekranı Çiz
+            alan.className = "oyun-kutusu"; // Animasyonu sıfırlamak için
+            
+            // Reflow tetikle ki animasyon baştan oynasın
+            void alan.offsetWidth; 
+            
+            alan.className = "oyun-kutusu animasyon-giris";
+            
+            alan.innerHTML = `
+                <div class="ust-bilgi">
+                    <div class="soru-sayaci">Soru ${aktifIndex + 1} / ${SORULAR.length}</div>
+                    <div class="skor-kutusu">Skor: ${skor}</div>
+                </div>
+                
+                <div class="soru-metni">${soruMetni}</div>
+                
+                <div class="secenekler">
+                    ${butonlarHTML}
+                </div>
+            `;
+        }
+
+        function cevapKontrol(buton, secim) {
+            if(kilitli) return;
+            kilitli = true;
+
+            yapayZekaSecimleri.push(secim);
+            let dogruCevap = (SORULAR[aktifIndex].dogru_cevap || "").trim();
+
+            if (secim === dogruCevap) {
+                buton.classList.add('dogru');
+                skor += 10;
+                document.querySelector('.skor-kutusu').innerHTML = `Skor: ${skor}`;
+            } else {
+                buton.classList.add('yanlis');
+                
+                // Doğruyu bul ve yeşil yak
+                let butonlar = document.querySelectorAll('.btn-secenek');
+                butonlar.forEach(b => {
+                    let span = b.querySelector('span:nth-child(2)');
+                    let text = span ? span.innerText : b.innerText;
+                    if(text.trim() === dogruCevap) b.classList.add('dogru');
+                });
+            }
+
+            setTimeout(() => {
+                aktifIndex++;
+                soruyuGetir();
+            }, 1500);
+        }
+
+        function oyunuBitir() {
+            let alan = document.getElementById('oyun-alani');
+            
+            alan.innerHTML = `
+                <div style="animation: fadeInScale 0.8s forwards;">
+                    <h2 style="color: #00f2fe; font-size: 36px; margin-bottom: 20px; font-weight: 900; text-transform: uppercase;">Mükemmel!</h2>
+                    <div style="font-size: 70px; font-weight: 900; color: #facc15; margin-bottom: 20px; text-shadow: 0 0 30px rgba(250,204,21,0.5);">
+                        ${skor}
+                    </div>
+                    <p style="color: #aaa; font-size: 16px; margin-bottom: 30px; letter-spacing: 1px;">TOPLAM PUANIN</p>
+                    
+                    <div id="ai-analiz-konteynir" style="display:none; background: rgba(0,0,0,0.4); padding: 25px; border-radius: 16px; margin-bottom: 30px; border: 1px solid rgba(0,242,254,0.2); text-align: left;">
+                        <h4 style="color: #00f2fe; margin-bottom: 15px; font-weight: 800; display:flex; align-items:center; gap:10px;"><span style="font-size:24px;">🤖</span> HangiEasy AI Analizi</h4>
+                        <p id="ai-analiz-metni" style="color: #ddd; font-size: 15px; line-height: 1.6;"></p>
+                    </div>
+
+                    <a href="/" class="btn-anasayfa">🏠 Stüdyoya Dön</a>
+                </div>
+            `;
+
+            // AI Analizi
+            fetch('/api/ai_analiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ secimler: yapayZekaSecimleri, oyun_basligi: OYUN_BASLIGI })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('ai-analiz-konteynir').style.display = 'block';
+                document.getElementById('ai-analiz-metni').innerText = data.analiz;
+            }).catch(err => console.log("AI API Hatası:", err));
+
+            // Coin Kazanma
+            fetch('/api/odul_al', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ miktar: 10 }) 
+            }).catch(err => console.log("Coin Hatası:", err));
+        }
+    </script>
+</body>
+</html>
