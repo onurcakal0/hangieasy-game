@@ -200,14 +200,25 @@
                         let isimler = (soru.secenekler || "").split(',');
                         let resimler = (soru.resim_url || "").split(',');
 
-                        let isim1 = isimler[0] ? isimler[0].trim() : "Bilinmeyen 1";
-                        let isim2 = isimler[1] ? isimler[1].trim() : "Bilinmeyen 2";
+                        let isim1_ham = isimler[0] ? isimler[0].trim() : "Bilinmeyen 1";
+                        let isim2_ham = isimler[1] ? isimler[1].trim() : "Bilinmeyen 2";
+                        
+                        let parseSecenek = (val) => {
+                            let bolumler = val.split('=');
+                            if (bolumler.length > 1 && !isNaN(bolumler[1])) {
+                                return { isim: bolumler[0].trim(), hacim: parseInt(bolumler[1]) };
+                            }
+                            return { isim: val.trim(), hacim: skorUret(val.trim()) };
+                        };
+
+                        let s1 = parseSecenek(isim1_ham);
+                        let s2 = parseSecenek(isim2_ham);
                         
                         let resim1 = resimler[0] ? resimler[0].trim() : "";
                         let resim2 = resimler[1] ? resimler[1].trim() : resim1; // 2. resim yoksa 1.yi kopyala
 
-                        adaylar.push({ isim: isim1, resim: resim1, hacim: skorUret(isim1) });
-                        adaylar.push({ isim: isim2, resim: resim2, hacim: skorUret(isim2) });
+                        adaylar.push({ isim: s1.isim, resim: resim1, hacim: s1.hacim });
+                        adaylar.push({ isim: s2.isim, resim: resim2, hacim: s2.hacim });
                     });
                     
                     // Havuzu karıştır
