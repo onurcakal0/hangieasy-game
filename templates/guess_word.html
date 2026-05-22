@@ -225,15 +225,13 @@
         let hedefKelime = "";
         let guncelSatir = 0;
         let guncelSutun = 0;
-        let tahta = []; // Grid içeriğini tutacak
+        let tahta = []; 
         let oyunBitti = false;
 
         const tahtaEl = document.getElementById('tahta');
         const mesajEl = document.getElementById('mesaj');
 
-        // Sözlük TR_WORDS olarak static js'den yükleniyor. 
-
-        function mesajGoster(mesaj, sure=2000) {
+        function mesajGoster(mesaj) {
             mesajEl.innerText = mesaj;
         }
 
@@ -245,31 +243,46 @@
         }
 
         function yeniOyunBaslat() {
-            document.getElementById('bitis-ekrani').style.display = 'none';
-            oyunBitti = false;
-            guncelSatir = 0;
-            guncelSutun = 0;
-            tahta = Array(TAHMIN_HAKKI).fill().map(() => Array(HARF_SAYISI).fill(""));
+            try {
+                document.getElementById('bitis-ekrani').style.display = 'none';
+                oyunBitti = false;
+                guncelSatir = 0;
+                guncelSutun = 0;
+                
+                // Güvenli dizi oluşturma
+                tahta = [];
+                for(let r=0; r<TAHMIN_HAKKI; r++) {
+                    tahta.push(Array(HARF_SAYISI).fill(""));
+                }
 
-            // Kelime seç
-            const liste = TR_WORDS[HARF_SAYISI.toString()];
-            if(liste && liste.length > 0) {
-                hedefKelime = liste[Math.floor(Math.random() * liste.length)].toLowerCase();
-            } else {
-                alert("Sözlük yüklenemedi!");
+                if (typeof TR_WORDS === 'undefined') {
+                    mesajGoster("Hata: Sözlük yüklenemedi! Sayfayı yenileyin.");
+                    return;
+                }
+
+                const liste = TR_WORDS[HARF_SAYISI.toString()];
+                if(liste && liste.length > 0) {
+                    hedefKelime = liste[Math.floor(Math.random() * liste.length)].toLowerCase();
+                } else {
+                    mesajGoster("Hata: Kelime listesi boş!");
+                    return;
+                }
+
+                document.querySelectorAll('.tus').forEach(t => {
+                    t.classList.remove('yesil', 'sari', 'gri');
+                });
+
+                tahtaCiz();
+                mesajGoster("Tahmin yapmaya başla!");
+            } catch (e) {
+                console.error(e);
+                mesajGoster("Bir hata oluştu: " + e.message);
             }
-
-            // Klavye renklerini sıfırla
-            document.querySelectorAll('.tus').forEach(t => {
-                t.classList.remove('yesil', 'sari', 'gri');
-            });
-
-            tahtaCiz();
-            mesajGoster("Tahmin yapmaya başla!");
         }
 
         function tahtaCiz() {
             tahtaEl.innerHTML = '';
+            // CSS grid'i güncelle
             tahtaEl.style.gridTemplateColumns = `repeat(${HARF_SAYISI}, 1fr)`;
             
             for(let r=0; r<TAHMIN_HAKKI; r++) {
@@ -286,8 +299,13 @@
             for(let r=0; r<TAHMIN_HAKKI; r++) {
                 for(let c=0; c<HARF_SAYISI; c++) {
                     const kutu = document.getElementById(`kutu-${r}-${c}`);
+                    if (!kutu) continue;
+                    
                     const harf = tahta[r][c];
-                    kutu.innerText = harf === 'i' ? 'İ' : harf; // i harfi CSS uppercase ile I oluyor, Türkçe i için İ bas.
+                    // Türkçe i harfi düzeltmesi
+                    if (harf === 'i') kutu.innerText = 'İ';
+                    else if (harf === 'ı') kutu.innerText = 'I';
+                    else kutu.innerText = harf;
                     
                     if(harf !== "") kutu.classList.add('dolu');
                     else kutu.classList.remove('dolu');
@@ -298,9 +316,11 @@
         function satirSars(satir) {
             for(let c=0; c<HARF_SAYISI; c++) {
                 const kutu = document.getElementById(`kutu-${satir}-${c}`);
-                kutu.classList.remove('sarsil');
-                void kutu.offsetWidth; // Trigger reflow
-                kutu.classList.add('sarsil');
+                if(kutu) {
+                    kutu.classList.remove('sarsil');
+                    void kutu.offsetWidth; 
+                    kutu.classList.add('sarsil');
+                }
             }
         }
 
@@ -308,7 +328,6 @@
             const tuslar = document.querySelectorAll('.tus');
             tuslar.forEach(tus => {
                 if(tus.getAttribute('data-tus') === harf) {
-                    // Yeşil her zaman kalır, sarı griye düşmez.
                     if(tus.classList.contains('yesil')) return;
                     if(tus.classList.contains('sari') && renkSinifi === 'gri') return;
                     
@@ -334,7 +353,6 @@
                 return;
             }
 
-            // Doğrulama Algoritması
             let hedefDizi = hedefKelime.split('');
             let tahminDizi = tahminKelime.split('');
             let renkler = Array(HARF_SAYISI).fill('gri');
@@ -343,8 +361,8 @@
             for(let i=0; i<HARF_SAYISI; i++) {
                 if(tahminDizi[i] === hedefDizi[i]) {
                     renkler[i] = 'yesil';
-                    hedefDizi[i] = null; // işaretlendi
-                    tahminDizi[i] = null; // işaretlendi
+                    hedefDizi[i] = null; 
+                    tahminDizi[i] = null; 
                 }
             }
 
@@ -356,25 +374,24 @@
                 }
             }
 
-            // Animasyonla Boya
-            oyunBitti = true; // Animasyon sırasında basılmasın
+            oyunBitti = true; 
             let dogruSayisi = 0;
 
             for(let i=0; i<HARF_SAYISI; i++) {
                 setTimeout(() => {
                     const kutu = document.getElementById(`kutu-${guncelSatir}-${i}`);
-                    kutu.classList.add('cevriliyor');
-                    
-                    setTimeout(() => {
-                        kutu.classList.add(renkler[i]);
-                        kutu.style.color = '#fff';
-                        kutu.style.borderColor = 'transparent';
-                        klavyeRenklendir(tahta[guncelSatir][i], renkler[i]);
-                    }, 300); // Dönüşün tam ortasında rengi değiştir
+                    if(kutu) {
+                        kutu.classList.add('cevriliyor');
+                        setTimeout(() => {
+                            kutu.classList.add(renkler[i]);
+                            kutu.style.color = '#fff';
+                            kutu.style.borderColor = 'transparent';
+                            klavyeRenklendir(tahta[guncelSatir][i], renkler[i]);
+                        }, 300);
+                    }
 
                     if(renkler[i] === 'yesil') dogruSayisi++;
 
-                    // Son harfin animasyonu bittiğinde
                     if(i === HARF_SAYISI - 1) {
                         setTimeout(() => {
                             if(dogruSayisi === HARF_SAYISI) {
@@ -384,11 +401,11 @@
                             } else {
                                 guncelSatir++;
                                 guncelSutun = 0;
-                                oyunBitti = false; // Oyuna devam
+                                oyunBitti = false; 
                             }
                         }, 500);
                     }
-                }, i * 300); // Her harfe gecikme ekle
+                }, i * 300); 
             }
         }
 
@@ -426,23 +443,30 @@
             if(oyunBitti) return;
             const key = e.key.toLowerCase();
             
-            if(key === 'enter') harfBas('ENTER');
-            else if(key === 'backspace') harfBas('BACKSPACE');
-            else if('abcçdefgğhıijklmnoöprsştuüvyz'.includes(key) && key.length === 1) {
+            if(key === 'enter') {
+                e.preventDefault();
+                harfBas('ENTER');
+            } else if(key === 'backspace') {
+                e.preventDefault();
+                harfBas('BACKSPACE');
+            } else if('abcçdefgğhıijklmnoöprsştuüvyz'.includes(key) && key.length === 1) {
+                e.preventDefault();
                 harfBas(key);
             }
         });
 
         // Ekran Klavyesi Dinleme
         document.querySelectorAll('.tus').forEach(tus => {
-            tus.addEventListener('click', () => {
+            tus.addEventListener('click', (e) => {
+                e.preventDefault(); // Odaklanmayı engelle
                 harfBas(tus.getAttribute('data-tus'));
             });
         });
 
         // Mod Değiştirme
         document.querySelectorAll('.mod-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
                 document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('aktif'));
                 this.classList.add('aktif');
                 HARF_SAYISI = parseInt(this.getAttribute('data-harf'));
@@ -450,8 +474,10 @@
             });
         });
 
-        // Başlangıç
-        setTimeout(yeniOyunBaslat, 200);
+        // Sayfa yüklendiğinde başlat (Gecikme ile sözlüğün yüklenmesini bekle)
+        window.onload = () => {
+            setTimeout(yeniOyunBaslat, 300);
+        };
 
     </script>
 </body>
