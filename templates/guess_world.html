@@ -198,6 +198,7 @@
         </div>
     </div>
 
+    <script src="/static/world_tr.js"></script>
     <script>
         const sureDakika = 30; // 30 Dakika
         let kalanSaniye = sureDakika * 60;
@@ -230,10 +231,18 @@
 
         let geojsonFeatures = [];
 
-        // İngilizce karakter küçültme fonksiyonu
+        // İngilizce karakter küçültme fonksiyonu (artık Türkçe karakterleri de normalize etmeli)
         function norm(str) {
             if(!str) return "";
-            return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+            return str.toLowerCase()
+                .replace(/ç/g, 'c')
+                .replace(/ğ/g, 'g')
+                .replace(/ı/g, 'i')
+                .replace(/i̇/g, 'i') // Bazen büyük İ'nin küçültülmüş hali
+                .replace(/ö/g, 'o')
+                .replace(/ş/g, 's')
+                .replace(/ü/g, 'u')
+                .replace(/[^a-z0-9]/g, '');
         }
 
         d3.json("/static/world.geo.json").then(function(geojson) {
@@ -258,7 +267,8 @@
                 .on("mouseover", function(event, d) {
                     if(!oyunAktif && !bulunanUlkeler.has(d.properties.name)) return;
                     if(bulunanUlkeler.has(d.properties.name) || !oyunAktif) {
-                        d3.select("#tooltip").style("display", "block").text(d.properties.name);
+                        const trAdi = TR_COUNTRIES[d.properties.name] || d.properties.name;
+                        d3.select("#tooltip").style("display", "block").text(trAdi);
                     }
                 })
                 .on("mousemove", function(event) {
@@ -292,7 +302,13 @@
             };
 
             for(let c in continents) {
-                continents[c].sort(); // Alfabetik
+                // Kıta ismindeki ülkeleri Türkçe isimlerine göre sıralayalım
+                continents[c].sort((a, b) => {
+                    const trA = TR_COUNTRIES[a] || a;
+                    const trB = TR_COUNTRIES[b] || b;
+                    return trA.localeCompare(trB, 'tr');
+                });
+                
                 let html = `
                     <div class="kita-kart" id="kart-${c}">
                         <div class="kita-kart-baslik">
@@ -302,7 +318,14 @@
                         <div class="ulke-grid">
                 `;
                 continents[c].forEach(ulke => {
-                    countriesData.push({ name: ulke, normName: norm(ulke), continent: c });
+                    const trAdi = TR_COUNTRIES[ulke] || ulke;
+                    countriesData.push({ 
+                        name: ulke, 
+                        trName: trAdi,
+                        normTrName: norm(trAdi),
+                        normEnName: norm(ulke),
+                        continent: c 
+                    });
                     html += `<div class="ulke-kutu" id="box-${norm(ulke)}">???</div>`;
                 });
                 html += `</div></div>`;
@@ -356,7 +379,8 @@
             const val = norm(this.value);
             if(val.length < 2) return;
 
-            const ulke = countriesData.find(u => u.normName === val);
+            // Hem Türkçe isminden (normTrName) hem de İngilizce isminden (normEnName) eşleştir!
+            const ulke = countriesData.find(u => u.normTrName === val || u.normEnName === val);
             
             if(ulke) {
                 if(!bulunanUlkeler.has(ulke.name)) {
@@ -364,11 +388,11 @@
                     bulunanUlkeler.add(ulke.name);
                     
                     // Haritayı boya
-                    d3.select("#path-" + ulke.normName).classed("bulundu", true);
+                    d3.select("#path-" + ulke.normEnName).classed("bulundu", true);
                     
                     // Kutuyu aç
-                    const box = document.getElementById("box-" + ulke.normName);
-                    box.innerText = ulke.name;
+                    const box = document.getElementById("box-" + ulke.normEnName);
+                    box.innerText = ulke.trName;
                     box.classList.add('bulundu');
                     
                     // Skoru güncelle
@@ -428,9 +452,9 @@
             // Bulunamayanları kırmızı yap
             countriesData.forEach(u => {
                 if(!bulunanUlkeler.has(u.name)) {
-                    d3.select("#path-" + u.normName).classed("bulunamadi", true);
-                    const box = document.getElementById("box-" + u.normName);
-                    box.innerText = u.name;
+                    d3.select("#path-" + u.normEnName).classed("bulunamadi", true);
+                    const box = document.getElementById("box-" + u.normEnName);
+                    box.innerText = u.trName;
                     box.classList.add('bulunamadi');
                 }
             });
