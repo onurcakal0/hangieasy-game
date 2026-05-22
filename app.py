@@ -639,6 +639,10 @@ def guess_lol():
 def guess_turkey():
     return render_template('guess_turkey.html')
 
+@app.route('/guess-world')
+def guess_world():
+    return render_template('guess_world.html')
+
 
 
 @app.route('/test-olustur', methods=['GET', 'POST'])

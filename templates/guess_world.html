@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess The World Country | Hangieasy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        :root {
+            --bg: #0b0c10;
+            --card: rgba(20, 21, 30, 0.85);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #3498db;
+            --green: #2ecc71;
+            --red: #e74c3c;
+            --text: #e2e8f0;
+            --muted: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; padding-bottom: 50px; }
+
+        /* Arka plan efektleri */
+        .orb { position: fixed; border-radius: 50%; filter: blur(130px); pointer-events: none; z-index: -1; }
+        .orb1 { width: 50vw; height: 50vw; background: rgba(52, 152, 219, 0.12); top: -10%; left: -10%; animation: of 14s infinite alternate ease-in-out; }
+        .orb2 { width: 45vw; height: 45vw; background: rgba(46, 204, 113, 0.1); bottom: -10%; right: -10%; animation: of 18s infinite alternate-reverse ease-in-out; }
+        @keyframes of { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 80px) scale(1.2); } }
+
+        nav {
+            width: 100%; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center;
+            background: rgba(11, 12, 16, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .nav-logo { font-size: 20px; font-weight: 900; background: linear-gradient(90deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+        .nav-back { color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.3s; }
+        .nav-back:hover { color: var(--text); }
+
+        .container { width: 100%; max-width: 1200px; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+
+        .header {
+            width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+            background: var(--card); padding: 15px 25px; border-radius: 20px; border: 1px solid var(--border);
+        }
+        .oyun-baslik { font-size: 24px; font-weight: 900; color: #fff; }
+        .skor-kutusu { font-size: 24px; font-weight: 900; color: var(--muted); }
+        .skor-kutusu span { color: var(--green); }
+        .sayac-kutusu {
+            background: rgba(255,255,255,0.05); padding: 8px 20px; border-radius: 12px;
+            font-size: 28px; font-weight: 900; color: #fff; border: 1px solid rgba(255,255,255,0.1);
+            letter-spacing: 2px;
+        }
+        .sayac-kutusu.azaldi { color: var(--red); animation: pulse 1s infinite; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* KITA FİLTRELERİ */
+        .kita-butonlar {
+            display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; width: 100%;
+        }
+        .kita-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--muted);
+            padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 700; transition: 0.3s;
+            font-size: 14px;
+        }
+        .kita-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .kita-btn.aktif { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 0 15px rgba(52,152,219,0.4); }
+
+        #harita-konteyner {
+            width: 100%; height: 500px; background: rgba(0,0,0,0.3); border-radius: 20px;
+            border: 1px solid var(--border); overflow: hidden; position: relative; margin-bottom: 30px;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .country-path {
+            fill: #1e293b; stroke: #334155; stroke-width: 0.5; transition: fill 0.3s ease; cursor: crosshair;
+        }
+        .country-path.bulundu { fill: var(--green); stroke: #14532d; }
+        .country-path.bulunamadi { fill: var(--red); stroke: #7f1d1d; }
+        
+        #tooltip {
+            position: absolute; display: none; background: rgba(0,0,0,0.8); color: #fff; padding: 5px 10px;
+            border-radius: 6px; font-size: 12px; font-weight: 700; pointer-events: none; z-index: 10;
+        }
+
+        .girdi-alani { width: 100%; max-width: 600px; margin-bottom: 30px; position: relative; }
+        .girdi-alani input {
+            width: 100%; padding: 20px 25px; border-radius: 15px; border: 2px solid var(--border);
+            background: var(--card); color: #fff; font-size: 20px; font-weight: 700; text-align: center;
+            outline: none; transition: 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .girdi-alani input:focus { border-color: var(--primary); box-shadow: 0 0 20px rgba(52, 152, 219, 0.3); }
+        .girdi-alani input.hata { border-color: var(--red); animation: sarsinti 0.4s; }
+
+        @keyframes sarsinti { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 50% { transform: translateX(10px); } 75% { transform: translateX(-10px); } }
+
+        /* KITA GRUPLARI LİSTESİ */
+        .kita-listeleri {
+            width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;
+        }
+        .kita-kart {
+            background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 20px;
+        }
+        .kita-kart-baslik {
+            font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 15px; display: flex; justify-content: space-between;
+            border-bottom: 1px solid var(--border); padding-bottom: 10px;
+        }
+        .ulke-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px;
+        }
+        .ulke-kutu {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 8px 10px;
+            border-radius: 8px; font-size: 13px; color: var(--muted); text-align: center; font-weight: 600;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: 0.3s;
+        }
+        .ulke-kutu.bulundu { background: rgba(46, 204, 113, 0.15); color: var(--green); border-color: rgba(46, 204, 113, 0.4); }
+        .ulke-kutu.bulunamadi { background: rgba(231, 76, 60, 0.15); color: var(--red); border-color: rgba(231, 76, 60, 0.4); }
+
+        /* Bitiş Ekranı */
+        #bitis-ekrani {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9);
+            display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(10px);
+        }
+        .bitis-icerik {
+            background: var(--card); border: 1px solid var(--border); padding: 50px; border-radius: 30px;
+            text-align: center; max-width: 500px; width: 90%; animation: asagidanGel 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes asagidanGel { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        #bitis-baslik { font-size: 40px; font-weight: 900; margin-bottom: 10px; }
+        #bitis-skor { font-size: 60px; font-weight: 900; color: var(--green); margin-bottom: 20px; }
+        .btn-anasayfa {
+            background: linear-gradient(45deg, var(--primary), #2980b9); color: #fff; border: none;
+            padding: 15px 30px; font-size: 18px; font-weight: 800; border-radius: 12px;
+            cursor: pointer; text-decoration: none; display: inline-block; margin-top: 20px; transition: 0.3s;
+        }
+        .btn-anasayfa:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(52, 152, 219, 0.4); }
+
+        /* MOBİL UYUMLULUK */
+        @media(max-width: 768px) {
+            .header { flex-direction: column; gap: 15px; }
+            .skor-kutusu { font-size: 20px; }
+            .sayac-kutusu { font-size: 24px; padding: 6px 15px; }
+            #harita-konteyner { height: 300px; border-radius: 12px; }
+            .girdi-alani input { font-size: 16px; padding: 15px 20px; }
+            .kita-btn { padding: 8px 12px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+
+    <nav>
+        <a href="/" class="nav-logo">HangiEasy</a>
+        <a href="/dashboard" class="nav-back">← Dashboard</a>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <div class="oyun-baslik">🌍 Guess The World</div>
+            <div class="skor-kutusu"><span id="skor">0</span> / <span id="toplam-ulke">...</span> BULUNDU</div>
+            <div class="sayac-kutusu" id="sayac">30:00</div>
+        </div>
+
+        <div class="kita-butonlar" id="kita-butonlari">
+            <button class="kita-btn aktif" data-kita="All">Dünya (Tümü)</button>
+            <button class="kita-btn" data-kita="Europe">Avrupa</button>
+            <button class="kita-btn" data-kita="Asia">Asya</button>
+            <button class="kita-btn" data-kita="Africa">Afrika</button>
+            <button class="kita-btn" data-kita="North America">Kuzey Amerika</button>
+            <button class="kita-btn" data-kita="South America">Güney Amerika</button>
+            <button class="kita-btn" data-kita="Oceania">Okyanusya</button>
+        </div>
+
+        <div id="harita-konteyner">
+            <div id="loading" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:bold;color:var(--muted);">Harita Yükleniyor... 🗺️</div>
+            <svg id="world-map"></svg>
+            <div id="tooltip"></div>
+        </div>
+
+        <div class="girdi-alani">
+            <input type="text" id="ulke-input" placeholder="Aşağıya ülke yaz... (Örn: Turkey, Germany)" autocomplete="off" disabled>
+        </div>
+
+        <div class="kita-listeleri" id="kita-listeleri">
+            <!-- JS İLE DOLACAK -->
+        </div>
+    </div>
+
+    <!-- Bitiş Ekranı -->
+    <div id="bitis-ekrani">
+        <div class="bitis-icerik">
+            <div id="bitis-baslik">Oyun Bitti!</div>
+            <div style="color:var(--muted); font-size:18px; margin-bottom:10px;">Bulduğun Ülke Sayısı</div>
+            <div id="bitis-skor">0 / 0</div>
+            <a href="/guess-world" class="btn-anasayfa">🔄 Tekrar Oyna</a>
+        </div>
+    </div>
+
+    <script>
+        const sureDakika = 30; // 30 Dakika
+        let kalanSaniye = sureDakika * 60;
+        let sayacInterval = null;
+        let oyunAktif = false;
+        let bulunanUlkeler = new Set();
+        let toplamUlke = 0;
+        let countriesData = [];
+
+        // D3 Ayarları
+        const width = 1200; 
+        const height = 600;
+        const svg = d3.select("#world-map")
+            .attr("width", "100%").attr("height", "100%")
+            .attr("viewBox", `0 0 ${width} ${height}`).style("display", "none");
+        
+        const mapGroup = svg.append("g");
+
+        // Zoom Behavior
+        const zoom = d3.zoom()
+            .scaleExtent([1, 15])
+            .on("zoom", (event) => {
+                mapGroup.attr("transform", event.transform);
+            });
+        svg.call(zoom);
+
+        // Highcharts Custom World Map uses projected coordinates (y goes up or down depending, usually up for highcharts)
+        const projection = d3.geoIdentity().reflectY(true);
+        const path = d3.geoPath().projection(projection);
+
+        let geojsonFeatures = [];
+
+        // İngilizce karakter küçültme fonksiyonu
+        function norm(str) {
+            if(!str) return "";
+            return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+        }
+
+        d3.json("/static/world.geo.json").then(function(geojson) {
+            document.getElementById('loading').style.display = 'none';
+            svg.style("display", "block");
+
+            // Antarktika (Seven seas) hariç tut
+            geojsonFeatures = geojson.features.filter(f => f.properties.continent && f.properties.continent !== 'Seven seas (open ocean)');
+            toplamUlke = geojsonFeatures.length;
+            document.getElementById('toplam-ulke').innerText = toplamUlke;
+
+            // Projection'u dünyayı sığdıracak şekilde ayarla
+            projection.fitSize([width, height], {type: "FeatureCollection", features: geojsonFeatures});
+
+            // Haritayı Çiz
+            mapGroup.selectAll("path")
+                .data(geojsonFeatures)
+                .enter().append("path")
+                .attr("class", "country-path")
+                .attr("d", path)
+                .attr("id", d => "path-" + norm(d.properties.name))
+                .on("mouseover", function(event, d) {
+                    if(!oyunAktif && !bulunanUlkeler.has(d.properties.name)) return;
+                    if(bulunanUlkeler.has(d.properties.name) || !oyunAktif) {
+                        d3.select("#tooltip").style("display", "block").text(d.properties.name);
+                    }
+                })
+                .on("mousemove", function(event) {
+                    d3.select("#tooltip")
+                        .style("left", (event.pageX + 15) + "px")
+                        .style("top", (event.pageY - 15) + "px");
+                })
+                .on("mouseout", function() {
+                    d3.select("#tooltip").style("display", "none");
+                });
+
+            // Ülkeleri kıtalara ayır ve diziyi doldur
+            let continents = {
+                "Europe": [], "Asia": [], "Africa": [], 
+                "North America": [], "South America": [], "Oceania": []
+            };
+
+            geojsonFeatures.forEach(f => {
+                const c = f.properties.continent;
+                const n = f.properties.name;
+                if(continents[c]) {
+                    continents[c].push(n);
+                }
+            });
+
+            // Kıtaları HTML'e bas
+            const listeKonteyner = document.getElementById('kita-listeleri');
+            const kitaIsimleri = {
+                "Europe": "Avrupa", "Asia": "Asya", "Africa": "Afrika",
+                "North America": "Kuzey Amerika", "South America": "Güney Amerika", "Oceania": "Okyanusya"
+            };
+
+            for(let c in continents) {
+                continents[c].sort(); // Alfabetik
+                let html = `
+                    <div class="kita-kart" id="kart-${c}">
+                        <div class="kita-kart-baslik">
+                            <span>${kitaIsimleri[c]}</span>
+                            <span id="skor-${c.replace(' ', '')}">0 / ${continents[c].length}</span>
+                        </div>
+                        <div class="ulke-grid">
+                `;
+                continents[c].forEach(ulke => {
+                    countriesData.push({ name: ulke, normName: norm(ulke), continent: c });
+                    html += `<div class="ulke-kutu" id="box-${norm(ulke)}">???</div>`;
+                });
+                html += `</div></div>`;
+                listeKonteyner.innerHTML += html;
+            }
+
+            // Oyunu Başlat
+            document.getElementById('ulke-input').disabled = false;
+            document.getElementById('ulke-input').focus();
+            oyunBaslat();
+
+        }).catch(err => {
+            console.error("Hata:", err);
+            document.getElementById('loading').innerText = "Harita yüklenemedi! İnternet bağlantınızı kontrol edin.";
+        });
+
+        // Zoom İşlevi
+        document.querySelectorAll('.kita-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.kita-btn').forEach(b => b.classList.remove('aktif'));
+                this.classList.add('aktif');
+                
+                const c = this.getAttribute('data-kita');
+                if(c === 'All') {
+                    svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
+                } else {
+                    const cFeatures = geojsonFeatures.filter(f => f.properties.continent === c);
+                    if(cFeatures.length > 0) {
+                        const fc = { type: "FeatureCollection", features: cFeatures };
+                        const bounds = path.bounds(fc);
+                        const dx = bounds[1][0] - bounds[0][0];
+                        const dy = bounds[1][1] - bounds[0][1];
+                        const x = (bounds[0][0] + bounds[1][0]) / 2;
+                        const y = (bounds[0][1] + bounds[1][1]) / 2;
+                        const scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / width, dy / height)));
+                        const translate = [width / 2 - scale * x, height / 2 - scale * y];
+
+                        svg.transition().duration(750).call(
+                            zoom.transform, 
+                            d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
+                        );
+                    }
+                }
+                document.getElementById('ulke-input').focus();
+            });
+        });
+
+        // Girdi Dinleme
+        document.getElementById('ulke-input').addEventListener('input', function(e) {
+            if(!oyunAktif) return;
+            const val = norm(this.value);
+            if(val.length < 2) return;
+
+            const ulke = countriesData.find(u => u.normName === val);
+            
+            if(ulke) {
+                if(!bulunanUlkeler.has(ulke.name)) {
+                    // Doğru Tahmin!
+                    bulunanUlkeler.add(ulke.name);
+                    
+                    // Haritayı boya
+                    d3.select("#path-" + ulke.normName).classed("bulundu", true);
+                    
+                    // Kutuyu aç
+                    const box = document.getElementById("box-" + ulke.normName);
+                    box.innerText = ulke.name;
+                    box.classList.add('bulundu');
+                    
+                    // Skoru güncelle
+                    document.getElementById('skor').innerText = bulunanUlkeler.size;
+                    
+                    // Kıta skorunu güncelle
+                    const c = ulke.continent;
+                    const kitaBulunan = Array.from(bulunanUlkeler).filter(n => countriesData.find(x => x.name === n).continent === c).length;
+                    const kitaToplam = countriesData.filter(x => x.continent === c).length;
+                    document.getElementById(`skor-${c.replace(' ', '')}`).innerText = `${kitaBulunan} / ${kitaToplam}`;
+
+                    // Girdiyi temizle
+                    this.value = '';
+
+                    // Hepsi bitti mi?
+                    if(bulunanUlkeler.size === toplamUlke) {
+                        oyunBitir(true);
+                    }
+                } else {
+                    // Zaten bulunduysa sars
+                    this.classList.add('hata');
+                    setTimeout(() => this.classList.remove('hata'), 400);
+                    this.value = '';
+                }
+            }
+        });
+
+        // Enter'a basınca hatalıysa sarsılsın
+        document.getElementById('ulke-input').addEventListener('keypress', function(e) {
+            if(e.key === 'Enter' && this.value.trim() !== '') {
+                this.classList.add('hata');
+                setTimeout(() => this.classList.remove('hata'), 400);
+            }
+        });
+
+        function oyunBaslat() {
+            oyunAktif = true;
+            sayacInterval = setInterval(() => {
+                kalanSaniye--;
+                let dk = Math.floor(kalanSaniye / 60);
+                let sn = kalanSaniye % 60;
+                document.getElementById('sayac').innerText = `${dk.toString().padStart(2, '0')}:${sn.toString().padStart(2, '0')}`;
+                
+                if(kalanSaniye <= 60) document.getElementById('sayac').classList.add('azaldi');
+
+                if(kalanSaniye <= 0) {
+                    oyunBitir(false);
+                }
+            }, 1000);
+        }
+
+        function oyunBitir(kazandiMi) {
+            oyunAktif = false;
+            clearInterval(sayacInterval);
+            document.getElementById('ulke-input').disabled = true;
+
+            // Bulunamayanları kırmızı yap
+            countriesData.forEach(u => {
+                if(!bulunanUlkeler.has(u.name)) {
+                    d3.select("#path-" + u.normName).classed("bulunamadi", true);
+                    const box = document.getElementById("box-" + u.normName);
+                    box.innerText = u.name;
+                    box.classList.add('bulunamadi');
+                }
+            });
+
+            // Bitiş Ekranı
+            document.getElementById('bitis-baslik').innerText = kazandiMi ? "Dünya Hakimi! 👑" : "Süre Bitti! ⏰";
+            document.getElementById('bitis-baslik').style.color = kazandiMi ? "var(--primary)" : "var(--red)";
+            document.getElementById('bitis-skor').innerText = `${bulunanUlkeler.size} / ${toplamUlke}`;
+            
+            setTimeout(() => {
+                document.getElementById('bitis-ekrani').style.display = 'flex';
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
