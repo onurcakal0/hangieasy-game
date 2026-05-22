@@ -578,7 +578,7 @@
             liste.innerHTML = '<div style="text-align:center;color:#00f2fe;">Yükleniyor...</div>';
             document.getElementById('takip-modal').style.display = 'flex';
 
-            fetch(`/api/takip_listesi/${kadi}/${tip}`)
+            fetch(`/api/takip_listesi/${encodeURIComponent(kadi)}/${tip}`)
             .then(res => res.json())
             .then(data => {
                 if(data.hata) {

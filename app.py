@@ -1203,7 +1203,7 @@ def takip_listesi(kadi, tip):
         if aktif_kullanici and aktif_kullanici.id != k.id:
             takip_ediyor_mu = aktif_kullanici.takip_ettikleri.filter(takipciler.c.takip_edilen_id == k.id).count() > 0
         
-        avatar = k.avatar_url if k.avatar_url else '/static/default_avatar.png'
+        avatar = k.profil_resmi if k.profil_resmi else '/static/default-avatar.png'
         sonuc.append({
             "kullanici_adi": k.kullanici_adi,
             "avatar_url": avatar,
