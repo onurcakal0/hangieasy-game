@@ -269,6 +269,12 @@
                 aktifResimElem.src = siradaki.resim;
                 aktifResimElem.onerror = function() { this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'; };
             }
+            
+            // ⚡ YÜKSEK PERFORMANS: Bir sonraki öğenin resmini arka planda önceden indir
+            if(aktifIndex + 1 < maxSlot && aktifIndex + 1 < adayHavuzu.length) {
+                let img = new Image();
+                img.src = adayHavuzu[aktifIndex + 1].resim;
+            }
         }
 
         function yerlestir(slotNumarasi) {

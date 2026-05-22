@@ -246,6 +246,14 @@
                     </div>
                 `;
             }
+            
+            // ⚡ YÜKSEK PERFORMANS: Bir sonraki turun resimlerini gizlice ön yükle (Preload)
+            if (adayHavuzu.length >= 2) {
+                let siradakiSol = adayHavuzu[adayHavuzu.length - 1];
+                let siradakiSag = adayHavuzu[adayHavuzu.length - 2];
+                let img1 = new Image(); img1.src = siradakiSol.resim;
+                let img2 = new Image(); img2.src = siradakiSag.resim;
+            }
         }
 
         function secimYap(secilenIsim, secilenResim, secilenKart) {

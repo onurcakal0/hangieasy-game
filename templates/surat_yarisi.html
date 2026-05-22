@@ -234,6 +234,14 @@
             }
 
             zamanlayiciyiBaslat(sol, sag);
+            
+            // ⚡ YÜKSEK PERFORMANS: Bir sonraki turun resimlerini gizlice indir
+            if (adaylar.length >= 2) {
+                let sSol = adaylar[adaylar.length - 1];
+                let sSag = adaylar[adaylar.length - 2];
+                let img1 = new Image(); img1.src = sSol.resim;
+                let img2 = new Image(); img2.src = sSag.resim;
+            }
         }
 
         function zamanlayiciyiBaslat(sol, sag) {

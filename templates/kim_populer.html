@@ -255,6 +255,12 @@
                 veriSag.innerText = aktifSag.hacim.toLocaleString();
             }
             islemde = false;
+            
+            // ⚡ YÜKSEK PERFORMANS: Bir sonraki kartı arka planda indir
+            if (adaylar.length >= 1) {
+                let img = new Image();
+                img.src = adaylar[adaylar.length - 1].resim;
+            }
         }
 
         function tahminYap(secim) {

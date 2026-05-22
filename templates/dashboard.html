@@ -514,7 +514,7 @@
             <div class="slider-track" id="sliderTrack">
                 {% for oyun in trend_oyunlar %}
                 <div class="slide">
-                    <img src="{{ oyun.resim_url }}" alt="Trend Oyun">
+                    <img src="{{ oyun.resim_url }}" alt="Trend Oyun" loading="lazy">
                     <div class="slide-katman">
                         <div class="slide-etiket">🔥 TREND #{{ loop.index }}</div>
                         <h2 class="slide-baslik">{{ oyun.baslik }}</h2>
@@ -560,7 +560,7 @@
                  data-oyun-modu="{{ oyun.oyun_modu }}"
                  onclick="modalAc(this)">
                  
-                <img src="{{ oyun.resim_url }}" alt="Oyun Resmi" class="oyun-resmi">
+                <img src="{{ oyun.resim_url }}" alt="Oyun Resmi" class="oyun-resmi" loading="lazy">
                 <div class="kart-icerik">
                     <div class="kategori-etiketi">{{ oyun.kategori }} • {{ oyun.oyun_modu|upper }}</div>
                     <h3 class="kart-baslik">{{ oyun.baslik }}</h3>

@@ -295,6 +295,14 @@
                     </div>
                 `;
             }
+            
+            // ⚡ YÜKSEK PERFORMANS: Bir sonraki turun resimlerini arka planda indir
+            if (adaylar.length >= 2) {
+                let siradakiSol = adaylar[adaylar.length - 1];
+                let siradakiSag = adaylar[adaylar.length - 2];
+                let img1 = new Image(); img1.src = siradakiSol.resim;
+                let img2 = new Image(); img2.src = siradakiSag.resim;
+            }
         }
 
         function secimYap(secilenIsim, secilenResim, secilenKart) {
