@@ -958,10 +958,17 @@ def boss_giris():
 
 @app.route('/oyun-sil/<int:oyun_id>', methods=['POST'])
 def oyun_sil(oyun_id):
+    kadi = session.get('kullanici_adi')
+    if not kadi or kadi.startswith('Misafir_'):
+        return redirect(url_for('giris'))
+    
     oyun = Oyun.query.get_or_404(oyun_id)
+    if oyun.olusturan_kullanici_adi != kadi:
+        return "Bu testi silme yetkiniz yok!", 403
+        
     Soru.query.filter_by(oyun_id=oyun.id).delete()
     db.session.delete(oyun); db.session.commit()
-    return redirect(url_for('profil'))
+    return redirect(url_for('profil', kadi=kadi))
 
 @app.route('/kayit', methods=['GET', 'POST'])
 def kayit():
@@ -1170,6 +1177,37 @@ def test_sil(id):
 @app.route('/aydinlatma-metni') # Bak burada tire (-) var!
 def aydinlatma_metni():
     return render_template('aydinlatma_metni.html') # Burada alt çizgi (_) var çünkü dosya adı böyle.
+
+@app.route('/api/takip_listesi/<kadi>/<tip>', methods=['GET'])
+def takip_listesi(kadi, tip):
+    # kadi: profili görüntülenen kişi
+    # tip: 'takipciler' veya 'takip_edilenler'
+    hedef = Kullanici.query.filter_by(kullanici_adi=kadi).first_or_404()
+    oturum_kadi = session.get('kullanici_adi')
+    aktif_kullanici = Kullanici.query.filter_by(kullanici_adi=oturum_kadi).first() if oturum_kadi and not oturum_kadi.startswith('Misafir_') else None
+
+    if tip == 'takipciler':
+        liste = hedef.takipcileri.all()
+    elif tip == 'takip_edilenler':
+        liste = hedef.takip_ettikleri.all()
+    else:
+        return jsonify({"hata": "Geçersiz tip"}), 400
+
+    sonuc = []
+    for k in liste:
+        takip_ediyor_mu = False
+        if aktif_kullanici and aktif_kullanici.id != k.id:
+            takip_ediyor_mu = aktif_kullanici.takip_ettikleri.filter(takipciler.c.takip_edilen_id == k.id).count() > 0
+        
+        avatar = k.avatar_url if k.avatar_url else '/static/default_avatar.png'
+        sonuc.append({
+            "kullanici_adi": k.kullanici_adi,
+            "avatar_url": avatar,
+            "takip_ediyor_mu": takip_ediyor_mu,
+            "kendisi_mi": (aktif_kullanici and aktif_kullanici.id == k.id)
+        })
+
+    return jsonify({"kullanicilar": sonuc})
 
 @app.route('/kullanici-sozlesmesi')
 def kullanici_sozlesmesi():

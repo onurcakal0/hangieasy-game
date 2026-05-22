@@ -188,11 +188,36 @@
         .oyna-btn:hover { background: #00f2fe; color: #000; box-shadow: 0 0 15px rgba(0, 242, 254, 0.4); }
         
         .sil-btn { 
-            background: transparent; border: 1px solid #ff0055; color: #ff0055; 
-            padding: 12px 20px; border-radius: 10px; font-weight: 800; 
-            cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 13px;
+            background: rgba(255, 0, 85, 0.1); color: #ff0055; border: 1px solid rgba(255, 0, 85, 0.3);
+            padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: 0.3s;
+            font-weight: 700;
         }
         .sil-btn:hover { background: #ff0055; color: #fff; box-shadow: 0 0 15px rgba(255, 0, 85, 0.5); }
+
+        /* TAKİP MODALI */
+        .takip-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;
+        }
+        .takip-kutu {
+            background: #1a1a2e; border: 1px solid #00f2fe; border-radius: 15px;
+            width: 90%; max-width: 400px; padding: 20px; max-height: 80vh; overflow-y: auto;
+        }
+        .takip-baslik {
+            font-size: 20px; font-weight: 800; color: #00f2fe; margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .takip-kapat { cursor: pointer; color: #ff0055; font-size: 24px; font-weight: bold; }
+        .takip-liste { display: flex; flex-direction: column; gap: 10px; }
+        .takip-oge {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px;
+        }
+        .takip-sol { display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; }
+        .takip-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #00f2fe; }
+        .takip-isim { font-weight: 700; font-size: 14px; }
+        .tiklanabilir { cursor: pointer; transition: 0.2s; color: #00f2fe; }
+        .tiklanabilir:hover { text-shadow: 0 0 5px #00f2fe; }
 
         .bos-durum {
             background: rgba(25, 25, 35, 0.4); backdrop-filter: blur(5px);
@@ -329,8 +354,8 @@
                         <div class="unvan-rozet">Nam-ı Değer: {{ kullanici.sahip_olunan_unvanlar.split(',')[-1] }}</div>
                     {% endif %}
                     <p style="margin-top:8px;">
-                        Takipçi: <span id="takipci-sayisi-gosterge">{{ takipci_sayisi }}</span> &bull; 
-                        Takip: {{ takip_edilen }}
+                        <span class="tiklanabilir" onclick="takipModalAc('{{ kullanici.kullanici_adi }}', 'takipciler', 'Takipçiler')">Takipçi: <span id="takipci-sayisi-gosterge">{{ takipci_sayisi }}</span></span> &bull; 
+                        <span class="tiklanabilir" onclick="takipModalAc('{{ kullanici.kullanici_adi }}', 'takip_edilenler', 'Takip Edilenler')">Takip: <span id="takip-edilen-sayisi-gosterge">{{ takip_edilen }}</span></span>
                     </p>
                     {% if not kendi_profili_mi %}
                         <button id="takip-btn" class="profil-btn {% if takip_ediyor_mu %}btn-kirmizi{% else %}btn-yesil{% endif %}" onclick="takipIslemi('{{ kullanici.kullanici_adi }}')" style="margin-top:10px; padding:8px 16px; font-size:12px;">
@@ -459,15 +484,30 @@
                         
                         <div class="aksiyon-grubu">
                             <a href="/oyun/{{ oyun.id }}" class="oyna-btn">İncele</a>
+                            {% if kendi_profili_mi %}
                             <form action="/oyun-sil/{{ oyun.id }}" method="POST" onsubmit="return confirm('Bu şaheseri silmek istediğine emin misin? Tüm sorularıyla birlikte kalıcı olarak yok olacak!');">
                                 <button type="submit" class="sil-btn">Sil</button>
                             </form>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 {% endfor %}
             </div>
         {% endif %}
+
+    <!-- TAKİP MODALI -->
+    <div id="takip-modal" class="takip-modal" onclick="takipModalKapat()">
+        <div class="takip-kutu" onclick="event.stopPropagation()">
+            <div class="takip-baslik">
+                <span id="takip-modal-baslik">Liste</span>
+                <span class="takip-kapat" onclick="takipModalKapat()">&times;</span>
+            </div>
+            <div id="takip-liste" class="takip-liste">
+                <!-- İçerik JS ile dolacak -->
+            </div>
+        </div>
+    </div>
 
     <script>
         const sayaclar = document.querySelectorAll('.sayaç');
@@ -505,13 +545,17 @@
         }
 
         // --- TAKİP SİSTEMİ AJAX ---
-        function takipIslemi(kullaniciAdi) {
+        function takipIslemi(kullaniciAdi, btnId = 'takip-btn') {
             fetch('/api/takip/' + kullaniciAdi, { method: 'POST' })
             .then(response => response.json())
             .then(data => {
                 if(data.status === 'success') {
-                    const btn = document.getElementById('takip-btn');
-                    document.getElementById('takipci-sayisi-gosterge').innerText = data.takipci_sayisi;
+                    const btn = document.getElementById(btnId);
+                    
+                    // Sadece ana takip butonuna basıldıysa sayaçları güncelle
+                    if (btnId === 'takip-btn') {
+                        document.getElementById('takipci-sayisi-gosterge').innerText = data.takipci_sayisi;
+                    }
                     
                     if(data.durum === 'takip_edildi') {
                         btn.innerText = 'Takipten Çık';
@@ -525,6 +569,53 @@
                 }
             })
             .catch(error => console.error('Hata:', error));
+        }
+
+        // --- TAKİP MODALI ---
+        function takipModalAc(kadi, tip, baslik) {
+            document.getElementById('takip-modal-baslik').innerText = baslik;
+            const liste = document.getElementById('takip-liste');
+            liste.innerHTML = '<div style="text-align:center;color:#00f2fe;">Yükleniyor...</div>';
+            document.getElementById('takip-modal').style.display = 'flex';
+
+            fetch(`/api/takip_listesi/${kadi}/${tip}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.hata) {
+                    liste.innerHTML = '<div style="color:red;">Hata oluştu!</div>';
+                    return;
+                }
+                
+                if(data.kullanicilar.length === 0) {
+                    liste.innerHTML = '<div style="text-align:center; color:#aaa;">Burası ıssız çöl...</div>';
+                    return;
+                }
+
+                liste.innerHTML = '';
+                data.kullanicilar.forEach((k, idx) => {
+                    let butonHtml = '';
+                    if(!k.kendisi_mi) {
+                        const btnClass = k.takip_ediyor_mu ? 'btn-kirmizi' : 'btn-yesil';
+                        const btnText = k.takip_ediyor_mu ? 'Takipten Çık' : 'Takip Et';
+                        const btnId = `modal-takip-btn-${idx}`;
+                        butonHtml = `<button id="${btnId}" class="profil-btn ${btnClass}" onclick="takipIslemi('${k.kullanici_adi}', '${btnId}')" style="padding:6px 12px; font-size:12px;">${btnText}</button>`;
+                    }
+
+                    liste.innerHTML += `
+                        <div class="takip-oge">
+                            <a href="/profil/${k.kullanici_adi}" class="takip-sol">
+                                <img src="${k.avatar_url}" class="takip-avatar">
+                                <span class="takip-isim">${k.kullanici_adi}</span>
+                            </a>
+                            ${butonHtml}
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        function takipModalKapat() {
+            document.getElementById('takip-modal').style.display = 'none';
         }
     </script>
 </body>
