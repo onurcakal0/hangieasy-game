@@ -548,21 +548,19 @@
         <h2 class="vitrin-basligi" id="vitrin-baslik">🎮 Tesisin Tamamı (Tüm Testler)</h2>
         <div class="oyun-grid" id="oyun-listesi">
             {% for oyun in oyunlar %}
-            <div class="oyun-karti {{ oyun.kategori|lower|replace(' ', '-') }}" 
-                 onclick="modalAc(this)" 
-                 data-baslik="{{ oyun.baslik|escape }}"
-                 data-aciklama="{{ oyun.aciklama|escape }}"
-                 data-resim="{{ oyun.resim_url }}"
-                 data-yazar="{{ (oyun.olusturan.kullanici_adi if oyun.olusturan else 'Sistem') }}"
-                 data-tarih="{{ oyun.olusturma_tarihi.strftime('%d.%m.%Y') if oyun.olusturma_tarihi else 'Bilinmiyor' }}"
-                 data-link-tek="/oyun/{{ oyun.id }}"
-                 data-link-vs="/oda_kur/{{ oyun.id }}"
-                 data-link-yayin="/yayin_odasi/{{ oyun.id }}"
-                 data-oyun-modu="{{ oyun.oyun_modu }}">
-                <div class="kart-gorsel-kutu">
-                    <img src="{{ oyun.resim_url }}" alt="{{ oyun.baslik|escape }}" class="kart-gorsel">
-                    <div class="oynanma-sayisi">🔥 {{ oyun.oynanma_sayisi or 0 }}</div>
-                </div>
+            <div class="oyun-karti" 
+                 data-baslik="{{ oyun.baslik }}" 
+                 data-aciklama="{{ oyun.aciklama }}" 
+                 data-resim="{{ oyun.resim_url }}" 
+                 data-yazar="{{ oyun.olusturan.kullanici_adi | default('Onur Çakal') }}" 
+                 data-tarih="{{ oyun.olusturma_tarihi | default('Yakın Zamanda') }}"
+                 data-link-tek="{{ url_for('oyun_sayfasi', oyun_id=oyun.id) }}"
+                 data-link-vs="{{ url_for('duello_kur', oyun_id=oyun.id) }}"
+                 data-link-yayin="{{ url_for('yayin_baslat', oyun_id=oyun.id) }}"
+                 data-oyun-modu="{{ oyun.oyun_modu }}"
+                 onclick="modalAc(this)">
+                 
+                <img src="{{ oyun.resim_url }}" alt="Oyun Resmi" class="oyun-resmi" loading="lazy">
                 <div class="kart-icerik">
                     <div class="kategori-etiketi">{{ oyun.kategori }} • {{ oyun.oyun_modu|upper }}</div>
                     <h3 class="kart-baslik">{{ oyun.baslik }}</h3>
