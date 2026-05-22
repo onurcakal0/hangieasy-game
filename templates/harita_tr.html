@@ -6,7 +6,6 @@
     <title>{{ oyun_basligi }} | QuizHub</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://unpkg.com/topojson@3"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
@@ -299,13 +298,11 @@
         const projection = d3.geoMercator();
         const path = d3.geoPath().projection(projection);
 
-        // Highcharts TopoJSON verisi
-        d3.json("https://code.highcharts.com/mapdata/countries/tr/tr-all.topo.json").then(function(topology) {
+        // Highcharts GeoJSON verisi
+        d3.json("https://code.highcharts.com/mapdata/countries/tr/tr-all.geo.json").then(function(geojson) {
             document.getElementById('loading').style.display = 'none';
             svg.style("display", "block");
 
-            const geojson = topojson.feature(topology, topology.objects.default);
-            
             // Projeksiyonu harita kutusuna sığdır
             projection.fitSize([width, height], geojson);
 
