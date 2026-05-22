@@ -155,6 +155,22 @@
             padding: 15px 30px; font-size: 18px; font-weight: 800; border-radius: 12px;
             cursor: pointer; text-decoration: none; display: inline-block; margin-top: 20px;
         }
+
+        /* MOBİL UYUMLULUK */
+        @media(max-width: 768px) {
+            .header { flex-direction: column; gap: 15px; margin-bottom: 10px; }
+            .skor-kutusu { font-size: 20px; }
+            .sayac-kutusu { font-size: 24px; padding: 6px 15px; }
+            #harita-konteyner { height: 300px; border-radius: 12px; }
+            .plaka-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+            .plaka-kutu { padding: 8px; gap: 6px; }
+            .plaka-no { font-size: 14px; padding: 2px 6px; }
+            .plaka-isim { font-size: 12px; }
+            .girdi-alani input { font-size: 16px; padding: 15px 20px; }
+            #bitis-baslik { font-size: 28px !important; }
+            #bitis-skor { font-size: 45px !important; }
+            .bitis-icerik { padding: 30px 20px; width: 90%; }
+        }
     </style>
 </head>
 <body>

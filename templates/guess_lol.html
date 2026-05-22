@@ -67,12 +67,20 @@ main{position:relative;z-index:10;max-width:900px;margin:0 auto;padding:30px 20p
 .guesses-left{text-align:center;color:var(--muted);font-size:13px;margin-bottom:16px;}
 .guesses-left span{color:#fff;font-weight:800;}
 @media(max-width:768px){
-  .attr-header,.guess-row{grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:4px;}
-  .cell{font-size:9px;padding:8px 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .input-row{flex-direction:column;}
-  .guess-btn{width:100%;}
-  nav{padding:12px 15px;}
-  main{padding:0 15px 50px;}
+  .attr-header, .guess-row { grid-template-columns: 1.5fr 1fr 1.2fr 1fr 1fr; gap: 4px; }
+  .attr-header { font-size: 9px; letter-spacing: 0.5px; }
+  .cell { font-size: 9px; padding: 8px 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .input-row { flex-direction: column; }
+  .guess-btn { width: 100%; padding: 14px 20px; }
+  nav { padding: 12px 15px; }
+  .nav-logo { font-size: 18px; }
+  .lol-badge { font-size: 10px; padding: 5px 12px; }
+  .game-title { font-size: 1.6rem; }
+  main { padding: 0 15px 50px; }
+  .win-title, .lose-title { font-size: 1.5rem; }
+  .win-panel, .lose-panel { padding: 30px 20px; }
+  .legend { gap: 8px; }
+  .legend-item { font-size: 10px; }
 }
 </style>
 </head>
