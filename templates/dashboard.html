@@ -567,6 +567,7 @@
                     <p class="kart-aciklama">{{ oyun.aciklama }}</p>
                 </div>
             </div>
+            {% endif %}
             {% endfor %}
         </div>
     </div>
@@ -575,6 +576,14 @@
     <div class="ozel-oyunlar">
         <div class="ozel-baslik">⚔️ Özel Oyunlar</div>
         <div class="ozel-grid">
+            {% for oyun in oyunlar if oyun.oyun_modu == 'harita_tr' %}
+            <a href="/oyun/{{ oyun.id }}" class="ozel-kart" style="--c1:#2ecc71;--c2:#27ae60;">
+                <div class="ozel-ikon">🇹🇷</div>
+                <h3>{{ oyun.baslik }}</h3>
+                <p>Türkiye coğrafyasına ne kadar hakimsin? 10 dakikada 81 ili bul.</p>
+                <span class="ozel-tag" style="background:rgba(46,204,113,0.12);color:#2ecc71;border:1px solid rgba(46,204,113,0.3);">Harita</span>
+            </a>
+            {% endfor %}
             <a href="/guess-valorant" class="ozel-kart" style="--c1:#ff4655;--c2:#ff8800;">
                 <div class="ozel-ikon">🔫</div>
                 <h3>Guess The Valorant Agent</h3>
