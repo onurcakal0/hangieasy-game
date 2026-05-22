@@ -270,7 +270,7 @@
         const projection = d3.geoMercator();
         const path = d3.geoPath().projection(projection);
 
-        d3.json("https://code.highcharts.com/mapdata/countries/tr/tr-all.geo.json").then(function(geojson) {
+        d3.json("/static/tr-all.geo.json").then(function(geojson) {
             document.getElementById('loading').style.display = 'none';
             svg.style("display", "block");
 
