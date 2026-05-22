@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ oyun_basligi }} | QuizHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: #0b0c10; color: #ffffff; 
+            min-height: 100vh; position: relative; overflow-x: hidden;
+            display: flex; flex-direction: column; align-items: center; padding: 40px 20px;
+        }
+
+        body::before, body::after {
+            content: ''; position: fixed; width: 60vw; height: 60vw;
+            border-radius: 50%; filter: blur(140px); z-index: -1;
+            animation: orbFloat 20s infinite alternate ease-in-out;
+        }
+        body::before { background: rgba(0, 242, 254, 0.15); top: -20%; left: -20%; }
+        body::after { background: rgba(255, 0, 122, 0.15); bottom: -20%; right: -20%; animation-delay: -10s; }
+        
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(60px, -60px) scale(1.2); }
+        }
+
+        .oyun-kutusu {
+            background: rgba(20, 20, 30, 0.6);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 1000px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .ust-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            padding: 15px 25px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .skor-kutusu {
+            font-size: 24px;
+            font-weight: 900;
+            color: #00f2fe;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .skor-kutusu span { color: #fff; font-size: 16px; opacity: 0.7; }
+
+        .input-alani {
+            flex-grow: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .input-alani input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            outline: none;
+            transition: 0.3s;
+            text-align: center;
+        }
+        
+        .input-alani input:focus {
+            border-color: #00f2fe;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .input-alani input::placeholder { color: rgba(255,255,255,0.3); }
+
+        .sayac-kutusu {
+            font-size: 28px;
+            font-weight: 900;
+            color: #facc15;
+            background: rgba(250, 204, 21, 0.1);
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(250, 204, 21, 0.2);
+            text-shadow: 0 0 10px rgba(250,204,21,0.5);
+            min-width: 120px;
+            text-align: center;
+        }
+
+        /* HARİTA STİLLERİ */
+        #harita-konteyner {
+            width: 100%;
+            height: 500px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .il-path {
+            fill: #2c3e50; /* Koyu gri/mavi varsayılan renk */
+            stroke: #0b0c10;
+            stroke-width: 1px;
+            transition: fill 0.4s ease, stroke-width 0.2s ease;
+        }
+
+        .il-path:hover {
+            fill: #34495e;
+            stroke-width: 2px;
+            cursor: crosshair;
+        }
+
+        .il-path.bulundu {
+            fill: #2ecc71 !important; /* Doğru bilinen il yeşili */
+            stroke: #27ae60;
+        }
+        
+        .il-path.kacirildi {
+            fill: #e74c3c !important; /* Süre bitince bulunamayanlar kırmızı */
+            animation: flash 1s alternate infinite;
+        }
+
+        @keyframes flash {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        /* LİSTE STİLLERİ */
+        .sehir-listesi {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .sehir-listesi::-webkit-scrollbar { width: 8px; }
+        .sehir-listesi::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 4px; }
+        .sehir-listesi::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+        .sehir-kutu {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.3);
+            text-transform: capitalize;
+            transition: 0.3s;
+        }
+
+        .sehir-kutu.bulundu {
+            background: rgba(46, 204, 113, 0.15);
+            border-color: #2ecc71;
+            color: #2ecc71;
+            text-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
+        }
+        
+        .sehir-kutu.kacirildi {
+            background: rgba(231, 76, 60, 0.15);
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        /* Bitiş Ekranı */
+        #bitis-ekrani {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .btn-anasayfa {
+            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.4);
+            transition: 0.3s;
+        }
+        .btn-anasayfa:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 242, 254, 0.6); }
+
+        #loading {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #00f2fe;
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="oyun-kutusu" id="oyun-alani">
+        <div class="ust-panel">
+            <div class="skor-kutusu">
+                <span id="skor">0</span> / 81 <span>İL BULUNDU</span>
+            </div>
+            
+            <div class="input-alani">
+                <input type="text" id="sehir-input" placeholder="Şehir adı yazmaya başla..." disabled autocomplete="off" spellcheck="false">
+            </div>
+
+            <div class="sayac-kutusu" id="sayac">10:00</div>
+        </div>
+
+        <div id="harita-konteyner">
+            <div id="loading">Harita Yükleniyor... 🗺️</div>
+            <svg id="turkey-map"></svg>
+        </div>
+
+        <div class="sehir-listesi" id="liste">
+            <!-- JavaScript ile doldurulacak -->
+        </div>
+        
+        <div id="bitis-ekrani">
+            <h2 style="color: #00f2fe; font-size: 36px; margin-bottom: 20px; font-weight: 900; text-transform: uppercase;" id="bitis-baslik">Süre Doldu!</h2>
+            <div style="font-size: 60px; font-weight: 900; color: #facc15; margin-bottom: 20px; text-shadow: 0 0 30px rgba(250,204,21,0.5);" id="bitis-skor">
+                0 / 81
+            </div>
+            <p style="color: #aaa; font-size: 16px; margin-bottom: 30px;">Türkiye coğrafyasına ne kadar hakimsin gördük!</p>
+            <a href="/" class="btn-anasayfa">🏠 Stüdyoya Dön</a>
+        </div>
+    </div>
+
+    <script>
+        const OYUN_ID = "{{ aktif_oyun }}";
+        const OYUN_BASLIGI = "{{ oyun_basligi }}";
+        
+        let sehirlerData = [];
+        let bulunanlar = new Set();
+        let sure = 600; // 10 dakika (saniye)
+        let timerInterval;
+        let oyunBitti = false;
+
+        const inputEl = document.getElementById('sehir-input');
+        const skorEl = document.getElementById('skor');
+        const sayacEl = document.getElementById('sayac');
+        const listeEl = document.getElementById('liste');
+        
+        // Türkçe karakterleri ve boşlukları temizleyerek standartlaştıran fonksiyon
+        function normalize(text) {
+            if(!text) return "";
+            return text.toLowerCase()
+                .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+                .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+                .replace(/i̇/g, 'i').replace(/[^a-z0-g]/g, '').trim();
+        }
+
+        // Alfabetik 81 İl (Highcharts verisi baz alınarak hazırlanacak)
+        // D3.js ile Harita Çizimi
+        const width = 1000;
+        const height = 500;
+        
+        const svg = d3.select("#turkey-map")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("viewBox", `0 0 ${width} ${height}`)
+            .style("display", "none");
+
+        const projection = d3.geoMercator();
+        const path = d3.geoPath().projection(projection);
+
+        // Highcharts TopoJSON verisi
+        d3.json("https://code.highcharts.com/mapdata/countries/tr/tr-all.topo.json").then(function(topology) {
+            document.getElementById('loading').style.display = 'none';
+            svg.style("display", "block");
+
+            const geojson = topojson.feature(topology, topology.objects.default);
+            
+            // Projeksiyonu harita kutusuna sığdır
+            projection.fitSize([width, height], geojson);
+
+            // Şehir isimlerini alfabetik topla
+            geojson.features.forEach(f => {
+                let orjinalIsim = f.properties.name;
+                // Highcharts bazen "Afyonkarahisar" için "Afyon" diyor olabilir, genel bir isim kontrolü
+                if(orjinalIsim === "Afyon") orjinalIsim = "Afyonkarahisar";
+                
+                let norm = normalize(orjinalIsim);
+                sehirlerData.push({
+                    id: f.properties['hc-key'],
+                    orjinal: orjinalIsim,
+                    norm: norm
+                });
+            });
+
+            // Alfabetik Sırala
+            sehirlerData.sort((a, b) => a.orjinal.localeCompare(b.orjinal, 'tr'));
+
+            // Listeyi Oluştur
+            sehirlerData.forEach(s => {
+                let div = document.createElement('div');
+                div.className = 'sehir-kutu';
+                div.id = 'kutu-' + s.norm;
+                // İlk başta ismin sadece baş harfi veya tire koyabiliriz ama "Guess the Turkey City" oyunlarında genellikle boş kutu veya ??? yazar.
+                // Biz sadece kutu gösterelim, ismini gizleyelim
+                div.innerText = "???"; 
+                listeEl.appendChild(div);
+            });
+
+            // Haritayı Çiz
+            svg.append("g")
+                .selectAll("path")
+                .data(geojson.features)
+                .enter().append("path")
+                .attr("class", "il-path")
+                .attr("id", d => {
+                    let name = d.properties.name;
+                    if(name === "Afyon") name = "Afyonkarahisar";
+                    return "path-" + normalize(name);
+                })
+                .attr("d", path)
+                .append("title")
+                .text(d => d.properties.name); // İsteğe bağlı: hover olunca ismi gösterme. Orijinal oyunda isimler gözükmez!
+            
+            // Hile yapılmaması için tooltip (title) kaldırıyoruz:
+            svg.selectAll("title").remove(); 
+
+            // Oyunu Başlat
+            oyunBaslat();
+
+        }).catch(err => {
+            console.error("Harita Yüklenirken Hata:", err);
+            document.getElementById('loading').innerText = "Harita yüklenemedi! İnternet bağlantınızı kontrol edin.";
+        });
+
+
+        function oyunBaslat() {
+            inputEl.disabled = false;
+            inputEl.focus();
+            timerInterval = setInterval(zamanGuncelle, 1000);
+            
+            // Input Dinleyici
+            inputEl.addEventListener('input', function() {
+                if(oyunBitti) return;
+                
+                let val = normalize(this.value);
+                if(val.length < 3) return; // En kısa il Van veya Muş
+                
+                // 81 il içinde bu isim var mı ve daha önce bulunmamış mı?
+                let eslesen = sehirlerData.find(s => s.norm === val);
+                if(eslesen && !bulunanlar.has(val)) {
+                    ilBulundu(eslesen);
+                }
+                
+                // Özel kısaltmalar (kullanıcı dostu)
+                if(val === 'afyon') val = 'afyonkarahisar';
+                if(val === 'maras') val = 'kahramanmaras';
+                if(val === 'antep') val = 'gaziantep';
+                if(val === 'urfa') val = 'sanliurfa';
+                if(val === 'kocaeli') val = 'kocaeli'; // bazen izmit derler
+                if(val === 'izmit') val = 'kocaeli';
+                if(val === 'adapazari') val = 'sakarya';
+                
+                let ozelEslesen = sehirlerData.find(s => s.norm === val);
+                if(ozelEslesen && !bulunanlar.has(val)) {
+                    ilBulundu(ozelEslesen);
+                }
+            });
+        }
+
+        function ilBulundu(sehir) {
+            bulunanlar.add(sehir.norm);
+            skorEl.innerText = bulunanlar.size;
+            inputEl.value = ""; // Kutuyu temizle
+            
+            // Haritayı boya
+            d3.select("#path-" + sehir.norm).classed("bulundu", true);
+            
+            // Listede göster
+            let kutu = document.getElementById("kutu-" + sehir.norm);
+            if(kutu) {
+                kutu.innerText = sehir.orjinal;
+                kutu.classList.add("bulundu");
+            }
+            
+            // Oyun bitti mi kontrolü
+            if(bulunanlar.size === 81) {
+                oyunuBitir(true);
+            }
+        }
+
+        function zamanGuncelle() {
+            sure--;
+            let dk = Math.floor(sure / 60);
+            let sn = sure % 60;
+            sayacEl.innerText = `${dk.toString().padStart(2, '0')}:${sn.toString().padStart(2, '0')}`;
+            
+            if(sure <= 0) {
+                oyunuBitir(false);
+            }
+        }
+
+        function oyunuBitir(kazandi) {
+            oyunBitti = true;
+            clearInterval(timerInterval);
+            inputEl.disabled = true;
+            inputEl.style.display = 'none';
+            
+            document.getElementById('bitis-skor').innerText = `${bulunanlar.size} / 81`;
+            
+            if(kazandi) {
+                document.getElementById('bitis-baslik').innerText = "TÜRKİYE FATİHİ! 🇹🇷";
+                document.getElementById('bitis-baslik').style.color = "#2ecc71";
+            } else {
+                document.getElementById('bitis-baslik').innerText = "SÜRE DOLDU!";
+                document.getElementById('bitis-baslik').style.color = "#e74c3c";
+                
+                // Bulunamayanları kırmızı yap ve isimlerini listede göster
+                sehirlerData.forEach(s => {
+                    if(!bulunanlar.has(s.norm)) {
+                        d3.select("#path-" + s.norm).classed("kacirildi", true);
+                        let kutu = document.getElementById("kutu-" + s.norm);
+                        if(kutu) {
+                            kutu.innerText = s.orjinal;
+                            kutu.classList.add("kacirildi");
+                        }
+                    }
+                });
+            }
+            
+            document.getElementById('bitis-ekrani').style.display = 'block';
+
+            // Kazanılan puana göre coin ver
+            fetch('/api/odul_al', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ miktar: bulunanlar.size }) // İl başına 1 coin
+            }).catch(err => console.log("Coin Hatası:", err));
+        }
+
+    </script>
+</body>
+</html>
