@@ -789,8 +789,7 @@ def oyun_sayfasi(oyun_id):
         'piksel_avcisi': 'piksel_avcisi.html',
         'casus_kim': 'casus_kim.html',
         'sesli_quiz': 'sesli_quiz.html',
-        'klasik_test': 'klasik_test.html',
-        'harita_tr': 'harita_tr.html'
+        'klasik_test': 'klasik_test.html'
     }
     if oyun.oynanma_sayisi is None:
         oyun.oynanma_sayisi = 0
