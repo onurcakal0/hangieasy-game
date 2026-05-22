@@ -643,6 +643,10 @@ def guess_turkey():
 def guess_world():
     return render_template('guess_world.html')
 
+@app.route('/guess-word')
+def guess_word():
+    return render_template('guess_word.html')
+
 
 
 @app.route('/test-olustur', methods=['GET', 'POST'])
