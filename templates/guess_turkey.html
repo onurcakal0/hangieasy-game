@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess The Turkey City | Hangieasy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: #0b0c10; color: #ffffff; 
+            min-height: 100vh; position: relative; overflow-x: hidden;
+            display: flex; flex-direction: column; align-items: center; padding: 20px;
+        }
+
+        body::before, body::after {
+            content: ''; position: fixed; width: 60vw; height: 60vw;
+            border-radius: 50%; filter: blur(140px); z-index: -1;
+            animation: orbFloat 20s infinite alternate ease-in-out;
+        }
+        body::before { background: rgba(46, 204, 113, 0.15); top: -20%; left: -20%; }
+        body::after { background: rgba(39, 174, 96, 0.15); bottom: -20%; right: -20%; animation-delay: -10s; }
+        
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(60px, -60px) scale(1.2); }
+        }
+
+        .header {
+            width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .geri-btn {
+            background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 10px 20px;
+            border-radius: 12px; font-weight: 600; cursor: pointer; text-decoration: none; transition: 0.3s;
+        }
+        .geri-btn:hover { background: rgba(255,255,255,0.2); transform: translateX(-3px); }
+
+        .skor-kutusu { font-size: 24px; font-weight: 900; color: #2ecc71; }
+        .skor-kutusu span { color: #fff; font-size: 14px; opacity: 0.7; }
+
+        .sayac-kutusu {
+            font-size: 28px; font-weight: 900; color: #facc15;
+            background: rgba(250, 204, 21, 0.1); padding: 8px 20px;
+            border-radius: 12px; border: 1px solid rgba(250, 204, 21, 0.2);
+            text-shadow: 0 0 10px rgba(250,204,21,0.5); min-width: 110px; text-align: center;
+        }
+
+        /* HARİTA STİLLERİ */
+        #harita-konteyner {
+            width: 100%; max-width: 1200px; height: 500px;
+            background: rgba(20, 20, 30, 0.6); backdrop-filter: blur(25px);
+            border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; position: relative; margin-bottom: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .il-path {
+            fill: #2c3e50; stroke: #0b0c10; stroke-width: 1px;
+            transition: fill 0.4s ease, stroke-width 0.2s ease;
+        }
+        .il-path.bulundu { fill: #2ecc71 !important; stroke: #27ae60; stroke-width: 1.5px; }
+        .il-path.kacirildi { fill: #e74c3c !important; animation: flash 1s alternate infinite; }
+
+        @keyframes flash { 0% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        /* GİRDİ ALANI */
+        .girdi-alani {
+            width: 100%; max-width: 600px; margin: 0 auto 30px auto; position: relative;
+        }
+
+        .girdi-alani input {
+            width: 100%; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1);
+            color: #fff; padding: 18px 25px; border-radius: 16px; font-size: 20px;
+            font-weight: 600; outline: none; transition: 0.3s; text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .girdi-alani input:focus { border-color: #2ecc71; box-shadow: 0 0 20px rgba(46, 204, 113, 0.3); background: rgba(255,255,255,0.1); }
+        .girdi-alani input.hata { border-color: #e74c3c; animation: shake 0.4s; }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        #hata-mesaji {
+            position: absolute; top: -30px; left: 0; width: 100%; text-align: center;
+            color: #e74c3c; font-weight: 600; font-size: 14px; opacity: 0; transition: 0.3s;
+        }
+        #hata-mesaji.goster { opacity: 1; transform: translateY(-5px); }
+
+        /* PLAKA LİSTESİ (81 İL GRİD) */
+        .plaka-konteyner {
+            width: 100%; max-width: 1200px;
+            background: rgba(20, 20, 30, 0.6); backdrop-filter: blur(25px);
+            border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);
+            padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .plaka-baslik {
+            font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .plaka-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px;
+        }
+
+        .plaka-kutu {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: flex-start;
+            gap: 10px; transition: 0.3s; position: relative; overflow: hidden;
+        }
+
+        .plaka-no {
+            font-weight: 900; color: rgba(255,255,255,0.4); font-size: 18px;
+            background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px;
+        }
+
+        .plaka-isim {
+            font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.2);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .plaka-kutu.bulundu {
+            background: rgba(46, 204, 113, 0.1); border-color: #2ecc71;
+        }
+        .plaka-kutu.bulundu .plaka-no { color: #fff; background: #2ecc71; }
+        .plaka-kutu.bulundu .plaka-isim { color: #2ecc71; text-shadow: 0 0 10px rgba(46, 204, 113, 0.4); }
+
+        .plaka-kutu.kacirildi {
+            background: rgba(231, 76, 60, 0.1); border-color: #e74c3c;
+        }
+        .plaka-kutu.kacirildi .plaka-no { color: #fff; background: #e74c3c; }
+        .plaka-kutu.kacirildi .plaka-isim { color: #e74c3c; }
+
+        /* Bitiş Modal */
+        #bitis-ekrani {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.9); z-index: 1000; display: none;
+            justify-content: center; align-items: center; backdrop-filter: blur(10px);
+        }
+        .bitis-icerik {
+            background: #111; padding: 50px; border-radius: 24px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+        .btn-anasayfa {
+            background: linear-gradient(45deg, #2ecc71, #27ae60); color: #fff; border: none;
+            padding: 15px 30px; font-size: 18px; font-weight: 800; border-radius: 12px;
+            cursor: pointer; text-decoration: none; display: inline-block; margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="/dashboard" class="geri-btn">⬅ Stüdyo</a>
+        <div class="skor-kutusu"><span id="skor">0</span> / 81 <span>BULUNDU</span></div>
+        <div class="sayac-kutusu" id="sayac">10:00</div>
+    </div>
+
+    <div id="harita-konteyner">
+        <div id="loading" style="color: #2ecc71; font-weight: 800; font-size: 20px;">Harita Yükleniyor... 🗺️</div>
+        <svg id="turkey-map"></svg>
+    </div>
+
+    <div class="girdi-alani">
+        <div id="hata-mesaji">Şehir bulunamadı!</div>
+        <input type="text" id="sehir-input" placeholder="Aşağıya şehir yaz... (Örn: Adana)" disabled autocomplete="off" spellcheck="false">
+    </div>
+
+    <div class="plaka-konteyner">
+        <div class="plaka-baslik">📍 Plaka Listesi (Alfabetik)</div>
+        <div class="plaka-grid" id="liste">
+            <!-- JS Dolduracak -->
+        </div>
+    </div>
+
+    <div id="bitis-ekrani">
+        <div class="bitis-icerik">
+            <h2 id="bitis-baslik" style="font-size: 40px; margin-bottom: 10px;">SÜRE DOLDU!</h2>
+            <div id="bitis-skor" style="font-size: 60px; font-weight: 900; color: #facc15; margin-bottom: 30px;">0 / 81</div>
+            <a href="/dashboard" class="btn-anasayfa">🏠 Ana Sayfaya Dön</a>
+        </div>
+    </div>
+
+    <script>
+        const plakaListesi = [
+            { plaka: 1, ad: "Adana" }, { plaka: 2, ad: "Adıyaman" }, { plaka: 3, ad: "Afyonkarahisar" },
+            { plaka: 4, ad: "Ağrı" }, { plaka: 5, ad: "Amasya" }, { plaka: 6, ad: "Ankara" },
+            { plaka: 7, ad: "Antalya" }, { plaka: 8, ad: "Artvin" }, { plaka: 9, ad: "Aydın" },
+            { plaka: 10, ad: "Balıkesir" }, { plaka: 11, ad: "Bilecik" }, { plaka: 12, ad: "Bingöl" },
+            { plaka: 13, ad: "Bitlis" }, { plaka: 14, ad: "Bolu" }, { plaka: 15, ad: "Burdur" },
+            { plaka: 16, ad: "Bursa" }, { plaka: 17, ad: "Çanakkale" }, { plaka: 18, ad: "Çankırı" },
+            { plaka: 19, ad: "Çorum" }, { plaka: 20, ad: "Denizli" }, { plaka: 21, ad: "Diyarbakır" },
+            { plaka: 22, ad: "Edirne" }, { plaka: 23, ad: "Elazığ" }, { plaka: 24, ad: "Erzincan" },
+            { plaka: 25, ad: "Erzurum" }, { plaka: 26, ad: "Eskişehir" }, { plaka: 27, ad: "Gaziantep" },
+            { plaka: 28, ad: "Giresun" }, { plaka: 29, ad: "Gümüşhane" }, { plaka: 30, ad: "Hakkari" },
+            { plaka: 31, ad: "Hatay" }, { plaka: 32, ad: "Isparta" }, { plaka: 33, ad: "Mersin" },
+            { plaka: 34, ad: "İstanbul" }, { plaka: 35, ad: "İzmir" }, { plaka: 36, ad: "Kars" },
+            { plaka: 37, ad: "Kastamonu" }, { plaka: 38, ad: "Kayseri" }, { plaka: 39, ad: "Kırklareli" },
+            { plaka: 40, ad: "Kırşehir" }, { plaka: 41, ad: "Kocaeli" }, { plaka: 42, ad: "Konya" },
+            { plaka: 43, ad: "Kütahya" }, { plaka: 44, ad: "Malatya" }, { plaka: 45, ad: "Manisa" },
+            { plaka: 46, ad: "Kahramanmaraş" }, { plaka: 47, ad: "Mardin" }, { plaka: 48, ad: "Muğla" },
+            { plaka: 49, ad: "Muş" }, { plaka: 50, ad: "Nevşehir" }, { plaka: 51, ad: "Niğde" },
+            { plaka: 52, ad: "Ordu" }, { plaka: 53, ad: "Rize" }, { plaka: 54, ad: "Sakarya" },
+            { plaka: 55, ad: "Samsun" }, { plaka: 56, ad: "Siirt" }, { plaka: 57, ad: "Sinop" },
+            { plaka: 58, ad: "Sivas" }, { plaka: 59, ad: "Tekirdağ" }, { plaka: 60, ad: "Tokat" },
+            { plaka: 61, ad: "Trabzon" }, { plaka: 62, ad: "Tunceli" }, { plaka: 63, ad: "Şanlıurfa" },
+            { plaka: 64, ad: "Uşak" }, { plaka: 65, ad: "Van" }, { plaka: 66, ad: "Yozgat" },
+            { plaka: 67, ad: "Zonguldak" }, { plaka: 68, ad: "Aksaray" }, { plaka: 69, ad: "Bayburt" },
+            { plaka: 70, ad: "Karaman" }, { plaka: 71, ad: "Kırıkkale" }, { plaka: 72, ad: "Batman" },
+            { plaka: 73, ad: "Şırnak" }, { plaka: 74, ad: "Bartın" }, { plaka: 75, ad: "Ardahan" },
+            { plaka: 76, ad: "Iğdır" }, { plaka: 77, ad: "Yalova" }, { plaka: 78, ad: "Karabük" },
+            { plaka: 79, ad: "Kilis" }, { plaka: 80, ad: "Osmaniye" }, { plaka: 81, ad: "Düzce" }
+        ];
+
+        let bulunanlar = new Set();
+        let sure = 600; // 10 dakika
+        let timerInterval;
+        let oyunBitti = false;
+
+        const inputEl = document.getElementById('sehir-input');
+        const skorEl = document.getElementById('skor');
+        const sayacEl = document.getElementById('sayac');
+        const listeEl = document.getElementById('liste');
+        const hataEl = document.getElementById('hata-mesaji');
+
+        function normalize(text) {
+            if(!text) return "";
+            return text.toLowerCase()
+                .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+                .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+                .replace(/i̇/g, 'i').replace(/[^a-z0-g]/g, '').trim();
+        }
+
+        // Plaka Grid'ini Oluştur
+        plakaListesi.forEach(p => {
+            p.norm = normalize(p.ad); // Normalleştirilmiş isim eklendi
+            
+            let div = document.createElement('div');
+            div.className = 'plaka-kutu';
+            div.id = 'plaka-' + p.norm;
+            
+            let no = document.createElement('div');
+            no.className = 'plaka-no';
+            no.innerText = p.plaka.toString().padStart(2, '0');
+            
+            let isim = document.createElement('div');
+            isim.className = 'plaka-isim';
+            isim.innerText = "???"; // Başlangıçta gizli
+            
+            div.appendChild(no);
+            div.appendChild(isim);
+            listeEl.appendChild(div);
+        });
+
+        // D3.js Harita
+        const width = 1200; const height = 500;
+        const svg = d3.select("#turkey-map")
+            .attr("width", "100%").attr("height", "100%")
+            .attr("viewBox", `0 0 ${width} ${height}`).style("display", "none");
+        
+        const projection = d3.geoMercator();
+        const path = d3.geoPath().projection(projection);
+
+        d3.json("https://code.highcharts.com/mapdata/countries/tr/tr-all.geo.json").then(function(geojson) {
+            document.getElementById('loading').style.display = 'none';
+            svg.style("display", "block");
+
+            projection.fitSize([width, height], geojson);
+
+            svg.append("g")
+                .selectAll("path")
+                .data(geojson.features)
+                .enter().append("path")
+                .attr("class", "il-path")
+                .attr("id", d => {
+                    let name = d.properties.name;
+                    if(name === "Afyon") name = "Afyonkarahisar";
+                    return "path-" + normalize(name);
+                })
+                .attr("d", path);
+
+            oyunBaslat();
+        }).catch(err => {
+            console.error("Hata:", err);
+            document.getElementById('loading').innerText = "Harita yüklenemedi! İnternet bağlantınızı kontrol edin.";
+        });
+
+        function hataGoster(mesaj) {
+            hataEl.innerText = mesaj;
+            hataEl.classList.add("goster");
+            inputEl.classList.add("hata");
+            setTimeout(() => {
+                hataEl.classList.remove("goster");
+                inputEl.classList.remove("hata");
+            }, 1000);
+        }
+
+        function oyunBaslat() {
+            inputEl.disabled = false;
+            inputEl.focus();
+            timerInterval = setInterval(zamanGuncelle, 1000);
+            
+            inputEl.addEventListener('keyup', function(e) {
+                if(oyunBitti) return;
+                let val = normalize(this.value);
+                
+                // Sadece enter basılırsa veya belli bir uzunluğa ulaşırsa kontrol etmek yerine her harfte kontrol
+                // Ancak "hata mesajı" göstermek için Enter'a basılmasını bekleyelim
+                if (e.key === 'Enter') {
+                    if(val.length < 3) return;
+
+                    // Özel Kısaltmalar
+                    if(val === 'afyon') val = 'afyonkarahisar';
+                    if(val === 'maras') val = 'kahramanmaras';
+                    if(val === 'antep') val = 'gaziantep';
+                    if(val === 'urfa') val = 'sanliurfa';
+                    if(val === 'kocaeli') val = 'kocaeli'; 
+                    if(val === 'izmit') val = 'kocaeli';
+                    if(val === 'adapazari') val = 'sakarya';
+                    if(val === 'mersin') val = 'mersin'; // Icel is officially Mersin
+
+                    let eslesen = plakaListesi.find(s => s.norm === val);
+                    
+                    if(!eslesen) {
+                        hataGoster("Böyle bir şehir yok!");
+                    } else if(bulunanlar.has(val)) {
+                        hataGoster("Bu şehri zaten buldun!");
+                    } else {
+                        ilBulundu(eslesen);
+                    }
+                } else {
+                    // Enter dışındaki tuşlarda da canlı eşleşme kontrolü (akıcılık için)
+                    let checkVal = val;
+                    if(checkVal === 'afyon') checkVal = 'afyonkarahisar';
+                    if(checkVal === 'maras') checkVal = 'kahramanmaras';
+                    if(checkVal === 'antep') checkVal = 'gaziantep';
+                    if(checkVal === 'urfa') checkVal = 'sanliurfa';
+                    if(checkVal === 'izmit') checkVal = 'kocaeli';
+                    if(checkVal === 'adapazari') checkVal = 'sakarya';
+
+                    let anlikEslesen = plakaListesi.find(s => s.norm === checkVal);
+                    if(anlikEslesen && !bulunanlar.has(checkVal)) {
+                        ilBulundu(anlikEslesen);
+                    }
+                }
+            });
+        }
+
+        function ilBulundu(sehir) {
+            bulunanlar.add(sehir.norm);
+            skorEl.innerText = bulunanlar.size;
+            inputEl.value = ""; 
+            
+            // Harita yeşil yap
+            let pathEl = d3.select("#path-" + sehir.norm);
+            if(!pathEl.empty()) {
+                pathEl.classed("bulundu", true);
+            }
+            
+            // Plaka Kutusunu doldur
+            let kutu = document.getElementById("plaka-" + sehir.norm);
+            if(kutu) {
+                kutu.querySelector('.plaka-isim').innerText = sehir.ad;
+                kutu.classList.add("bulundu");
+            }
+            
+            if(bulunanlar.size === 81) {
+                oyunuBitir(true);
+            }
+        }
+
+        function zamanGuncelle() {
+            sure--;
+            let dk = Math.floor(sure / 60);
+            let sn = sure % 60;
+            sayacEl.innerText = `${dk.toString().padStart(2, '0')}:${sn.toString().padStart(2, '0')}`;
+            
+            if(sure <= 0) oyunuBitir(false);
+        }
+
+        function oyunuBitir(kazandi) {
+            oyunBitti = true;
+            clearInterval(timerInterval);
+            inputEl.disabled = true;
+            
+            document.getElementById('bitis-skor').innerText = `${bulunanlar.size} / 81`;
+            
+            if(kazandi) {
+                document.getElementById('bitis-baslik').innerText = "TÜRKİYE FATİHİ! 🇹🇷";
+                document.getElementById('bitis-baslik').style.color = "#2ecc71";
+            } else {
+                document.getElementById('bitis-baslik').innerText = "SÜRE DOLDU!";
+                document.getElementById('bitis-baslik').style.color = "#e74c3c";
+                
+                // Bulunamayanları kırmızı yap
+                plakaListesi.forEach(s => {
+                    if(!bulunanlar.has(s.norm)) {
+                        d3.select("#path-" + s.norm).classed("kacirildi", true);
+                        let kutu = document.getElementById("plaka-" + s.norm);
+                        if(kutu) {
+                            kutu.querySelector('.plaka-isim').innerText = s.ad;
+                            kutu.classList.add("kacirildi");
+                        }
+                    }
+                });
+            }
+            
+            document.getElementById('bitis-ekrani').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
