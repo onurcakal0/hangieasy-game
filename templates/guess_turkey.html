@@ -267,7 +267,9 @@
             .attr("width", "100%").attr("height", "100%")
             .attr("viewBox", `0 0 ${width} ${height}`).style("display", "none");
         
-        const projection = d3.geoMercator();
+        // Highcharts GeoJSON verisi zaten yansıtılmış X/Y koordinatlarıdır (Lon/Lat değildir).
+        // Bu yüzden geoMercator yerine geoIdentity kullanmalı ve SVG için Y eksenini ters çevirmeliyiz.
+        const projection = d3.geoIdentity().reflectY(true);
         const path = d3.geoPath().projection(projection);
 
         d3.json("/static/tr-all.geo.json").then(function(geojson) {
