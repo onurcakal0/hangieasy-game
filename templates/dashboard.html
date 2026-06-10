@@ -372,6 +372,44 @@
             .modal-buton-grubu { flex-direction: column; gap: 8px; }
             .btn-aksiyon { font-size: 12px; padding: 12px; }
         }
+        /* 🟢 KOMPLİKE FUTBOL BANNER */
+        .komplike-banner {
+            background: linear-gradient(135deg, #050505 0%, #0a1f0a 100%);
+            border: 1px solid rgba(0, 255, 0, 0.4);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.15);
+            margin: 20px auto;
+            max-width: 900px;
+            border-radius: 16px;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: pulseGlow 3s infinite alternate;
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px rgba(0, 255, 0, 0.1); }
+            100% { box-shadow: 0 0 25px rgba(0, 255, 0, 0.3); }
+        }
+        .komplike-title { font-size: 32px; font-weight: 900; color: #fff; margin-bottom: 8px; letter-spacing: -1px; }
+        .komplike-title span { color: #00e600; text-shadow: 0 0 10px rgba(0,255,0,0.5); }
+        .komplike-desc { font-size: 15px; color: #b3b3b3; margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .komplike-socials { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+        .komplike-btn { 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            font-weight: 800; 
+            font-size: 14px; 
+            color: #fff; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .komplike-btn.inst { background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); }
+        .komplike-btn.tt { background: #000; border: 1px solid #00f2fe; }
+        .komplike-btn.tw { background: #000; border: 1px solid #555; }
+        .komplike-btn:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
@@ -486,6 +524,17 @@
         <a href="/test-olustur" class="ub-pill" style="border-color:rgba(0,176,155,0.3);color:#00b09b;">＋ {{ t.yeni_test }}</a>
     </div>
     {% endif %}
+
+    <!-- 🟢 KOMPLİKE FUTBOL DUYURUSU -->
+    <div class="komplike-banner">
+        <h2 class="komplike-title">Komplike<span>Futbol</span> Yayında! ⚽</h2>
+        <p class="komplike-desc">Futbolun en komplike, en zeki ve en eğlenceli hali artık bizimle! HangiEasy güvencesiyle açılan yeni futbol sayfamızı sosyal medyada takip et, futbol aklını konuştur.</p>
+        <div class="komplike-socials">
+            <a href="https://instagram.com/komplikefutbol" target="_blank" class="komplike-btn inst">📸 Instagram</a>
+            <a href="https://tiktok.com/@komplikefutbol" target="_blank" class="komplike-btn tt">🎵 TikTok</a>
+            <a href="https://twitter.com/komplikefutbol" target="_blank" class="komplike-btn tw">✖️ Twitter (X)</a>
+        </div>
+    </div>
 
     <!-- 🚀 DUYURU + GERİ SAYIM -->
     <div class="dashboard-countdown">
