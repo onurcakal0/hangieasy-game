@@ -11,6 +11,7 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for, s
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from flask_socketio import SocketIO, emit, join_room
+from flask_cors import CORS
 
 # --- GÜVENLİK VE ARAÇLAR ---
 from werkzeug.utils import secure_filename
@@ -52,6 +53,7 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 # 🚀 3. EKLENTİLERİ MOTORA BAĞLA
 
 mail = Mail(app)
+CORS(app)
 s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -1298,6 +1300,119 @@ def kimim_ben():
 def robots():
     # Google botlarına "Bütün siteyi tarayabilirsin" emrini veriyoruz.
     return "User-agent: *\nAllow: /"
+
+# --- 📱 MOBİL UYGULAMA API UÇ NOKTALARI (PHASE 1) ---
+
+@app.route('/api/auth/register', methods=['POST'])
+def api_auth_register():
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'message': 'Veri alınamadı.'}), 400
+    
+    ad_soyad = data.get('ad_soyad')
+    kullanici_adi = data.get('kullanici_adi')
+    eposta = data.get('eposta')
+    sifre = data.get('sifre')
+    
+    if not all([ad_soyad, kullanici_adi, eposta, sifre]):
+        return jsonify({'success': False, 'message': 'Lütfen tüm alanları doldurun.'}), 400
+        
+    mevcut_kullanici = Kullanici.query.filter((Kullanici.eposta == eposta) | (Kullanici.kullanici_adi == kullanici_adi)).first()
+    if mevcut_kullanici:
+        return jsonify({'success': False, 'message': 'Bu e-posta veya kullanıcı adı zaten kullanımda.'}), 409
+        
+    hashed_sifre = generate_password_hash(sifre, method='pbkdf2:sha256')
+    yeni_kullanici = Kullanici(
+        ad_soyad=ad_soyad,
+        kullanici_adi=kullanici_adi,
+        eposta=eposta,
+        dogum_tarihi="",
+        sifre_hash=hashed_sifre,
+        onayli_mi=True  # Mobil için otomatik onay
+    )
+    db.session.add(yeni_kullanici)
+    db.session.commit()
+    
+    token = s.dumps({'kullanici_adi': kullanici_adi}, salt='mobil-api-token')
+    return jsonify({'success': True, 'message': 'Kayıt başarılı.', 'token': token}), 201
+
+@app.route('/api/auth/login', methods=['POST'])
+def api_auth_login():
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'message': 'Veri alınamadı.'}), 400
+        
+    kullanici_adi = data.get('kullanici_adi')
+    sifre = data.get('sifre')
+    
+    kullanici = Kullanici.query.filter_by(kullanici_adi=kullanici_adi).first()
+    if kullanici and check_password_hash(kullanici.sifre_hash, sifre):
+        token = s.dumps({'kullanici_adi': kullanici.kullanici_adi}, salt='mobil-api-token')
+        return jsonify({
+            'success': True, 
+            'token': token,
+            'user': {
+                'kullanici_adi': kullanici.kullanici_adi,
+                'ad_soyad': kullanici.ad_soyad,
+                'he_coin': kullanici.he_coin,
+                'rutbe': kullanici.rutbe
+            }
+        }), 200
+    
+    return jsonify({'success': False, 'message': 'Kullanıcı adı veya şifre hatalı.'}), 401
+
+@app.route('/api/user/profile', methods=['GET'])
+def api_user_profile():
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return jsonify({'success': False, 'message': 'Token bulunamadı.'}), 401
+        
+    token = auth_header.split(' ')[1]
+    try:
+        data = s.loads(token, salt='mobil-api-token', max_age=86400 * 30) # 30 gün geçerli token
+        kullanici_adi = data.get('kullanici_adi')
+    except Exception:
+        return jsonify({'success': False, 'message': 'Geçersiz veya süresi dolmuş token.'}), 401
+        
+    kullanici = Kullanici.query.filter_by(kullanici_adi=kullanici_adi).first()
+    if not kullanici:
+        return jsonify({'success': False, 'message': 'Kullanıcı bulunamadı.'}), 404
+        
+    return jsonify({
+        'success': True,
+        'profile': {
+            'ad_soyad': kullanici.ad_soyad,
+            'kullanici_adi': kullanici.kullanici_adi,
+            'he_coin': kullanici.he_coin,
+            'rutbe': kullanici.rutbe,
+            'cozulen_test_sayisi': kullanici.cozulen_test_sayisi,
+            'profil_resmi': kullanici.profil_resmi
+        }
+    }), 200
+
+@app.route('/api/games', methods=['GET'])
+def api_games():
+    oyunlar = Oyun.query.all()
+    oyun_listesi = []
+    for oyun in oyunlar:
+        oyun_listesi.append({
+            'id': oyun.id,
+            'baslik': oyun.baslik,
+            'kategori': oyun.kategori,
+            'oyun_modu': oyun.oyun_modu,
+            'oynanma_sayisi': oyun.oynanma_sayisi
+        })
+    return jsonify({'success': True, 'games': oyun_listesi}), 200
+
+@app.route('/api/shop/items', methods=['GET'])
+def api_shop_items():
+    items = [
+        {'id': 'cerceve_standart', 'name': 'Standart', 'price': 0, 'type': 'frame'},
+        {'id': 'cerceve_siber', 'name': 'Siber Komuta', 'price': 500, 'type': 'frame'},
+        {'id': 'unvan_korsan', 'name': 'Siber Korsan', 'price': 1000, 'type': 'title'}
+    ]
+    return jsonify({'success': True, 'items': items}), 200
+
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 5001))
     socketio.run(app, host='0.0.0.0', port=port, debug=True)
