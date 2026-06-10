@@ -2,6 +2,7 @@ Flask==3.0.0
 Flask-Mail
 Flask-SocketIO
 Flask-SQLAlchemy==3.1.1
+Flask-Cors
 Werkzeug==3.0.1
 gunicorn
 gevent-websocket
