@@ -318,25 +318,25 @@
         /* 📱 MOBİL UYUM */
         @media (max-width: 768px) {
             /* NAVBAR */
-            .navbar { padding: 10px; flex-wrap: wrap; gap: 8px; height: auto; justify-content: space-between; }
-            .sol-grup { flex: 0 0 auto; margin-right: auto; }
-            .logo { font-size: 16px; }
+            .navbar { padding: 12px 15px; flex-wrap: wrap; gap: 10px; height: auto; justify-content: center; }
+            .sol-grup { flex: 1 1 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+            .logo { font-size: 18px; margin: 0; }
             
-            /* SAĞ MENÜ (EKRANA SIĞDIRMA) */
+            /* SAĞ MENÜ (EKRANA SIĞDIRMA VE ORTALAMA) */
             .sag-menu { 
-                flex: 0 0 auto; display: flex; flex-wrap: wrap; 
-                justify-content: flex-end; gap: 6px; align-items: center;
+                flex: 1 1 100%; display: flex; flex-wrap: wrap; 
+                justify-content: center; gap: 10px; align-items: center; order: 2;
             }
-            .stealth-btn, .profil-btn { padding: 6px 8px; font-size: 10px; }
+            .stealth-btn, .profil-btn { padding: 8px 12px; font-size: 11px; }
             #stealth-yazi { display: none; } /* RGB yazısını gizle, ikon kalsın */
             
-            .cuzdan-kapsulu { flex: 1 1 100%; border-radius: 20px; order: 3; margin-top: 4px; }
+            .cuzdan-kapsulu { flex: 1 1 100%; border-radius: 20px; order: 3; margin-top: 5px; }
             .cuzdan-kapsulu form { display: flex; width: 100%; }
-            .cuzdan-kapsulu input[name="oda_kodu"] { flex: 1; font-size: 12px !important; padding: 8px 15px !important; }
+            .cuzdan-kapsulu input[name="oda_kodu"] { flex: 1; font-size: 12px !important; padding: 8px 15px !important; text-align: center; }
             .cuzdan-kapsulu button[type="submit"] { padding: 8px 15px !important; font-size: 11px !important; flex-shrink: 0; }
 
-            .arama-kiti { flex: 1 1 100%; order: 4; margin-top: 4px; }
-            .arama-kiti input { padding: 10px 15px; font-size: 12px; }
+            .arama-kiti { flex: 1 1 100%; order: 4; margin-top: 5px; }
+            .arama-kiti input { padding: 10px 15px; font-size: 12px; text-align: center; }
 
             /* USER BAR (2x2 IZGARA) */
             .user-bar { 
