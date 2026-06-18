@@ -318,34 +318,36 @@
         /* 📱 MOBİL UYUM */
         @media (max-width: 768px) {
             /* NAVBAR */
-            .navbar { padding: 10px; flex-wrap: wrap; gap: 10px; height: auto; }
-            .sol-grup { flex: 0 0 auto; }
-            .arama-kiti { order: 3; flex: 0 0 100%; margin-top: 5px; }
-            .arama-kiti input { padding: 10px 16px; font-size: 13px; }
+            .navbar { padding: 10px; flex-wrap: wrap; gap: 8px; height: auto; justify-content: space-between; }
+            .sol-grup { flex: 0 0 auto; margin-right: auto; }
+            .logo { font-size: 16px; }
             
-            /* SAĞ MENÜ (YATAY KAYDIRMA) */
+            /* SAĞ MENÜ (EKRANA SIĞDIRMA) */
             .sag-menu { 
-                order: 2; flex: 1; display: flex; flex-wrap: nowrap; 
-                overflow-x: auto; justify-content: flex-start; gap: 8px; 
-                padding-bottom: 2px; -webkit-overflow-scrolling: touch;
+                flex: 0 0 auto; display: flex; flex-wrap: wrap; 
+                justify-content: flex-end; gap: 6px; align-items: center;
             }
-            .sag-menu::-webkit-scrollbar { display: none; } /* Gizli Scroll */
+            .stealth-btn, .profil-btn { padding: 6px 8px; font-size: 10px; }
+            #stealth-yazi { display: none; } /* RGB yazısını gizle, ikon kalsın */
             
-            .stealth-btn, .profil-btn { flex-shrink: 0; padding: 6px 10px; font-size: 11px; }
-            
-            .cuzdan-kapsulu { border-radius: 20px; flex-shrink: 0; }
-            .cuzdan-kapsulu form { display: flex; flex-wrap: nowrap; margin: 0; }
-            .cuzdan-kapsulu input[name="oda_kodu"] { width: 80px !important; font-size: 12px !important; padding: 6px 10px !important; }
-            .cuzdan-kapsulu button[type="submit"] { padding: 6px 12px !important; font-size: 11px !important; }
+            .cuzdan-kapsulu { flex: 1 1 100%; border-radius: 20px; order: 3; margin-top: 4px; }
+            .cuzdan-kapsulu form { display: flex; width: 100%; }
+            .cuzdan-kapsulu input[name="oda_kodu"] { flex: 1; font-size: 12px !important; padding: 8px 15px !important; }
+            .cuzdan-kapsulu button[type="submit"] { padding: 8px 15px !important; font-size: 11px !important; flex-shrink: 0; }
 
-            /* USER BAR (YATAY KAYDIRMA) */
+            .arama-kiti { flex: 1 1 100%; order: 4; margin-top: 4px; }
+            .arama-kiti input { padding: 10px 15px; font-size: 12px; }
+
+            /* USER BAR (2x2 IZGARA) */
             .user-bar { 
-                padding: 10px 12px; top: auto; position: relative; 
-                display: flex; flex-wrap: nowrap; overflow-x: auto; 
-                justify-content: flex-start; gap: 8px; -webkit-overflow-scrolling: touch;
+                padding: 10px; top: auto; position: relative; 
+                display: flex; flex-wrap: wrap; 
+                justify-content: space-between; gap: 6px; 
             }
-            .user-bar::-webkit-scrollbar { display: none; }
-            .ub-pill { flex-shrink: 0; padding: 6px 12px; font-size: 11px; }
+            .ub-pill { 
+                flex: 1 1 calc(50% - 6px); padding: 8px 5px; 
+                font-size: 10px; text-align: center; justify-content: center; 
+            }
 
             /* COUNTDOWN */
             .dashboard-countdown { padding: 20px 15px; }
