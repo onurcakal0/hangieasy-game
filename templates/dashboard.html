@@ -452,6 +452,34 @@
             <span class="sidebar-kapat" onclick="sidebarKapat()">✖</span>
         </div>
         
+        {% if session.kullanici_adi %}
+        <div class="sidebar-bolum">
+            <div class="sidebar-bolum-baslik">👤 Kullanıcı Paneli</div>
+            <div class="sidebar-link" style="color: #f39c12; font-weight: bold; font-size: 14px;">🪙 {{ bakiye }} HE-Coin</div>
+            {% if kullanici and kullanici.boss_bileti_alindi %}
+            <div class="sidebar-link" style="color: #ff5588; font-weight: bold; background: rgba(255,85,136,0.1);">🎫 Boss Bileti Aktif</div>
+            {% endif %}
+            <a href="/boss-arenasi" class="sidebar-link" style="color: #ff4444; font-weight: bold;">👹 Boss Arenası</a>
+            <a href="/test-olustur" class="sidebar-link" style="color: #00b09b; font-weight: bold;">＋ {{ t.yeni_test }}</a>
+            
+            <div style="margin-top: 15px; padding: 10px; background: rgba(0,242,254,0.05); border: 1px solid rgba(0,242,254,0.3); border-radius: 12px;">
+                <div style="font-size: 11px; color: #00f2fe; margin-bottom: 8px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">Özel Odaya Katıl</div>
+                <form action="/odaya-katil" method="POST" style="display: flex; gap: 5px;">
+                    <input type="text" name="oda_kodu" placeholder="Oda Kodu" style="flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px 10px; border-radius: 6px; outline: none; font-size: 13px;" required autocomplete="off">
+                    <button type="submit" style="background: linear-gradient(45deg, #00f2fe, #4facfe); border: none; padding: 8px 12px; border-radius: 6px; color: #000; font-weight: 900; cursor: pointer; font-size: 12px;">KATIL</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="sidebar-bolum">
+            <div class="sidebar-bolum-baslik">🎮 Özel Odaya Katıl</div>
+            <form action="/odaya-katil" method="POST" style="display: flex; gap: 5px; padding: 0 10px;">
+                <input type="text" name="oda_kodu" placeholder="Oda Kodu" style="flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px 10px; border-radius: 6px; outline: none; font-size: 13px;" required autocomplete="off">
+                <button type="submit" style="background: linear-gradient(45deg, #00f2fe, #4facfe); border: none; padding: 8px 12px; border-radius: 6px; color: #000; font-weight: 900; cursor: pointer; font-size: 12px;">KATIL</button>
+            </form>
+        </div>
+        {% endif %}
+        
         <div class="sidebar-bolum">
             <div class="sidebar-bolum-baslik">📂 Katolog & Filtreler</div>
             <div class="sidebar-link aktif-kat" onclick="kategoriFiltrele('Hepsi', this)">🌍 Tüm Tesis (Hepsi)</div>
@@ -512,12 +540,6 @@
             <button id="stealth-salteri" class="stealth-btn" onclick="stealthModunuTetikle()">
                 <span id="stealth-ikon">🏎️</span> <span id="stealth-yazi">RGB</span>
             </button>
-            <div class="cuzdan-kapsulu" style="border-color: #00f2fe; overflow: hidden; padding: 0;">
-                <form action="/odaya-katil" method="POST" style="display: flex; align-items: center; margin: 0;">
-                    <input type="text" name="oda_kodu" placeholder="Oda Kodu" style="background: transparent; border: none; color: white; padding: 8px 12px; width: 90px; outline: none; font-size: 12px; font-weight: 600;" required autocomplete="off">
-                    <button type="submit" style="background: linear-gradient(45deg, #00f2fe, #4facfe); border: none; padding: 9px 15px; color: #000; font-weight: 900; cursor: pointer; font-size: 11px; text-transform: uppercase;">KATIL⚡</button>
-                </form>
-            </div>
             {% if 'kullanici_adi' in session %}
                 <a href="/profil" class="profil-btn btn-sari">{{ t.studyo }}</a>
                 <a href="/cikis" class="profil-btn btn-kirmizi">{{ t.cikis }}</a>
@@ -527,18 +549,6 @@
             {% endif %}
         </div>
     </nav>
-
-    <!-- USER SUB-BAR -->
-    {% if session.kullanici_adi %}
-    <div class="user-bar">
-        <span class="ub-pill ub-coin">🪙 {{ bakiye }} HE-Coin</span>
-        {% if kullanici and kullanici.boss_bileti_alindi %}
-        <span class="ub-pill ub-ticket">🎫 Boss Bileti</span>
-        {% endif %}
-        <a href="/boss-arenasi" class="ub-pill ub-boss">👹 BOSS</a>
-        <a href="/test-olustur" class="ub-pill" style="border-color:rgba(0,176,155,0.3);color:#00b09b;">＋ {{ t.yeni_test }}</a>
-    </div>
-    {% endif %}
 
     <!-- 🟢 KOMPLİKE FUTBOL DUYURUSU -->
     <div class="komplike-banner">
