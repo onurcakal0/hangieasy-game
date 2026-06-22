@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hangieasy | Sisteme Giriş</title>
+    <title>Hangieasy | Şifremi Unuttum</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* Senin Efsanevi CSS Kodların Birebir Aynı */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background-color: #0b0c10; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; position: relative; padding: 40px 20px; }
         body::before, body::after { content: ''; position: fixed; width: 50vw; height: 50vw; border-radius: 50%; filter: blur(120px); z-index: -1; animation: orbFloat 12s infinite alternate ease-in-out; }
@@ -16,41 +15,41 @@
         .form-kutusu { background: rgba(20, 20, 30, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); padding: 50px 40px; border-radius: 20px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 20px rgba(0, 176, 155, 0.1); position: relative; z-index: 1; }
         .logo { font-size: 36px; font-weight: 800; background: linear-gradient(90deg, #00b09b, #96c93d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; display: inline-block; letter-spacing: 1px; }
         .form-kutusu p { color: #888; font-size: 14px; margin-bottom: 30px; letter-spacing: 0.5px;}
-        input[type="text"], input[type="password"] { width: 100%; padding: 15px 20px; margin-bottom: 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); background-color: rgba(0, 0, 0, 0.4); color: white; outline: none; font-size: 14px; transition: all 0.3s ease; }
+        input[type="email"] { width: 100%; padding: 15px 20px; margin-bottom: 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); background-color: rgba(0, 0, 0, 0.4); color: white; outline: none; font-size: 14px; transition: all 0.3s ease; }
         input:focus { border-color: #00b09b; box-shadow: 0 0 15px rgba(0, 176, 155, 0.3); background-color: rgba(0, 0, 0, 0.6);}
         button { width: 100%; padding: 16px; background: linear-gradient(45deg, #00b09b, #96c93d); color: #fff; border: none; border-radius: 12px; font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease; margin-top: 10px; }
         button:hover { box-shadow: 0 8px 25px rgba(0, 176, 155, 0.5); transform: translateY(-2px);}
         .alt-linkler { margin-top: 25px; display: flex; flex-direction: column; gap: 12px; }
         .alt-linkler a { color: #aaa; text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.3s; }
         .alt-linkler a:hover { color: #fff; }
-        /* Hata Mesajı Tasarımı */
         .hata-mesaji { background: rgba(255, 75, 75, 0.1); border: 1px dashed #ff4b4b; color: #ff4b4b; padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; font-weight: 600; }
+        .basari-mesaji { background: rgba(0, 255, 0, 0.1); border: 1px dashed #00ff00; color: #00ff00; padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; font-weight: 600; }
     </style>
 </head>
 <body>
     <div class="form-kutusu">
         <div class="logo">HangiEasy</div>
-        <p>Sisteme Giriş Yap ve Oynamaya Başla</p>
+        <p>Şifreni mi unuttun? E-posta adresini gir, sıfırlama linki gönderelim.</p>
         
-        <!-- Flask flash mesajları için -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="hata-mesaji">⚠️ {{ message }}</div>
+                    {% if category == 'error' %}
+                        <div class="hata-mesaji">⚠️ {{ message }}</div>
+                    {% else %}
+                        <div class="basari-mesaji">✅ {{ message }}</div>
+                    {% endif %}
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
         <form method="POST">
-            <input type="text" name="kullanici_adi" placeholder="Kullanıcı Adı" required>
-            <input type="password" name="sifre" placeholder="Şifre" required>
-            <button type="submit">GİRİŞ YAP ➔</button>
+            <input type="email" name="eposta" placeholder="Kayıtlı E-posta Adresin" required>
+            <button type="submit">Sıfırlama Linki Gönder ➔</button>
         </form>
         
         <div class="alt-linkler">
-            <a href="/sifremi-unuttum">Şifremi Unuttum?</a>
-            <a href="/kayit">Hesabın yok mu? Yeni VIP Kayıt Oluştur</a>
-            <a href="/">← Ana Sayfaya Dön</a>
+            <a href="/giris">← Giriş Sayfasına Dön</a>
         </div>
     </div>
 </body>

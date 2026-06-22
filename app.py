@@ -1090,6 +1090,77 @@ def cikis():
     session.clear()
     return redirect(url_for('dashboard'))
 
+@app.route('/sifremi-unuttum', methods=['GET', 'POST'])
+def sifremi_unuttum():
+    if request.method == 'POST':
+        eposta = request.form.get('eposta')
+        kullanici = Kullanici.query.filter_by(eposta=eposta).first()
+        
+        if kullanici:
+            token = s.dumps(eposta, salt='sifre-sifirlama')
+            site_url = os.getenv('SITE_URL', 'https://hangieasy.com').rstrip('/')
+            sifirlama_linki = f"{site_url}/sifreyi-yenile/{token}"
+            
+            msg = Message('HangiEasy — Şifre Sıfırlama ⚡', recipients=[eposta])
+            msg.html = f"""
+            <div style="background-color:#0b0c10; color:white; padding:30px; font-family:sans-serif; border-radius:10px; text-align:center;">
+                <h1 style="color:#f39c12;">Şifre Sıfırlama ⚡</h1>
+                <p style="color:#aaa;">Merhaba {kullanici.kullanici_adi}! Şifreni sıfırlamak için aşağıdaki butona tıkla:</p>
+                <a href="{sifirlama_linki}" style="display:inline-block; padding:15px 30px; background-color:#f39c12; color:#000; text-decoration:none; font-weight:bold; border-radius:10px; margin-top:20px;">ŞİFREMİ YENİLE ⚡</a>
+                <p style="color:#666; font-size:12px; margin-top:30px;">Bu link 1 saat geçerlidir.</p>
+                <p style="color:#666; font-size:12px;">Eğer bu isteği sen yapmadıysan, bu mesajı görmezden gelebilirsin.</p>
+            </div>
+            """
+            
+            def mail_bg(flask_app, mesaj):
+                with flask_app.app_context():
+                    try:
+                        mail.send(mesaj)
+                        print(f"✅ Şifre sıfırlama maili gönderildi: {eposta}")
+                    except Exception as ex:
+                        print(f"❌ Mail hatası: {ex}")
+
+            threading.Thread(target=mail_bg, args=(app, msg), daemon=True).start()
+            
+        flash("Eğer bu e-posta adresi sistemimizde kayıtlıysa, şifre sıfırlama bağlantısı gönderdik.", "success")
+        return redirect(url_for('sifremi_unuttum'))
+        
+    return render_template('sifremi_unuttum.html')
+
+@app.route('/sifreyi-yenile/<token>', methods=['GET', 'POST'])
+def sifreyi_yenile(token):
+    try:
+        eposta = s.loads(token, salt='sifre-sifirlama', max_age=3600)
+    except SignatureExpired:
+        flash("Şifre sıfırlama linkinin süresi dolmuş. Lütfen tekrar istek gönderin.", "error")
+        return redirect(url_for('sifremi_unuttum'))
+    except Exception:
+        flash("Geçersiz şifre sıfırlama linki.", "error")
+        return redirect(url_for('sifremi_unuttum'))
+        
+    if request.method == 'POST':
+        sifre = request.form.get('sifre')
+        sifre_tekrar = request.form.get('sifre_tekrar')
+        
+        if sifre != sifre_tekrar:
+            flash("Şifreler eşleşmiyor!", "error")
+            return redirect(url_for('sifreyi_yenile', token=token))
+            
+        kullanici = Kullanici.query.filter_by(eposta=eposta).first()
+        if not kullanici:
+            flash("Kullanıcı bulunamadı.", "error")
+            return redirect(url_for('giris'))
+            
+        hashed_sifre = generate_password_hash(sifre, method='pbkdf2:sha256')
+        kullanici.sifre_hash = hashed_sifre
+        db.session.commit()
+        
+        flash("Şifreniz başarıyla güncellendi. Şimdi giriş yapabilirsiniz.", "success")
+        return redirect(url_for('giris'))
+        
+    return render_template('sifreyi_yenile.html')
+
+
 @app.route('/yeniden-dogrula')
 def yeniden_dogrula():
     """Onaylı değil hesap için doğrulama mailini tekrar gönder."""
