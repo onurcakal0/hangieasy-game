@@ -1026,17 +1026,11 @@ def kayit():
         </div>
         """
 
-        def mail_gonder_bg(flask_app, mesaj):
-            """Mail'i arka planda gönder — isteği bloke etme."""
-            with flask_app.app_context():
-                try:
-                    mail.send(mesaj)
-                    print(f"✅ Doğrulama maili gönderildi: {eposta}")
-                except Exception as ex:
-                    print(f"❌ Mail gönderilemedi ({eposta}): {ex}")
-
-        t = threading.Thread(target=mail_gonder_bg, args=(app, msg), daemon=True)
-        t.start()
+        try:
+            mail.send(msg)
+            print(f"✅ Doğrulama maili gönderildi: {eposta}")
+        except Exception as ex:
+            print(f"❌ Mail gönderilemedi ({eposta}): {ex}")
 
         # Kullanıcıyı BEKLETMEDEN anında başarı sayfasına gönder
         return render_template('kayit_basarili.html',
@@ -1112,15 +1106,11 @@ def sifremi_unuttum():
             </div>
             """
             
-            def mail_bg(flask_app, mesaj):
-                with flask_app.app_context():
-                    try:
-                        mail.send(mesaj)
-                        print(f"✅ Şifre sıfırlama maili gönderildi: {eposta}")
-                    except Exception as ex:
-                        print(f"❌ Mail hatası: {ex}")
-
-            threading.Thread(target=mail_bg, args=(app, msg), daemon=True).start()
+            try:
+                mail.send(msg)
+                print(f"✅ Şifre sıfırlama maili gönderildi: {eposta}")
+            except Exception as ex:
+                print(f"❌ Mail hatası: {ex}")
             
         flash("Eğer bu e-posta adresi sistemimizde kayıtlıysa, şifre sıfırlama bağlantısı gönderdik.", "success")
         return redirect(url_for('sifremi_unuttum'))
@@ -1191,15 +1181,11 @@ def yeniden_dogrula():
     </div>
     """
 
-    def mail_bg(flask_app, mesaj):
-        with flask_app.app_context():
-            try:
-                mail.send(mesaj)
-                print(f"✅ Yeniden doğrulama maili gönderildi: {kullanici.eposta}")
-            except Exception as ex:
-                print(f"❌ Mail hatası: {ex}")
-
-    threading.Thread(target=mail_bg, args=(app, msg), daemon=True).start()
+    try:
+        mail.send(msg)
+        print(f"✅ Yeniden doğrulama maili gönderildi: {kullanici.eposta}")
+    except Exception as ex:
+        print(f"❌ Mail hatası: {ex}")
     return render_template('kayit_basarili.html',
                            mail_gonderildi=True,
                            eposta=kullanici.eposta,
