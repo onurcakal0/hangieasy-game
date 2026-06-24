@@ -11,9 +11,8 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for, s
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, emit, join_room
 from flask_cors import CORS
-import urllib.request
+import requests
 import json
-import urllib.error
 
 # --- GÜVENLİK VE ARAÇLAR ---
 from werkzeug.utils import secure_filename
@@ -56,15 +55,15 @@ def send_email_via_resend(to_email, subject, html_content):
         "html": html_content
     }
     
-    req = urllib.request.Request(url, data=json.dumps(data).encode("utf-8"), headers=headers, method="POST")
     try:
-        with urllib.request.urlopen(req, timeout=10) as response:
-            print(f"✅ Resend API ile e-posta gönderildi: {to_email}")
-            return True, "E-posta başarıyla gönderildi."
-    except urllib.error.URLError as e:
+        response = requests.post(url, headers=headers, json=data, timeout=10)
+        response.raise_for_status()
+        print(f"✅ Resend API ile e-posta gönderildi: {to_email}")
+        return True, "E-posta başarıyla gönderildi."
+    except requests.exceptions.RequestException as e:
         error_detail = ""
-        if hasattr(e, 'read'):
-            error_detail = e.read().decode('utf-8')
+        if hasattr(e, 'response') and e.response is not None:
+            error_detail = e.response.text
         print(f"❌ Resend API Hatası: {e} - {error_detail}")
         return False, f"Resend API Hatası: {error_detail}"
 # --- 💾 YEREL VERİTABANI (SQLITE) VE KLASÖR AYARLARI ---
