@@ -52,7 +52,7 @@ def send_email_via_resend(to_email, subject, html_content):
         "Content-Type": "application/json"
     }
     data = {
-        "from": "HangiEasy <onboarding@resend.dev>",
+        "from": "HangiEasy <noreply@hangieasy.com>",
         "to": [to_email],
         "subject": subject,
         "html": html_content
