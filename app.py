@@ -326,12 +326,12 @@ def baska_profil(kullanici_adi):
     
     kullanicinin_oyunlari = Oyun.query.filter_by(olusturan_id=hedef_kullanici.id).all()
     aktif_test_sayisi = len(kullanicinin_oyunlari)
-    global_etkilesim = sum(getattr(oyun, 'oynanma_sayisi', 0) for oyun in kullanicinin_oyunlari)
+    global_etkilesim = sum((getattr(oyun, 'oynanma_sayisi', 0) or 0) for oyun in kullanicinin_oyunlari)
     
     try:
         taclanan_sampiyon = Skor.query.join(Oyun).filter(Oyun.olusturan_id == hedef_kullanici.id).count()
     except Exception:
-        taclanan_sampiyon = sum(getattr(oyun, 'bitirilme_sayisi', 0) for oyun in kullanicinin_oyunlari)
+        taclanan_sampiyon = sum((getattr(oyun, 'bitirilme_sayisi', 0) or 0) for oyun in kullanicinin_oyunlari)
         
     aktif_kullanici = None
     takip_ediyor_mu = False
