@@ -603,16 +603,9 @@ def kapisma_oy_gonder(data):
 
 # --- DIŞARIDAN GELENLER İÇİN YENİ ANA SAYFA ---
 # --- 🌍 HANGIEASY ANA SAYFA (LANSMAN BİTTİ, SİSTEM CANLI!) ---
-# --- 🌍 HANGIEASY ANA SAYFA (LANSMAN BİTTİ, SİSTEM CANLI!) ---
 # ANA SAYFA MOTORU
-# --- 🌍 DIŞARIDAN GELENLER İÇİN (GERİ SAYIM VİTRİNİ) ---
+# --- 🌍 DIŞARIDAN GELENLER İÇİN ANA SAYFA ---
 @app.route('/')
-def coming_soon():
-    # Toplam test sayısını da geçir
-    toplam_test = Oyun.query.count()
-    return render_template('countdown.html', toplam_test=toplam_test)
-
-# --- 🕵️‍♂️ PATRON VE TEST EKİBİ İÇİN GİZLİ KAPI (ASIL SİSTEM) ---
 @app.route('/dashboard')
 def dashboard():
     # Tüm testleri oynanma sayısına göre sırala (en popüler üstte)
