@@ -646,6 +646,12 @@ def dashboard():
     
     return render_template('dashboard.html', oyunlar=oyunlar, kullanici=kullanici)
 
+@app.route('/world-cup-2026')
+def world_cup_2026():
+    # Sadece World Cup 2026 kategorisindeki veya başlığındaki oyunları filtrele
+    oyunlar = Oyun.query.filter(Oyun.kategori == 'World Cup 2026').all()
+    return render_template('world_cup_2026.html', oyunlar=oyunlar)
+
 @app.route('/gizli-test-odasi')
 def gizli_oda():
     return redirect(url_for('dashboard'))

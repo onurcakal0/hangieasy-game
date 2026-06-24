@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HangiEasy & Komplike Futbol | World Cup 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: #0b0c10; color: #ffffff; 
+            overflow-x: hidden; position: relative; min-height: 100vh;
+        }
+        
+        /* 🌌 IŞILTILI ARKA PLAN — WORLD CUP TEMASI (ALTIN/YEŞİL) */
+        .orb-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(120px); animation: orbFloat 15s infinite alternate ease-in-out; }
+        .orb-1 { width: 55vw; height: 55vw; background: rgba(212, 175, 55, 0.15); top: -12%; left: -12%; } /* Altın */
+        .orb-2 { width: 50vw; height: 50vw; background: rgba(0, 100, 0, 0.15); bottom: -12%; right: -12%; animation-delay: -6s; animation-direction: alternate-reverse; } /* Koyu Yeşil */
+        
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 90px) scale(1.18); }
+        }
+
+        /* ---------------- NAVBAR ---------------- */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 4%; background: rgba(15, 15, 20, 0.8);
+            backdrop-filter: blur(15px); border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            position: sticky; top: 0; z-index: 100; gap: 15px; flex-wrap: wrap;
+        }
+        .sol-grup { display: flex; align-items: center; gap: 15px; }
+        .logo { 
+            font-size: 26px; font-weight: 800; 
+            background: linear-gradient(90deg, #d4af37, #f1c40f); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none; letter-spacing: 1px;
+        }
+        .geridon-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; font-size: 14px; cursor: pointer; padding: 8px 15px;
+            border-radius: 10px; text-decoration: none; font-weight: bold; transition: 0.3s;
+        }
+        .geridon-btn:hover { background: #d4af37; color: #000; border-color: #d4af37; }
+
+        /* ---------------- HERO BÖLÜMÜ ---------------- */
+        .hero {
+            position: relative; width: 100%; height: 50vh; min-height: 400px;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            background: url('https://images.unsplash.com/photo-1518605368461-1e1e3bce7fb9?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
+            border-bottom: 2px solid #d4af37;
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(to bottom, rgba(11,12,16,0.3), #0b0c10);
+        }
+        .hero-icerik {
+            position: relative; z-index: 2; padding: 20px;
+        }
+        .hero-baslik {
+            font-size: 60px; font-weight: 900; text-transform: uppercase;
+            background: linear-gradient(to right, #d4af37, #fff, #d4af37);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 10px; letter-spacing: 2px; text-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+        .hero-aciklama {
+            font-size: 18px; color: #ccc; max-width: 600px; margin: 0 auto; line-height: 1.6;
+        }
+
+        /* ---------------- İÇERİK ---------------- */
+        .icerik { position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
+        .vitrin-basligi { 
+            font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 30px; 
+            border-left: 5px solid #d4af37; padding-left: 15px; 
+        }
+
+        .oyun-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;
+        }
+        .oyun-karti {
+            background: rgba(20, 20, 25, 0.6); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 15px; overflow: hidden;
+            transition: all 0.3s ease; position: relative; cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .oyun-karti:hover {
+            transform: translateY(-10px); border-color: rgba(212, 175, 55, 0.4);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.2);
+        }
+        .oyun-img-kutu { width: 100%; height: 180px; overflow: hidden; position: relative; }
+        .oyun-img-kutu img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .oyun-karti:hover .oyun-img-kutu img { transform: scale(1.1); }
+        .oyun-detay { padding: 20px; }
+        .oyun-baslik { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+        .oyun-aciklama { font-size: 13px; color: #888; line-height: 1.5; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .oyna-btn {
+            width: 100%; padding: 12px; background: linear-gradient(45deg, #d4af37, #f1c40f);
+            color: #000; border: none; border-radius: 8px; font-weight: 800; font-size: 14px;
+            cursor: pointer; text-transform: uppercase; transition: 0.3s;
+        }
+        .oyna-btn:hover { box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+        
+        .bos-durum {
+            text-align: center; padding: 50px; background: rgba(255,255,255,0.02);
+            border-radius: 20px; border: 1px dashed rgba(255,255,255,0.1); margin-top: 20px; grid-column: 1 / -1;
+        }
+        .bos-durum h3 { color: #d4af37; margin-bottom: 10px; }
+        .bos-durum p { color: #888; }
+    </style>
+</head>
+<body>
+    <div class="orb-wrap">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="sol-grup">
+            <a href="/" class="geridon-btn">← Tesis'e Dön</a>
+            <a href="/world-cup-2026" class="logo">WC 2026</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-icerik">
+            <h1 class="hero-baslik">WORLD CUP 2026</h1>
+            <p class="hero-aciklama">HangiEasy ve Komplike Futbol işbirliğiyle hazırlanan, zekanı test edecek özel Dünya Kupası etkinlik alanına hoş geldin.</p>
+        </div>
+    </div>
+
+    <div class="icerik">
+        <h2 class="vitrin-basligi">🏆 Turnuva Özel Testleri</h2>
+        
+        <div class="oyun-grid">
+            {% if oyunlar and oyunlar|length > 0 %}
+                {% for oyun in oyunlar %}
+                <div class="oyun-karti" onclick="window.location.href='{{ url_for('oyun_sayfasi', oyun_id=oyun.id) }}'">
+                    <div class="oyun-img-kutu">
+                        <img src="{{ oyun.resim_url }}" alt="Oyun Kapak">
+                    </div>
+                    <div class="oyun-detay">
+                        <h3 class="oyun-baslik">{{ oyun.baslik }}</h3>
+                        <p class="oyun-aciklama">{{ oyun.aciklama }}</p>
+                        <button class="oyna-btn">Hemen Oyna</button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="bos-durum">
+                    <h3>🏆 Turnuva Testleri Yakında Geliyor!</h3>
+                    <p>Komplike Futbol ile hazırladığımız özel Dünya Kupası testleri çok yakında bu alanda erişime açılacak.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+</html>
