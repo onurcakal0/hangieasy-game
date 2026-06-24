@@ -42,7 +42,7 @@ def send_email_via_resend(to_email, subject, html_content):
     api_key = os.getenv('RESEND_API_KEY')
     if not api_key:
         print("❌ RESEND_API_KEY bulunamadı! Lütfen Vercel veya .env'ye ekleyin.")
-        return False
+        return False, "Sistemde API anahtarı eksik."
         
     url = "https://api.resend.com/emails"
     headers = {
@@ -60,12 +60,13 @@ def send_email_via_resend(to_email, subject, html_content):
     try:
         with urllib.request.urlopen(req, timeout=10) as response:
             print(f"✅ Resend API ile e-posta gönderildi: {to_email}")
-            return True
+            return True, "E-posta başarıyla gönderildi."
     except urllib.error.URLError as e:
-        print(f"❌ Resend API Hatası: {e}")
+        error_detail = ""
         if hasattr(e, 'read'):
-            print(f"Detay: {e.read().decode('utf-8')}")
-        return False
+            error_detail = e.read().decode('utf-8')
+        print(f"❌ Resend API Hatası: {e} - {error_detail}")
+        return False, f"Resend API Hatası: {error_detail}"
 # --- 💾 YEREL VERİTABANI (SQLITE) VE KLASÖR AYARLARI ---
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -1039,7 +1040,9 @@ def kayit():
         </div>
         """
 
-        send_email_via_resend(eposta, 'HangiEasy Krallığına Hoş Geldin! 👑', html_content)
+        success, err_msg = send_email_via_resend(eposta, 'HangiEasy Krallığına Hoş Geldin! 👑', html_content)
+        if not success:
+            flash(f"E-posta gönderilemedi! Hata: {err_msg}", "error")
 
         session['onay_bekleyen_eposta'] = eposta
         return redirect(url_for('dogrula'))
@@ -1119,7 +1122,9 @@ def sifremi_unuttum():
             </div>
             """
             
-            send_email_via_resend(eposta, 'HangiEasy — Şifre Sıfırlama ⚡', html_content)
+            success, err_msg = send_email_via_resend(eposta, 'HangiEasy — Şifre Sıfırlama ⚡', html_content)
+            if not success:
+                flash(f"E-posta gönderilemedi! Hata: {err_msg}", "error")
             
         flash("Eğer bu e-posta adresi sistemimizde kayıtlıysa, şifre sıfırlama bağlantısı gönderdik.", "success")
         return redirect(url_for('sifremi_unuttum'))
@@ -1193,10 +1198,12 @@ def yeniden_dogrula():
     </div>
     """
 
-    send_email_via_resend(kullanici.eposta, 'HangiEasy — Yeni Onay Kodun ⚡', html_content)
-        
-    session['onay_bekleyen_eposta'] = kullanici.eposta
-    flash("Yeni kod e-posta adresinize gönderildi.", "success")
+    success, err_msg = send_email_via_resend(kullanici.eposta, 'HangiEasy — Yeni Onay Kodun ⚡', html_content)
+    if not success:
+        flash(f"E-posta gönderilemedi! Hata: {err_msg}", "error")
+    else:
+        session['onay_bekleyen_eposta'] = kullanici.eposta
+        flash("Yeni kod e-posta adresinize gönderildi.", "success")
     return redirect(url_for('dogrula'))
 
 @app.route('/god-mode')
