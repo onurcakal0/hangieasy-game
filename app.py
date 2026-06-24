@@ -9,9 +9,11 @@ from datetime import date
 # --- FLASK VE EKLENTİLER ---
 from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_mail import Mail, Message
 from flask_socketio import SocketIO, emit, join_room
 from flask_cors import CORS
+import urllib.request
+import json
+import urllib.error
 
 # --- GÜVENLİK VE ARAÇLAR ---
 from werkzeug.utils import secure_filename
@@ -35,17 +37,35 @@ app = Flask(__name__)
 # İki farklı secret key vardı, onları kasadan çekip tek bir mühürde birleştirdik.
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.secret_key = app.config['SECRET_KEY']
-# --- 📧 HANGIEASY POSTACI (MAIL) AYARLARI ---
-import socket
-socket.setdefaulttimeout(8)  # Vercel'in kilitlenmesini önlemek için 8 saniye timeout
-
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587             
-app.config['MAIL_USE_TLS'] = True        
-app.config['MAIL_USE_SSL'] = False         
-app.config['MAIL_USERNAME'] = 'hangieasy@gmail.com'
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = ('HangiEasy Merkez', 'hangieasy@gmail.com')
+# --- 📧 HANGIEASY POSTACI (RESEND API) ---
+def send_email_via_resend(to_email, subject, html_content):
+    api_key = os.getenv('RESEND_API_KEY')
+    if not api_key:
+        print("❌ RESEND_API_KEY bulunamadı! Lütfen Vercel veya .env'ye ekleyin.")
+        return False
+        
+    url = "https://api.resend.com/emails"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "from": "HangiEasy <onboarding@resend.dev>",
+        "to": [to_email],
+        "subject": subject,
+        "html": html_content
+    }
+    
+    req = urllib.request.Request(url, data=json.dumps(data).encode("utf-8"), headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=10) as response:
+            print(f"✅ Resend API ile e-posta gönderildi: {to_email}")
+            return True
+    except urllib.error.URLError as e:
+        print(f"❌ Resend API Hatası: {e}")
+        if hasattr(e, 'read'):
+            print(f"Detay: {e.read().decode('utf-8')}")
+        return False
 # --- 💾 YEREL VERİTABANI (SQLITE) VE KLASÖR AYARLARI ---
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -55,7 +75,7 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # 🚀 3. EKLENTİLERİ MOTORA BAĞLA
 
-mail = Mail(app)
+# Mail config removed
 CORS(app)
 s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -1008,8 +1028,7 @@ def kayit():
         db.session.add(yeni_kullanici)
         db.session.commit()
         
-        msg = Message('HangiEasy Krallığına Hoş Geldin! 👑', recipients=[eposta])
-        msg.html = f"""
+        html_content = f"""
         <div style="background-color:#0b0c10; color:white; padding:30px; font-family:sans-serif; border-radius:10px; text-align:center;">
             <h1 style="color:#00b09b;">Aramıza Hoş Geldin {kullanici_adi}!</h1>
             <p style="color:#aaa; font-size:16px;">Hesabını onaylamak ve <strong style="color:#f39c12;">100 HE-Coin</strong> kazanmak için gereken kodun aşağıda!</p>
@@ -1020,11 +1039,7 @@ def kayit():
         </div>
         """
 
-        try:
-            mail.send(msg)
-            print(f"✅ Doğrulama kodu maili gönderildi: {eposta}")
-        except Exception as ex:
-            print(f"❌ Mail gönderilemedi ({eposta}): {ex}")
+        send_email_via_resend(eposta, 'HangiEasy Krallığına Hoş Geldin! 👑', html_content)
 
         session['onay_bekleyen_eposta'] = eposta
         return redirect(url_for('dogrula'))
@@ -1094,8 +1109,7 @@ def sifremi_unuttum():
             site_url = os.getenv('SITE_URL', 'https://hangieasy.com').rstrip('/')
             sifirlama_linki = f"{site_url}/sifreyi-yenile/{token}"
             
-            msg = Message('HangiEasy — Şifre Sıfırlama ⚡', recipients=[eposta])
-            msg.html = f"""
+            html_content = f"""
             <div style="background-color:#0b0c10; color:white; padding:30px; font-family:sans-serif; border-radius:10px; text-align:center;">
                 <h1 style="color:#f39c12;">Şifre Sıfırlama ⚡</h1>
                 <p style="color:#aaa;">Merhaba {kullanici.kullanici_adi}! Şifreni sıfırlamak için aşağıdaki butona tıkla:</p>
@@ -1105,11 +1119,7 @@ def sifremi_unuttum():
             </div>
             """
             
-            try:
-                mail.send(msg)
-                print(f"✅ Şifre sıfırlama maili gönderildi: {eposta}")
-            except Exception as ex:
-                print(f"❌ Mail hatası: {ex}")
+            send_email_via_resend(eposta, 'HangiEasy — Şifre Sıfırlama ⚡', html_content)
             
         flash("Eğer bu e-posta adresi sistemimizde kayıtlıysa, şifre sıfırlama bağlantısı gönderdik.", "success")
         return redirect(url_for('sifremi_unuttum'))
@@ -1172,8 +1182,7 @@ def yeniden_dogrula():
     kullanici.onay_kodu = rastgele_kod
     db.session.commit()
 
-    msg = Message('HangiEasy — Yeni Onay Kodun ⚡', recipients=[kullanici.eposta])
-    msg.html = f"""
+    html_content = f"""
     <div style="background-color:#0b0c10; color:white; padding:30px; font-family:sans-serif; border-radius:10px; text-align:center;">
         <h1 style="color:#f39c12;">E-posta Doğrulama ⚡</h1>
         <p style="color:#aaa;">Merhaba {kullanici.kullanici_adi}! Hesabını aktifleştirmek için yeni kodun aşağıda:</p>
@@ -1184,11 +1193,7 @@ def yeniden_dogrula():
     </div>
     """
 
-    try:
-        mail.send(msg)
-        print(f"✅ Yeniden doğrulama maili gönderildi: {kullanici.eposta}")
-    except Exception as ex:
-        print(f"❌ Mail hatası: {ex}")
+    send_email_via_resend(kullanici.eposta, 'HangiEasy — Yeni Onay Kodun ⚡', html_content)
         
     session['onay_bekleyen_eposta'] = kullanici.eposta
     flash("Yeni kod e-posta adresinize gönderildi.", "success")
