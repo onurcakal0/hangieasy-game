@@ -551,9 +551,11 @@
     <!-- WORLD CUP 2026 ÖZEL BANNER -->
     <div class="wc-banner-container" onclick="window.location.href='/world-cup-2026'">
         <div class="wc-banner-bg"></div>
+        <img src="{{ url_for('static', filename='img/trophy.png') }}" class="wc-trophy-left" alt="Trophy">
+        <img src="{{ url_for('static', filename='img/trophy.png') }}" class="wc-trophy-right" alt="Trophy">
         <div class="wc-banner-content">
             <div class="wc-badge">HangiEasy & Komplike Futbol Sunar</div>
-            <h1 class="wc-title">WORLD CUP 2026</h1>
+            <h1 class="wc-title"><img src="{{ url_for('static', filename='img/trophy.png') }}" class="wc-trophy-inline" alt="Trophy"> WORLD CUP 2026 <img src="{{ url_for('static', filename='img/trophy.png') }}" class="wc-trophy-inline" alt="Trophy"></h1>
             <p class="wc-desc">Turnuvaya özel hazırlanan zorlu testler alanına giriş yap.</p>
             <button class="wc-btn">Zekanı Kanıtla ➔</button>
         </div>
@@ -605,7 +607,24 @@
         .wc-banner-container:hover .wc-btn {
             transform: scale(1.05); box-shadow: 0 8px 25px rgba(212, 175, 55, 0.6);
         }
+        
+        .wc-trophy-left, .wc-trophy-right {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            height: 160px; z-index: 3; opacity: 0.9; filter: drop-shadow(0 5px 15px rgba(212,175,55,0.4));
+            transition: 0.5s ease;
+        }
+        .wc-trophy-left { left: 40px; }
+        .wc-trophy-right { right: 40px; }
+        .wc-banner-container:hover .wc-trophy-left { transform: translateY(-50%) scale(1.1) rotate(-10deg); opacity: 1; }
+        .wc-banner-container:hover .wc-trophy-right { transform: translateY(-50%) scale(1.1) rotate(10deg); opacity: 1; }
+        
+        .wc-trophy-inline {
+            height: 45px; vertical-align: middle; margin: 0 10px;
+            filter: drop-shadow(0 2px 10px rgba(212,175,55,0.8));
+        }
+
         @media (max-width: 768px) {
+            .wc-trophy-left, .wc-trophy-right { display: none; }
             .wc-title { font-size: 30px; }
             .wc-banner-content { padding: 30px 20px; }
         }
