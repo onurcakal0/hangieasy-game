@@ -172,6 +172,13 @@ class Bildirim(db.Model):
     okundu = db.Column(db.Boolean, default=False)
     tarih = db.Column(db.DateTime, default=datetime.utcnow)
 
+class HaritaSkor(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    oyun_turu = db.Column(db.String(50), nullable=False) # 'tr_map' or 'world_map'
+    kullanici_adi = db.Column(db.String(100), nullable=False)
+    bulunan_sehir_sayisi = db.Column(db.Integer, nullable=False)
+    gecen_sure_saniye = db.Column(db.Integer, nullable=False)
+    tarih = db.Column(db.DateTime, default=datetime.utcnow)
     
 # Veritabanını kuran kodun (Burası doğru, kalsın)
 with app.app_context():
@@ -838,6 +845,37 @@ def oyun_sayfasi(oyun_id):
     db.session.commit()
     return render_template(sablonlar.get(oyun.oyun_modu, 'index.html'), aktif_oyun=oyun_id, oyun_basligi=oyun.baslik, oyun=oyun)
 @app.route('/api/sorular/<int:oyun_id>')
+@app.route('/api/harita_skor_kaydet', methods=['POST'])
+def harita_skor_kaydet():
+    data = request.json
+    try:
+        yeni_skor = HaritaSkor(
+            oyun_turu=data['oyun_turu'],
+            kullanici_adi=data['kullanici_adi'],
+            bulunan_sehir_sayisi=int(data['bulunan_sehir_sayisi']),
+            gecen_sure_saniye=int(data['gecen_sure_saniye'])
+        )
+        db.session.add(yeni_skor)
+        db.session.commit()
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 400
+
+@app.route('/api/harita_liderlik_tablosu/<oyun_turu>')
+def harita_liderlik_tablosu(oyun_turu):
+    skorlar = HaritaSkor.query.filter_by(oyun_turu=oyun_turu)\
+        .order_by(HaritaSkor.bulunan_sehir_sayisi.desc(), HaritaSkor.gecen_sure_saniye.asc())\
+        .limit(10).all()
+    
+    sonuclar = []
+    for s in skorlar:
+        sonuclar.append({
+            'kullanici_adi': s.kullanici_adi,
+            'bulunan_sehir_sayisi': s.bulunan_sehir_sayisi,
+            'gecen_sure_saniye': s.gecen_sure_saniye,
+            'tarih': s.tarih.strftime('%d.%m.%Y')
+        })
+    return jsonify(sonuclar)
 def api_sorular(oyun_id):
     sorular = Soru.query.filter_by(oyun_id=oyun_id).all()
     # 🚀 VİTRİNE GİDEN KARGO: Artık doğru cevap (casus) da paketin içinde!
