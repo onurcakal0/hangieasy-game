@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangieasy | E-posta Doğrulama</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* Senin Efsanevi CSS Kodların Birebir Aynı */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #0b0c10; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; position: relative; padding: 40px 20px; }
+        body::before, body::after { content: ''; position: fixed; width: 50vw; height: 50vw; border-radius: 50%; filter: blur(120px); z-index: -1; animation: orbFloat 12s infinite alternate ease-in-out; }
+        body::before { background: rgba(0, 176, 155, 0.15); top: -10%; left: -10%; }
+        body::after { background: rgba(0, 242, 254, 0.12); bottom: -10%; right: -10%; animation-delay: -4s; }
+        @keyframes orbFloat { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(40px, 60px) scale(1.15); } }
+        .form-kutusu { background: rgba(20, 20, 30, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); padding: 50px 40px; border-radius: 20px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 20px rgba(0, 176, 155, 0.1); position: relative; z-index: 1; }
+        .logo { font-size: 36px; font-weight: 800; background: linear-gradient(90deg, #f39c12, #ff007a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; display: inline-block; letter-spacing: 1px; }
+        .form-kutusu p { color: #888; font-size: 14px; margin-bottom: 30px; letter-spacing: 0.5px; line-height: 1.6;}
+        input[type="text"] { width: 100%; padding: 15px 20px; margin-bottom: 15px; border-radius: 12px; border: 1px dashed rgba(243, 156, 18, 0.5); background-color: rgba(0, 0, 0, 0.4); color: #f39c12; outline: none; font-size: 24px; font-weight: 900; letter-spacing: 10px; text-align: center; transition: all 0.3s ease; }
+        input:focus { border-color: #f39c12; box-shadow: 0 0 15px rgba(243, 156, 18, 0.3); background-color: rgba(0, 0, 0, 0.6);}
+        button { width: 100%; padding: 16px; background: linear-gradient(45deg, #f39c12, #ff007a); color: #fff; border: none; border-radius: 12px; font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease; margin-top: 10px; }
+        button:hover { box-shadow: 0 8px 25px rgba(243, 156, 18, 0.5); transform: translateY(-2px);}
+        .alt-linkler { margin-top: 25px; display: flex; flex-direction: column; gap: 12px; }
+        .alt-linkler a { color: #aaa; text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.3s; }
+        .alt-linkler a:hover { color: #fff; }
+        .hata-mesaji { background: rgba(255, 75, 75, 0.1); border: 1px dashed #ff4b4b; color: #ff4b4b; padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; font-weight: 600; }
+        .basari-mesaji { background: rgba(75, 255, 75, 0.1); border: 1px dashed #4bff4b; color: #4bff4b; padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; font-weight: 600; }
+        
+        /* HE-Coin Badge */
+        .he-coin-badge { display: inline-block; background: rgba(243, 156, 18, 0.1); border: 1px solid #f39c12; color: #f39c12; padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; margin-bottom: 15px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(243,156,18,0.4); } 70% { box-shadow: 0 0 0 10px rgba(243,156,18,0); } 100% { box-shadow: 0 0 0 0 rgba(243,156,18,0); } }
+    </style>
+</head>
+<body>
+    <div class="form-kutusu">
+        <div class="he-coin-badge">🎁 100 HE-Coin Ödüllü</div>
+        <div class="logo">Hesabını Onayla</div>
+        <p>E-posta adresine (<strong>{{ eposta }}</strong>) 6 haneli özel bir kod gönderdik. Kodu aşağıya girerek hesabını aktifleştir.</p>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category == 'success' %}
+                        <div class="basari-mesaji">✅ {{ message }}</div>
+                    {% else %}
+                        <div class="hata-mesaji">⚠️ {{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <input type="text" name="kod" placeholder="------" maxlength="6" autocomplete="off" required>
+            <button type="submit">DOĞRULA VE KAZAN 🚀</button>
+        </form>
+        
+        <div class="alt-linkler">
+            <a href="/yeniden-dogrula">Kodu alamadım, tekrar gönder</a>
+            <a href="/dashboard">← Ana Sayfaya Dön (Onaysız)</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -86,6 +86,7 @@ class Kullanici(db.Model):
     dogum_tarihi = db.Column(db.String(20), nullable=False)
     sifre_hash = db.Column(db.String(255), nullable=False) # Postgres için sınırı 255 yaptık
     onayli_mi = db.Column(db.Boolean, default=False) # E-posta onayı için şart!
+    onay_kodu = db.Column(db.String(10), nullable=True)
     profil_resmi = db.Column(db.String(300), nullable=True)
     # --- 💰 EKONOMİ VE OYUN SİSTEMİ ---
     he_coin = db.Column(db.Integer, default=50) 
@@ -166,7 +167,8 @@ with app.app_context():
         "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS gunluk_test_sayaci INTEGER DEFAULT 0",
         "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS gunluk_odul_alindi BOOLEAN DEFAULT FALSE",
         "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS sahip_olunan_cerceveler TEXT DEFAULT ''",
-        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS sahip_olunan_unvanlar TEXT DEFAULT ''"
+        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS sahip_olunan_unvanlar TEXT DEFAULT ''",
+        "ALTER TABLE kullanici ADD COLUMN IF NOT EXISTS onay_kodu VARCHAR(10)"
     ]
     with db.engine.connect() as conn:
         for sql in migrasyonlar:
@@ -982,83 +984,84 @@ def kayit():
         dogum_tarihi = request.form.get('dogum_tarihi')
         sifre = request.form.get('sifre')
 
-        # 1. VERİTABANI KONTROLÜ
         mevcut_kullanici = Kullanici.query.filter((Kullanici.eposta == eposta) | (Kullanici.kullanici_adi == kullanici_adi)).first()
         if mevcut_kullanici:
             flash("Bu e-posta veya kullanıcı adı zaten kullanımda! Lütfen giriş yapın veya başka bir tane deneyin.", "error")
             return redirect(url_for('kayit'))
 
         hashed_sifre = generate_password_hash(sifre, method='pbkdf2:sha256')
+        rastgele_kod = str(random.randint(100000, 999999))
 
-        # 2. YENİ KULLANICI (onayli_mi = False olarak geri döndü!)
         yeni_kullanici = Kullanici(
             ad_soyad=ad_soyad,
             kullanici_adi=kullanici_adi,
             eposta=eposta,
             dogum_tarihi=dogum_tarihi,
             sifre_hash=hashed_sifre, 
-            onayli_mi=False  # Patronun emriyle doğrulama sistemi devrede!
+            onayli_mi=False,
+            onay_kodu=rastgele_kod
         )
         
         db.session.add(yeni_kullanici)
         db.session.commit()
         
-        # 3. MAİL GÖNDER — arka plan thread'inde (sayfayı bloke etmesin!)
-        token = s.dumps(eposta, salt='eposta-dogrulama')
-        site_url = os.getenv('SITE_URL', 'https://hangieasy.com').rstrip('/')
-        dogrulama_linki = f"{site_url}/dogrula/{token}"
-
         msg = Message('HangiEasy Krallığına Hoş Geldin! 👑', recipients=[eposta])
         msg.html = f"""
         <div style="background-color:#0b0c10; color:white; padding:30px; font-family:sans-serif; border-radius:10px; text-align:center;">
             <h1 style="color:#00b09b;">Aramıza Hoş Geldin {kullanici_adi}!</h1>
-            <p style="color:#aaa; font-size:16px;">HangiEasy'de rakiplerini ezmeye başlamadan önce son bir adım kaldı.</p>
-            <p>Aşağıdaki butona tıklayarak e-posta adresini doğrula ve hesabını aktifleştir:</p>
-            <a href="{dogrulama_linki}" style="display:inline-block; padding:15px 30px; background-color:#f39c12; color:#000; text-decoration:none; font-weight:bold; border-radius:10px; margin-top:20px;">HESABIMI ONAYLA ⚡</a>
-            <p style="color:#666; font-size:12px; margin-top:30px;">Bu link 1 saat boyunca geçerlidir.</p>
+            <p style="color:#aaa; font-size:16px;">Hesabını onaylamak ve <strong style="color:#f39c12;">100 HE-Coin</strong> kazanmak için gereken kodun aşağıda!</p>
+            <div style="font-size:32px; font-weight:900; letter-spacing:10px; color:#f39c12; margin:30px 0; padding:20px; background:rgba(255,255,255,0.05); border-radius:10px; border:2px dashed #f39c12;">
+                {rastgele_kod}
+            </div>
+            <p style="color:#666; font-size:12px; margin-top:30px;">Bu kod senin içindir, lütfen kimseyle paylaşma.</p>
         </div>
         """
 
         try:
             mail.send(msg)
-            print(f"✅ Doğrulama maili gönderildi: {eposta}")
+            print(f"✅ Doğrulama kodu maili gönderildi: {eposta}")
         except Exception as ex:
             print(f"❌ Mail gönderilemedi ({eposta}): {ex}")
 
-        # Kullanıcıyı BEKLETMEDEN anında başarı sayfasına gönder
-        return render_template('kayit_basarili.html',
-                               mail_gonderildi=True,   # Arka planda gönderiliyor, iyimser göster
-                               eposta=eposta,
-                               dogrulama_linki=dogrulama_linki)
+        session['onay_bekleyen_eposta'] = eposta
+        return redirect(url_for('dogrula'))
 
     return render_template('kayit.html')
-@app.route('/dogrula/<token>')
-def dogrula(token):
-    try:
-        # Token'ı çözüyoruz, max_age=3600 (1 saat) geçerlilik süresi var
-        eposta = s.loads(token, salt='eposta-dogrulama', max_age=3600)
-    except SignatureExpired:
-        return "<h1>⏳ Doğrulama linkinin süresi dolmuş! Lütfen tekrar kayıt olun.</h1>"
-    except Exception:
-        return "<h1>❌ Geçersiz doğrulama linki!</h1>"
 
-    # BURADA VERİTABANINI GÜNCELLE (CTO Dokunuşu)
-    # 1. Bu e-postaya sahip kullanıcıyı bul.
+@app.route('/dogrula', methods=['GET', 'POST'])
+def dogrula():
+    eposta = session.get('onay_bekleyen_eposta')
+    if not eposta:
+        flash("Önce giriş yapmalısınız veya kayıt olmalısınız.", "error")
+        return redirect(url_for('giris'))
+        
     kullanici = Kullanici.query.filter_by(eposta=eposta).first()
-    
     if not kullanici:
-        return "<h1>❌ Bu e-postaya ait bir hesap bulunamadı!</h1>"
+        session.pop('onay_bekleyen_eposta', None)
+        return redirect(url_for('giris'))
         
     if kullanici.onayli_mi:
-        # Adam zaten onaylamış, tekrar basarsa hata vermesin
+        session.pop('onay_bekleyen_eposta', None)
         return render_template('dogrulama_basarili.html')
 
-    # 2. kullanici.onayli_mi = True yap ve veritabanına kaydet (commit).
-    kullanici.onayli_mi = True
-    db.session.commit()
-    
-    # HER ŞEY BAŞARILIYSA EFSANE ONAY EKRANINI ÇAĞIR!
-    return render_template('dogrulama_basarili.html')
+    if request.method == 'POST':
+        girilen_kod = request.form.get('kod')
+        
+        if girilen_kod and girilen_kod.strip() == kullanici.onay_kodu:
+            kullanici.onayli_mi = True
+            kullanici.onay_kodu = None
+            kullanici.he_coin += 100
+            db.session.commit()
+            
+            session.pop('onay_bekleyen_eposta', None)
+            session['kullanici_adi'] = kullanici.kullanici_adi
+            session['onayli_mi'] = True
+            
+            return render_template('dogrulama_basarili.html')
+        else:
+            flash("Hatalı kod girdiniz! Lütfen e-postanızı kontrol edin.", "error")
+            
+    return render_template('dogrula.html', eposta=eposta)
 @app.route('/giris', methods=['GET', 'POST'])
 def giris():
     hata = None
@@ -1146,31 +1149,35 @@ def sifreyi_yenile(token):
 
 @app.route('/yeniden-dogrula')
 def yeniden_dogrula():
-    """Onaylı değil hesap için doğrulama mailini tekrar gönder."""
     kadi = session.get('kullanici_adi')
-    if not kadi:
-        return redirect(url_for('giris'))
-
-    kullanici = Kullanici.query.filter_by(kullanici_adi=kadi).first()
+    eposta = session.get('onay_bekleyen_eposta')
+    
+    kullanici = None
+    if kadi and not kadi.startswith('Misafir_'):
+        kullanici = Kullanici.query.filter_by(kullanici_adi=kadi).first()
+    elif eposta:
+        kullanici = Kullanici.query.filter_by(eposta=eposta).first()
+        
     if not kullanici:
         return redirect(url_for('giris'))
 
     if kullanici.onayli_mi:
-        # Zaten onaylı, gerek yok
         flash("✅ Hesabın zaten onaylanmış!", "success")
         return redirect(url_for('profil'))
 
-    token = s.dumps(kullanici.eposta, salt='eposta-dogrulama')
-    site_url = os.getenv('SITE_URL', 'https://hangieasy.com').rstrip('/')
-    dogrulama_linki = f"{site_url}/dogrula/{token}"
+    rastgele_kod = str(random.randint(100000, 999999))
+    kullanici.onay_kodu = rastgele_kod
+    db.session.commit()
 
-    msg = Message('HangiEasy — Hesabını Onayla ⚡', recipients=[kullanici.eposta])
+    msg = Message('HangiEasy — Yeni Onay Kodun ⚡', recipients=[kullanici.eposta])
     msg.html = f"""
     <div style="background-color:#0b0c10; color:white; padding:30px; font-family:sans-serif; border-radius:10px; text-align:center;">
         <h1 style="color:#f39c12;">E-posta Doğrulama ⚡</h1>
-        <p style="color:#aaa;">Merhaba {kullanici.kullanici_adi}! Hesabını aktifleştirmek için aşağıya tıkla:</p>
-        <a href="{dogrulama_linki}" style="display:inline-block; padding:15px 30px; background-color:#f39c12; color:#000; text-decoration:none; font-weight:bold; border-radius:10px; margin-top:20px;">HESABIMI ONAYLA ⚡</a>
-        <p style="color:#666; font-size:12px; margin-top:30px;">Bu link 1 saat geçerlidir.</p>
+        <p style="color:#aaa;">Merhaba {kullanici.kullanici_adi}! Hesabını aktifleştirmek için yeni kodun aşağıda:</p>
+        <div style="font-size:32px; font-weight:900; letter-spacing:10px; color:#f39c12; margin:30px 0; padding:20px; background:rgba(255,255,255,0.05); border-radius:10px; border:2px dashed #f39c12;">
+            {rastgele_kod}
+        </div>
+        <p style="color:#666; font-size:12px; margin-top:30px;">Eğer kod çalışmazsa sayfadan tekrar kod isteyebilirsin.</p>
     </div>
     """
 
@@ -1179,10 +1186,10 @@ def yeniden_dogrula():
         print(f"✅ Yeniden doğrulama maili gönderildi: {kullanici.eposta}")
     except Exception as ex:
         print(f"❌ Mail hatası: {ex}")
-    return render_template('kayit_basarili.html',
-                           mail_gonderildi=True,
-                           eposta=kullanici.eposta,
-                           dogrulama_linki=dogrulama_linki)
+        
+    session['onay_bekleyen_eposta'] = kullanici.eposta
+    flash("Yeni kod e-posta adresinize gönderildi.", "success")
+    return redirect(url_for('dogrula'))
 
 @app.route('/god-mode')
 def god_mode():
