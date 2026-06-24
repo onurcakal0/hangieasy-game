@@ -36,10 +36,13 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.secret_key = app.config['SECRET_KEY']
 # --- 📧 HANGIEASY POSTACI (MAIL) AYARLARI ---
+import socket
+socket.setdefaulttimeout(8)  # Vercel'in kilitlenmesini önlemek için 8 saniye timeout
+
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 465             # 587'yi çöpe attık, 465 SSL portuna geçtik!
-app.config['MAIL_USE_TLS'] = False        # TLS'i kapattık
-app.config['MAIL_USE_SSL'] = True         # Zırhlı SSL bağlantısını aktif ettik!
+app.config['MAIL_PORT'] = 587             
+app.config['MAIL_USE_TLS'] = True        
+app.config['MAIL_USE_SSL'] = False         
 app.config['MAIL_USERNAME'] = 'hangieasy@gmail.com'
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = ('HangiEasy Merkez', 'hangieasy@gmail.com')
