@@ -47,13 +47,17 @@
         .timer-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; letter-spacing: 1px; color: #fff; text-shadow: 0 0 5px #000; }
 
         .question-box {
-            width: 100%; max-width: 600px; background: rgba(10, 20, 50, 0.8);
+            width: 100%; max-width: 800px; background: rgba(10, 20, 50, 0.8);
             border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 20px;
             padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             backdrop-filter: blur(10px); position: relative;
         }
-        .q-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 20px; display: none; }
-        .q-text { font-size: 24px; font-weight: 800; margin-bottom: 30px; line-height: 1.4; }
+        .q-img { 
+            width: 100%; max-height: 450px; object-fit: contain; 
+            border-radius: 10px; margin-bottom: 20px; display: none; 
+            background: rgba(0,0,0,0.5); padding: 10px;
+        }
+        .q-text { font-size: 26px; font-weight: 800; margin-bottom: 30px; line-height: 1.4; }
 
         .options-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
@@ -175,7 +179,7 @@
             </div>
             
             <div class="question-box" id="q-box">
-                <img src="" id="q-img" class="q-img">
+                <img src="" id="q-img" class="q-img" onerror="this.src='https://via.placeholder.com/800x450/151520/FFFFFF?text=Görsel+Yüklenemedi'">
                 <div class="q-text" id="q-text">Soru Yükleniyor...</div>
                 
                 <div class="options-grid">
@@ -430,7 +434,7 @@
                 
                 grid.innerHTML += `
                     <div class="ans-card">
-                        ${cvp.soru.resim_url ? `<img src="${cvp.soru.resim_url}" class="ans-img">` : ''}
+                        ${cvp.soru.resim_url ? `<img src="${cvp.soru.resim_url}" class="ans-img" onerror="this.src='https://via.placeholder.com/150x80/151520/FFFFFF?text=X'">` : ''}
                         ${badge}
                         <div style="font-size:11px; margin-bottom:5px; color:#ccc;">Senin Cevabın:<br><strong style="color:#fff;">${cvp.secilen}</strong></div>
                         ${!cvp.dogru_mu ? `<div style="font-size:11px; color:#2ecc71;">Doğrusu:<br><strong>${dogruMetin}</strong></div>` : ''}
