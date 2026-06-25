@@ -438,6 +438,7 @@
             <div class="sidebar-link" style="color: #ff5588; font-weight: bold; background: rgba(255,85,136,0.1);">🎫 Boss Bileti Aktif</div>
             {% endif %}
             <a href="/boss-arenasi" class="sidebar-link" style="color: #ff4444; font-weight: bold;">👹 Boss Arenası</a>
+            <a href="/hangisi" class="sidebar-link" style="color: #00f2fe; font-weight: bold;">🤔 Hangisi (Trivia)</a>
             <a href="/test-olustur" class="sidebar-link" style="color: #00b09b; font-weight: bold;">＋ {{ t.yeni_test }}</a>
             
             <div style="margin-top: 15px; padding: 10px; background: rgba(0,242,254,0.05); border: 1px solid rgba(0,242,254,0.3); border-radius: 12px;">
@@ -536,6 +537,9 @@
             <button id="stealth-salteri" class="stealth-btn" onclick="stealthModunuTetikle()">
                 <span id="stealth-ikon">🏎️</span> <span id="stealth-yazi">RGB</span>
             </button>
+            <a href="/hangisi" class="stealth-btn" style="border-color: #00f2fe; color: #00f2fe; text-decoration: none;">
+                🤔 HANGİSİ
+            </a>
             {% if 'kullanici_adi' in session %}
                 <a href="/profil" class="profil-btn btn-sari">{{ t.studyo }}</a>
                 <a href="/cikis" class="profil-btn btn-kirmizi">{{ t.cikis }}</a>

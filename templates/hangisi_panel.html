@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HangiEasy | Hangisi Trivia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/131922bbde.js" crossorigin="anonymous"></script>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4362078981934571" crossorigin="anonymous"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { 
+            background: linear-gradient(135deg, #0a0f25, #001f3f); 
+            color: #e0f7fa; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 5%; background: rgba(0, 31, 63, 0.8);
+            backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 24px; font-weight: 900; color: #00f2fe; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .logo span { color: #fff; }
+        .back-btn {
+            background: transparent; border: 1px solid rgba(0,242,254,0.5);
+            color: #00f2fe; padding: 8px 15px; border-radius: 20px; text-decoration: none;
+            font-weight: 600; font-size: 13px; transition: 0.3s;
+        }
+        .back-btn:hover { background: rgba(0, 242, 254, 0.1); transform: scale(1.05); }
+
+        /* HEADER */
+        .header-section {
+            text-align: center; padding: 60px 20px 40px;
+        }
+        .header-title {
+            font-size: 48px; font-weight: 900;
+            background: linear-gradient(90deg, #00f2fe, #4facfe);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+        .header-desc { font-size: 16px; color: #b3e5fc; max-width: 600px; margin: 0 auto; }
+
+        /* GRID */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px; padding: 20px 5%; max-width: 1400px; margin: 0 auto 60px;
+        }
+        .game-card {
+            background: rgba(10, 20, 50, 0.6); border: 1px solid rgba(0, 242, 254, 0.1);
+            border-radius: 20px; overflow: hidden; position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer; display: flex; flex-direction: column;
+            text-decoration: none; color: inherit;
+        }
+        .game-card:hover {
+            transform: translateY(-10px); border-color: rgba(0, 242, 254, 0.5);
+            box-shadow: 0 15px 40px rgba(0, 242, 254, 0.15);
+        }
+        .card-img-wrap {
+            position: relative; height: 180px; overflow: hidden;
+        }
+        .card-img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: 0.5s ease;
+        }
+        .game-card:hover .card-img { transform: scale(1.1); }
+        .card-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(10,20,50,1), transparent);
+        }
+        .play-count {
+            position: absolute; top: 15px; right: 15px;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;
+            display: flex; align-items: center; gap: 5px; color: #fff;
+        }
+        
+        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .card-title { font-size: 20px; font-weight: 800; margin-bottom: 10px; line-height: 1.3; }
+        .card-desc { font-size: 13px; color: #81d4fa; margin-bottom: 20px; line-height: 1.5; flex-grow: 1; }
+        
+        .card-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid rgba(0,242,254,0.1); padding-top: 15px;
+        }
+        .creator { font-size: 11px; color: #4dd0e1; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        .play-btn {
+            background: linear-gradient(45deg, #00f2fe, #4facfe); border: none;
+            color: #000; font-weight: 800; font-size: 12px; padding: 8px 18px;
+            border-radius: 20px; cursor: pointer; transition: 0.3s;
+        }
+        .game-card:hover .play-btn { box-shadow: 0 0 15px rgba(0,242,254,0.5); }
+
+        /* DECORATIONS */
+        .decor-circle {
+            position: absolute; border-radius: 50%; filter: blur(100px); z-index: -1;
+        }
+        .c1 { width: 400px; height: 400px; background: rgba(0, 242, 254, 0.1); top: -100px; right: -100px; }
+        .c2 { width: 500px; height: 500px; background: rgba(0, 100, 255, 0.08); bottom: -200px; left: -100px; }
+    </style>
+</head>
+<body>
+
+    <div class="decor-circle c1"></div>
+    <div class="decor-circle c2"></div>
+
+    <nav class="navbar">
+        <a href="/dashboard" class="logo">🤔 <span>Hangisi</span></a>
+        <a href="/dashboard" class="back-btn">← Panele Dön</a>
+    </nav>
+
+    <div class="header-section">
+        <h1 class="header-title">Bilgini Kanıtla</h1>
+        <p class="header-desc">Yeni nesil bilgi yarışmalarına hoş geldin. Yüzlerce kategorideki zorlu testleri çöz, liderlik tablosuna adını yazdır!</p>
+    </div>
+
+    <div class="grid-container">
+        {% for oyun in oyunlar %}
+        <a href="/hangisi/{{ oyun.id }}" class="game-card">
+            <div class="card-img-wrap">
+                <img src="{{ oyun.resim_url or 'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?q=80&w=1000&auto=format&fit=crop' }}" class="card-img" alt="Test Resmi">
+                <div class="card-overlay"></div>
+                <div class="play-count"><i class="fa-solid fa-play"></i> {{ oyun.oynanma_sayisi }}</div>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">{{ oyun.baslik }}</h3>
+                <p class="card-desc">{{ oyun.aciklama }}</p>
+                <div class="card-footer">
+                    <div class="creator"><i class="fa-solid fa-crown"></i> {{ oyun.olusturan_adi }}</div>
+                    <button class="play-btn">Teste Başla</button>
+                </div>
+            </div>
+        </a>
+        {% else %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 50px; background: rgba(0,242,254,0.05); border-radius: 20px; border: 1px dashed rgba(0,242,254,0.3);">
+            <h2 style="color:#00f2fe; margin-bottom: 10px;">Henüz Test Yok</h2>
+            <p style="color:#81d4fa;">Çok yakında yepyeni efsanevi testler eklenecek!</p>
+        </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

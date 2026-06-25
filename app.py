@@ -184,7 +184,42 @@ class BossAbone(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     eposta = db.Column(db.String(120), nullable=False)
     tarih = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
+class HangisiOyun(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    baslik = db.Column(db.String(200), nullable=False)
+    aciklama = db.Column(db.Text, nullable=True)
+    resim_url = db.Column(db.String(500), nullable=True)
+    olusturan_id = db.Column(db.Integer, nullable=True) # Admin for now
+    olusturan_adi = db.Column(db.String(100), default="HangiEasy")
+    oynanma_sayisi = db.Column(db.Integer, default=0)
+    tarih = db.Column(db.DateTime, default=datetime.utcnow)
+
+class HangisiSoru(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    oyun_id = db.Column(db.Integer, db.ForeignKey('hangisi_oyun.id'), nullable=False)
+    soru_metni = db.Column(db.Text, nullable=False)
+    resim_url = db.Column(db.String(500), nullable=True)
+    secenek_a = db.Column(db.String(200), nullable=False)
+    secenek_b = db.Column(db.String(200), nullable=False)
+    secenek_c = db.Column(db.String(200), nullable=False)
+    secenek_d = db.Column(db.String(200), nullable=False)
+    dogru_cevap = db.Column(db.String(1), nullable=False) # A, B, C or D
+
+class HangisiSkor(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    oyun_id = db.Column(db.Integer, db.ForeignKey('hangisi_oyun.id'), nullable=False)
+    kullanici_adi = db.Column(db.String(100), nullable=False)
+    puan = db.Column(db.Integer, nullable=False)
+    tarih = db.Column(db.DateTime, default=datetime.utcnow)
+
+class HangisiTepki(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    oyun_id = db.Column(db.Integer, db.ForeignKey('hangisi_oyun.id'), nullable=False)
+    kullanici_adi = db.Column(db.String(100), nullable=False)
+    tepki = db.Column(db.String(50), nullable=False) # e.g. 'ates', 'beyin', 'gulme'
+    tarih = db.Column(db.DateTime, default=datetime.utcnow)
+
 # Veritabanını kuran kodun (Burası doğru, kalsın)
 with app.app_context():
     db.create_all()
@@ -1566,6 +1601,109 @@ def api_shop_items():
         {'id': 'unvan_korsan', 'name': 'Siber Korsan', 'price': 1000, 'type': 'title'}
     ]
     return jsonify({'success': True, 'items': items}), 200
+# ==========================================
+# 🚀 HANGISI (QUIZEI TARZI) TRIVIA SİSTEMİ
+# ==========================================
+
+@app.route('/hangisi')
+def hangisi_panel():
+    oyunlar = HangisiOyun.query.order_by(HangisiOyun.id.desc()).all()
+    # Populate a dict with top 3 players for each game if needed
+    liderler_dict = {}
+    for o in oyunlar:
+        top_skorlar = HangisiSkor.query.filter_by(oyun_id=o.id).order_by(HangisiSkor.puan.desc()).limit(3).all()
+        liderler_dict[o.id] = [{'kullanici_adi': s.kullanici_adi, 'puan': s.puan} for s in top_skorlar]
+        
+    return render_template('hangisi_panel.html', oyunlar=oyunlar, liderler_dict=liderler_dict)
+
+@app.route('/hangisi/<int:id>')
+def hangisi_oyun_sayfasi(id):
+    oyun = HangisiOyun.query.get_or_404(id)
+    sorular = HangisiSoru.query.filter_by(oyun_id=id).all()
+    
+    # Leaderboard
+    liderlik = HangisiSkor.query.filter_by(oyun_id=id).order_by(HangisiSkor.puan.desc()).limit(10).all()
+    
+    # Reactions stats
+    tepkiler_raw = db.session.query(HangisiTepki.tepki, db.func.count(HangisiTepki.id)).filter_by(oyun_id=id).group_by(HangisiTepki.tepki).all()
+    tepkiler = {t[0]: t[1] for t in tepkiler_raw}
+    
+    # Related Quizzes
+    benzer_oyunlar = HangisiOyun.query.filter(HangisiOyun.id != id).order_by(db.func.random()).limit(4).all()
+    
+    # Convert sorular to list of dicts for JS
+    soru_listesi = []
+    for s in sorular:
+        soru_listesi.append({
+            'id': s.id,
+            'soru_metni': s.soru_metni,
+            'resim_url': s.resim_url,
+            'secenek_a': s.secenek_a,
+            'secenek_b': s.secenek_b,
+            'secenek_c': s.secenek_c,
+            'secenek_d': s.secenek_d,
+            'dogru_cevap': s.dogru_cevap
+        })
+        
+    kullanici_adi = session.get('kullanici_adi', '')
+    
+    return render_template('hangisi_oyun.html', 
+                           oyun=oyun, 
+                           sorular=soru_listesi, 
+                           liderlik=liderlik, 
+                           tepkiler=tepkiler, 
+                           benzer_oyunlar=benzer_oyunlar,
+                           kullanici_adi=kullanici_adi)
+
+@app.route('/api/hangisi/skor_kaydet', methods=['POST'])
+def hangisi_skor_kaydet():
+    data = request.json
+    try:
+        oyun = HangisiOyun.query.get(data['oyun_id'])
+        if oyun:
+            oyun.oynanma_sayisi += 1
+            
+        yeni_skor = HangisiSkor(
+            oyun_id=data['oyun_id'],
+            kullanici_adi=data['kullanici_adi'],
+            puan=int(data['puan'])
+        )
+        db.session.add(yeni_skor)
+        db.session.commit()
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 400
+
+@app.route('/api/hangisi/tepki', methods=['POST'])
+def hangisi_tepki_ver():
+    data = request.json
+    try:
+        # Check if already reacted
+        mevcut = HangisiTepki.query.filter_by(
+            oyun_id=data['oyun_id'], 
+            kullanici_adi=data['kullanici_adi']
+        ).first()
+        
+        if mevcut:
+            mevcut.tepki = data['tepki'] # Update reaction
+        else:
+            yeni_tepki = HangisiTepki(
+                oyun_id=data['oyun_id'],
+                kullanici_adi=data['kullanici_adi'],
+                tepki=data['tepki']
+            )
+            db.session.add(yeni_tepki)
+            
+        db.session.commit()
+        
+        # Return new counts
+        tepkiler_raw = db.session.query(HangisiTepki.tepki, db.func.count(HangisiTepki.id)).filter_by(oyun_id=data['oyun_id']).group_by(HangisiTepki.tepki).all()
+        tepkiler = {t[0]: t[1] for t in tepkiler_raw}
+        
+        return jsonify({'status': 'success', 'tepkiler': tepkiler})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 400
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
