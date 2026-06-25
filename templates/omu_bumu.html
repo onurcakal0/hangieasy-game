@@ -234,17 +234,19 @@
             if(turBilgi) turBilgi.innerText = `${T.kalan} ${toplamMacSayisi - oynananMac + 1}`;
 
             // 🚀 ZIRH 2: Resim yüklenmezse sistemi çökertmek yerine kırık resim koruması koy (onerror)
+            let baslikGizle = "{{ oyun.baslik }}".includes("IMDb") ? "display: none;" : "";
+            
             let kapismaKutusu = document.getElementById('kapisma-kutusu');
             if(kapismaKutusu) {
                 kapismaKutusu.innerHTML = `
                     <div class="kart secenek-kart" onclick="secimYap('${solAday.isim.replace(/'/g, "\\'")}', '${solAday.resim}', this)">
                         <img src="${solAday.resim}" onerror="this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'">
-                        <h3>${solAday.isim}</h3>
+                        <h3 style="${baslikGizle}">${solAday.isim}</h3>
                     </div>
                     <div class="vs-rozet">VS</div>
                     <div class="kart secenek-kart" onclick="secimYap('${sagAday.isim.replace(/'/g, "\\'")}', '${sagAday.resim}', this)">
                         <img src="${sagAday.resim}" onerror="this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'">
-                        <h3>${sagAday.isim}</h3>
+                        <h3 style="${baslikGizle}">${sagAday.isim}</h3>
                     </div>
                 `;
             }
