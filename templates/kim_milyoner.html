@@ -329,15 +329,15 @@
             { step: 4, amount: 500, safe: false },
             { step: 5, amount: 1000, safe: true },
             { step: 6, amount: 2000, safe: false },
-            { step: 7, amount: 4000, safe: false },
-            { step: 8, amount: 8000, safe: false },
-            { step: 9, amount: 16000, safe: false },
-            { step: 10, amount: 32000, safe: true },
-            { step: 11, amount: 64000, safe: false },
-            { step: 12, amount: 125000, safe: false },
-            { step: 13, amount: 250000, safe: false },
-            { step: 14, amount: 500000, safe: false },
-            { step: 15, amount: 1000000, safe: true }
+            { step: 7, amount: 3000, safe: false },
+            { step: 8, amount: 5000, safe: false },
+            { step: 9, amount: 7500, safe: false },
+            { step: 10, amount: 10000, safe: true },
+            { step: 11, amount: 15000, safe: false },
+            { step: 12, amount: 25000, safe: false },
+            { step: 13, amount: 50000, safe: false },
+            { step: 14, amount: 75000, safe: false },
+            { step: 15, amount: 100000, safe: true }
         ];
 
         let currentQuestionIndex = 0;
@@ -487,8 +487,8 @@
 
             let finalPrize = 0;
             if (wonAll) {
-                finalPrize = 1000000;
-                goTitle.textContent = "İNANILMAZ! MİLYONER OLDUN!";
+                finalPrize = 100000;
+                goTitle.textContent = "İNANILMAZ! 100.000 HE-COIN KAZANDIN!";
                 confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
             } else if (manualAmount !== null) {
                 finalPrize = manualAmount;
@@ -501,13 +501,14 @@
 
             goPrize.textContent = finalPrize.toLocaleString('tr-TR') + " HE-Coin";
 
-            // Skor kaydetme isteği gönderilebilir
+            // Skor kaydetme isteği gönder
             if(finalPrize > 0) {
-                fetch('/api/skor_kaydet', {
+                fetch('/api/hangisi/skor_kaydet', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         oyun_id: {{ oyun.id }},
+                        kullanici_adi: "{{ kullanici_adi }}",
                         puan: finalPrize,
                         dogru_sayisi: currentQuestionIndex
                     })
