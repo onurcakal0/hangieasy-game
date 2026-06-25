@@ -344,18 +344,43 @@
     </div>
 
     <script>
-        function bildirimiKaydet() {
+        async function bildirimiKaydet() {
             const input = document.getElementById('notif-email');
+            const btn = document.querySelector('.bildir-btn');
             const val = input.value.trim();
             if (!val || !val.includes('@')) {
                 input.style.borderColor = '#ff0055';
                 setTimeout(() => { input.style.borderColor = ''; }, 2000);
                 return;
             }
-            input.value = '';
-            input.placeholder = '✅ Kaydedildi! Boss uyandığında haber vereceğiz.';
-            input.style.borderColor = '#2ecc71';
-            input.style.boxShadow = '0 0 15px rgba(46,204,113,0.3)';
+            
+            btn.innerText = 'Bekle...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/boss_abone', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ eposta: val })
+                });
+                const data = await res.json();
+                
+                if (data.status === 'success') {
+                    input.value = '';
+                    input.placeholder = '✅ Kaydedildi! E-postanı kontrol et.';
+                    input.style.borderColor = '#2ecc71';
+                    input.style.boxShadow = '0 0 15px rgba(46,204,113,0.3)';
+                } else {
+                    alert(data.message || 'Bir hata oluştu!');
+                    input.style.borderColor = '#ff0055';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Bağlantı hatası!');
+            }
+            
+            btn.innerText = 'Bildir';
+            btn.disabled = false;
         }
 
         // Enter ile kayıt

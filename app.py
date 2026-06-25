@@ -179,6 +179,11 @@ class HaritaSkor(db.Model):
     bulunan_sehir_sayisi = db.Column(db.Integer, nullable=False)
     gecen_sure_saniye = db.Column(db.Integer, nullable=False)
     tarih = db.Column(db.DateTime, default=datetime.utcnow)
+
+class BossAbone(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    eposta = db.Column(db.String(120), nullable=False)
+    tarih = db.Column(db.DateTime, default=datetime.utcnow)
     
 # Veritabanını kuran kodun (Burası doğru, kalsın)
 with app.app_context():
@@ -1013,6 +1018,36 @@ def boss_arenasi():
     return render_template('boss_arenasi.html',
                            bakiye=kullanici.he_coin,
                            bilet_alindi=kullanici.boss_bileti_alindi)
+@app.route('/api/boss_abone', methods=['POST'])
+def boss_abone():
+    data = request.json
+    eposta = data.get('eposta', '').strip()
+    if not eposta or '@' not in eposta:
+        return jsonify({'status': 'error', 'message': 'Geçersiz e-posta'}), 400
+    
+    # Check if already subscribed
+    mevcut = BossAbone.query.filter_by(eposta=eposta).first()
+    if mevcut:
+        return jsonify({'status': 'success', 'message': 'Zaten kayıtlı'})
+    
+    yeni_abone = BossAbone(eposta=eposta)
+    db.session.add(yeni_abone)
+    db.session.commit()
+    
+    # Send email via Resend
+    html_content = f"""
+    <div style="font-family: sans-serif; text-align: center; color: #fff; background-color: #111; padding: 40px; border-radius: 10px;">
+        <h1 style="color: #ff0055;">Boss Arenası Radarı Aktif! 🎯</h1>
+        <p style="font-size: 16px;">Selamlar cesur savaşçı,</p>
+        <p style="font-size: 16px;">E-posta adresin Boss Arenası radar sistemimize kaydedildi.</p>
+        <p style="font-size: 16px;">Büyük Boss uyandığı anda sana ilk haberi biz vereceğiz. Kılıcını bileyip hazır bekle!</p>
+        <br>
+        <p style="color: #666; font-size: 12px;">HangiEasy Krallığı</p>
+    </div>
+    """
+    send_email_via_resend(eposta, "Boss Uyandığında İlk Sen Öğren! 🐉", html_content)
+    
+    return jsonify({'status': 'success'})
 
 @app.route('/api/boss_giris', methods=['POST'])
 def boss_giris():
