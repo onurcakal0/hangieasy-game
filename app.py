@@ -23,7 +23,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # --- DIŞ SERVİSLER ---
 from supabase import create_client, Client
@@ -205,6 +205,7 @@ class HangisiSoru(db.Model):
     secenek_c = db.Column(db.String(200), nullable=False)
     secenek_d = db.Column(db.String(200), nullable=False)
     dogru_cevap = db.Column(db.String(1), nullable=False) # A, B, C or D
+    zorluk_derecesi = db.Column(db.String(20), default="Orta")
 
 class HangisiSkor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -1671,11 +1672,45 @@ def hangisi_oyun_sayfasi(id):
         
     kullanici_adi = session.get('kullanici_adi', '')
     
-    # "Kim HE-Coin'er Olmak İster" oyunu için özel tasarım
+    # "Kim HE-Coin'er Olmak İster" oyunu için özel tasarım ve mantık
     if "Kim HE-Coin'er Olmak İster" in oyun.baslik:
+        if not kullanici_adi:
+            flash("Kim HE-Coin'er Olmak İster? yarışmasına katılmak için giriş yapmalısınız.", "warning")
+            return redirect(url_for('giris'))
+            
+        # Son 7 gün içinde oynamış mı kontrolü
+        son_skor = HangisiSkor.query.filter_by(oyun_id=id, kullanici_adi=kullanici_adi).order_by(HangisiSkor.tarih.desc()).first()
+        if son_skor:
+            gecen_zaman = datetime.utcnow() - son_skor.tarih
+            if gecen_zaman.days < 7:
+                kalan_zaman = timedelta(days=7) - gecen_zaman
+                kalan_saniye = int(kalan_zaman.total_seconds())
+                return render_template('milyoner_countdown.html', oyun=oyun, kalan_saniye=kalan_saniye)
+                
+        # Özel soru seçimi: 5 Kolay, 2 Orta, 8 Zor
+        kolaylar = HangisiSoru.query.filter_by(oyun_id=id, zorluk_derecesi='Kolay').order_by(db.func.random()).limit(5).all()
+        ortalar = HangisiSoru.query.filter_by(oyun_id=id, zorluk_derecesi='Orta').order_by(db.func.random()).limit(2).all()
+        zorlar = HangisiSoru.query.filter_by(oyun_id=id, zorluk_derecesi='Zor').order_by(db.func.random()).limit(8).all()
+        
+        milyoner_sorular = kolaylar + ortalar + zorlar
+        
+        # Soru listesini JSON formatına uygun hale getir
+        milyoner_listesi = []
+        for s in milyoner_sorular:
+            milyoner_listesi.append({
+                'id': s.id,
+                'soru_metni': s.soru_metni,
+                'resim_url': s.resim_url,
+                'secenek_a': s.secenek_a,
+                'secenek_b': s.secenek_b,
+                'secenek_c': s.secenek_c,
+                'secenek_d': s.secenek_d,
+                'dogru_cevap': s.dogru_cevap
+            })
+            
         return render_template('kim_milyoner.html',
                                oyun=oyun, 
-                               sorular=soru_listesi, 
+                               sorular=milyoner_listesi, 
                                liderlik=liderlik, 
                                tepkiler=tepkiler, 
                                benzer_oyunlar=benzer_oyunlar,
@@ -1696,6 +1731,13 @@ def hangisi_skor_kaydet():
         oyun = HangisiOyun.query.get(data['oyun_id'])
         if oyun:
             oyun.oynanma_sayisi += 1
+            
+            # Eğer Milyoner oyunuysa, kazanılan ödülün yarısını bakiyeye ekle
+            if "Kim HE-Coin'er Olmak İster" in oyun.baslik:
+                kullanici = Kullanici.query.filter_by(kullanici_adi=data['kullanici_adi']).first()
+                if kullanici:
+                    kazanc = int(data['puan']) // 2
+                    kullanici.he_coin += kazanc
             
         yeni_skor = HangisiSkor(
             oyun_id=data['oyun_id'],

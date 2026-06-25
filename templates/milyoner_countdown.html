@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Süre Bekleniyor - HangiEasy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: radial-gradient(circle at center, #1b0f36 0%, #080312 100%);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .countdown-box {
+            background: linear-gradient(to bottom, #0d1e55, #000c28);
+            border: 2px solid #2354a3;
+            border-radius: 30px;
+            box-shadow: 0 0 30px rgba(35, 84, 163, 0.5);
+            padding: 3rem;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        .time-unit {
+            display: inline-block;
+            margin: 0 10px;
+        }
+        .time-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #f7931a;
+            text-shadow: 0 0 15px rgba(247, 147, 26, 0.5);
+        }
+        .time-label {
+            font-size: 1rem;
+            color: #b0c4de;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="countdown-box">
+        <i class="fas fa-hourglass-half text-6xl text-[#f7931a] mb-6 animate-pulse"></i>
+        <h1 class="text-3xl font-bold mb-4">Haftalık Hakkınızı Doldurdunuz!</h1>
+        <p class="text-gray-300 mb-8 text-lg">Bu efsanevi teste yalnızca haftada bir kez katılabilirsiniz. Yeni sorularla dolu bir sonraki oyuna girebilmek için kalan süre:</p>
+        
+        <div id="countdown" class="flex justify-center flex-wrap mb-8">
+            <div class="time-unit"><div class="time-value" id="d">0</div><div class="time-label">GÜN</div></div>
+            <div class="time-unit"><div class="time-value" id="h">0</div><div class="time-label">SAAT</div></div>
+            <div class="time-unit"><div class="time-value" id="m">0</div><div class="time-label">DAKİKA</div></div>
+            <div class="time-unit"><div class="time-value" id="s">0</div><div class="time-label">SANİYE</div></div>
+        </div>
+
+        <a href="/hangisi" class="inline-block px-8 py-3 bg-[#2354a3] hover:bg-[#3b76e1] text-white rounded-full font-bold transition">
+            <i class="fas fa-arrow-left mr-2"></i> Lobiye Dön
+        </a>
+    </div>
+
+    <script>
+        let totalSeconds = parseInt("{{ kalan_saniye }}");
+        
+        function updateTimer() {
+            if (totalSeconds <= 0) {
+                location.reload();
+                return;
+            }
+            
+            const d = Math.floor(totalSeconds / (3600*24));
+            const h = Math.floor(totalSeconds % (3600*24) / 3600);
+            const m = Math.floor(totalSeconds % 3600 / 60);
+            const s = Math.floor(totalSeconds % 60);
+            
+            document.getElementById('d').textContent = d;
+            document.getElementById('h').textContent = h;
+            document.getElementById('m').textContent = m;
+            document.getElementById('s').textContent = s;
+            
+            totalSeconds--;
+        }
+        
+        setInterval(updateTimer, 1000);
+        updateTimer();
+    </script>
+</body>
+</html>
