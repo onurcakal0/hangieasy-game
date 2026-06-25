@@ -844,7 +844,6 @@ def oyun_sayfasi(oyun_id):
     oyun.oynanma_sayisi += 1
     db.session.commit()
     return render_template(sablonlar.get(oyun.oyun_modu, 'index.html'), aktif_oyun=oyun_id, oyun_basligi=oyun.baslik, oyun=oyun)
-@app.route('/api/sorular/<int:oyun_id>')
 @app.route('/api/harita_skor_kaydet', methods=['POST'])
 def harita_skor_kaydet():
     data = request.json
@@ -876,6 +875,8 @@ def harita_liderlik_tablosu(oyun_turu):
             'tarih': s.tarih.strftime('%d.%m.%Y')
         })
     return jsonify(sonuclar)
+
+@app.route('/api/sorular/<int:oyun_id>')
 def api_sorular(oyun_id):
     sorular = Soru.query.filter_by(oyun_id=oyun_id).all()
     # 🚀 VİTRİNE GİDEN KARGO: Artık doğru cevap (casus) da paketin içinde!
