@@ -179,7 +179,7 @@
             </div>
             
             <div class="question-box" id="q-box">
-                <img src="" id="q-img" class="q-img" onerror="this.src='https://via.placeholder.com/800x450/151520/FFFFFF?text=Görsel+Yüklenemedi'">
+                <img src="" id="q-img" class="q-img" onerror="this.src='https://dummyimage.com/800x450/151520/ffffff&text=Gorsel+Yok'">
                 <div class="q-text" id="q-text">Soru Yükleniyor...</div>
                 
                 <div class="options-grid">
@@ -434,7 +434,7 @@
                 
                 grid.innerHTML += `
                     <div class="ans-card">
-                        ${cvp.soru.resim_url ? `<img src="${cvp.soru.resim_url}" class="ans-img" onerror="this.src='https://via.placeholder.com/150x80/151520/FFFFFF?text=X'">` : ''}
+                        ${cvp.soru.resim_url ? `<img src="${cvp.soru.resim_url}" class="ans-img" onerror="this.src='https://dummyimage.com/150x80/151520/ffffff&text=Yok'">` : ''}
                         ${badge}
                         <div style="font-size:11px; margin-bottom:5px; color:#ccc;">Senin Cevabın:<br><strong style="color:#fff;">${cvp.secilen}</strong></div>
                         ${!cvp.dogru_mu ? `<div style="font-size:11px; color:#2ecc71;">Doğrusu:<br><strong>${dogruMetin}</strong></div>` : ''}
