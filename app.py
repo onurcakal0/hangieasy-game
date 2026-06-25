@@ -1671,6 +1671,16 @@ def hangisi_oyun_sayfasi(id):
         
     kullanici_adi = session.get('kullanici_adi', '')
     
+    # "Kim HE-Coin'er Olmak İster" oyunu için özel tasarım
+    if "Kim HE-Coin'er Olmak İster" in oyun.baslik:
+        return render_template('kim_milyoner.html',
+                               oyun=oyun, 
+                               sorular=soru_listesi, 
+                               liderlik=liderlik, 
+                               tepkiler=tepkiler, 
+                               benzer_oyunlar=benzer_oyunlar,
+                               kullanici_adi=kullanici_adi)
+    
     return render_template('hangisi_oyun.html', 
                            oyun=oyun, 
                            sorular=soru_listesi, 

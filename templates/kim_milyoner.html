@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ oyun.baslik }} - HangiEasy</title>
+    <!-- TailwindCSS for structural layout, custom CSS for Millionaire theme -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            background: radial-gradient(circle at center, #1b0f36 0%, #080312 100%);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Hexagonal Container Style */
+        .mil-box {
+            position: relative;
+            background: linear-gradient(to bottom, #0d1e55, #000c28);
+            border: 2px solid #2354a3;
+            border-radius: 50px;
+            box-shadow: 0 0 15px rgba(35, 84, 163, 0.5), inset 0 0 10px rgba(0,0,0,0.8);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .mil-box::before, .mil-box::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30px;
+            height: 2px;
+            background: #2354a3;
+        }
+        .mil-box::before { left: -30px; }
+        .mil-box::after { right: -30px; }
+
+        .question-box {
+            font-size: 1.5rem;
+            padding: 2rem;
+            margin: 2rem 0;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .option-box {
+            font-size: 1.25rem;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            text-align: left;
+            margin: 0.5rem 0;
+        }
+        
+        .option-box:hover:not(:disabled) {
+            background: linear-gradient(to bottom, #1d3c85, #0a1b4d);
+            border-color: #3b76e1;
+            box-shadow: 0 0 20px rgba(59, 118, 225, 0.8);
+        }
+
+        .option-letter {
+            color: #f7931a; /* HE-Coin orange/gold */
+            font-weight: 800;
+            margin-right: 15px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .option-text {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        /* States */
+        .state-selected {
+            background: linear-gradient(to bottom, #d08200, #905500) !important;
+            border-color: #ffd700 !important;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.6) !important;
+        }
+
+        .state-correct {
+            background: linear-gradient(to bottom, #138535, #064d1a) !important;
+            border-color: #28c754 !important;
+            box-shadow: 0 0 30px rgba(40, 199, 84, 0.8) !important;
+            animation: pulse-correct 1s infinite;
+        }
+
+        .state-wrong {
+            background: linear-gradient(to bottom, #a31515, #550404) !important;
+            border-color: #ff3b3b !important;
+        }
+
+        @keyframes pulse-correct {
+            0% { box-shadow: 0 0 10px rgba(40, 199, 84, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(40, 199, 84, 1); }
+            100% { box-shadow: 0 0 10px rgba(40, 199, 84, 0.5); }
+        }
+
+        /* Money Tree Sidebar */
+        .money-tree {
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 2px solid #2354a3;
+            height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: center;
+        }
+
+        .money-step {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 15px;
+            margin: 2px 0;
+            border-radius: 20px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            color: #b0c4de;
+            transition: all 0.3s;
+        }
+
+        .money-step.safe { color: white; }
+        .money-step.active {
+            background: #f7931a;
+            color: #000;
+            box-shadow: 0 0 15px rgba(247, 147, 26, 0.8);
+            transform: scale(1.05);
+        }
+        .money-step.passed { color: #5a739c; }
+
+        /* Lifelines */
+        .lifeline-btn {
+            background: linear-gradient(135deg, #0d1e55, #000c28);
+            border: 2px solid #2354a3;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(35, 84, 163, 0.5);
+            transition: all 0.3s;
+        }
+        .lifeline-btn:hover:not(.used) {
+            transform: translateY(-5px);
+            border-color: #f7931a;
+            box-shadow: 0 0 20px rgba(247, 147, 26, 0.6);
+            color: #f7931a;
+        }
+        .lifeline-btn.used {
+            opacity: 0.3;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+            border-color: red;
+        }
+        .lifeline-btn.used::after {
+            content: '\\d7';
+            position: absolute;
+            font-size: 4rem;
+            color: red;
+            font-family: sans-serif;
+        }
+
+        .mil-logo {
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, #f7931a, #8f5000);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 4px solid #fff;
+            box-shadow: 0 0 30px rgba(247, 147, 26, 0.8);
+            margin: 0 auto 2rem auto;
+        }
+        
+        /* Modal for Audience/Phone */
+        .joker-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+        }
+        .joker-content {
+            background: linear-gradient(to bottom, #0d1e55, #000c28);
+            border: 2px solid #f7931a;
+            padding: 2rem;
+            border-radius: 20px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(247,147,26,0.4);
+        }
+
+        .bar-container { display: flex; align-items: flex-end; justify-content: space-around; height: 150px; margin-top: 20px; }
+        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 40px; }
+        .bar { width: 100%; background: linear-gradient(to top, #f7931a, #ffc845); border-radius: 5px 5px 0 0; transition: height 1s ease-out; height: 0%; }
+        .bar-label { margin-top: 10px; font-weight: bold; }
+        .bar-pct { margin-bottom: 5px; font-size: 0.9rem; color: #f7931a; font-weight: bold;}
+    </style>
+</head>
+<body>
+
+    <div class="flex h-screen w-full">
+        <!-- Main Game Area -->
+        <div class="flex-1 flex flex-col items-center justify-center p-8 relative">
+            
+            <!-- Quit Button -->
+            <a href="/hangisi/{{ oyun.id }}" class="absolute top-4 left-4 text-gray-400 hover:text-white transition">
+                <i class="fas fa-arrow-left mr-2"></i> Çıkış
+            </a>
+
+            <!-- Logo -->
+            <div class="mil-logo">
+                <div class="text-center">
+                    <div class="text-3xl font-black italic">HE</div>
+                    <div class="text-sm font-bold tracking-widest mt-1">COIN'ER</div>
+                </div>
+            </div>
+
+            <!-- Lifelines -->
+            <div class="flex space-x-6 mb-8" id="lifelines-container">
+                <button class="lifeline-btn" id="joker-50" onclick="kullanJoker50()" title="%50 Yarı Yarıya">
+                    <span class="font-bold font-sans">50:50</span>
+                </button>
+                <button class="lifeline-btn" id="joker-phone" onclick="kullanJokerTelefon()" title="Telefonla Bağlanma">
+                    <i class="fas fa-phone-alt"></i>
+                </button>
+                <button class="lifeline-btn" id="joker-audience" onclick="kullanJokerSeyirci()" title="Seyirciye Sor">
+                    <i class="fas fa-users"></i>
+                </button>
+            </div>
+
+            <!-- Game Container -->
+            <div id="game-container" class="w-full max-w-4xl">
+                <!-- Question -->
+                <div class="mil-box question-box" id="q-text">
+                    Soru yükleniyor...
+                </div>
+
+                <!-- Options Grid -->
+                <div class="grid grid-cols-2 gap-x-12 gap-y-4 px-8 mt-6">
+                    <button class="mil-box option-box" id="opt-A" onclick="cevapVer('A')">
+                        <span class="option-letter">A:</span>
+                        <span class="option-text" id="text-A">...</span>
+                    </button>
+                    <button class="mil-box option-box" id="opt-B" onclick="cevapVer('B')">
+                        <span class="option-letter">B:</span>
+                        <span class="option-text" id="text-B">...</span>
+                    </button>
+                    <button class="mil-box option-box" id="opt-C" onclick="cevapVer('C')">
+                        <span class="option-letter">C:</span>
+                        <span class="option-text" id="text-C">...</span>
+                    </button>
+                    <button class="mil-box option-box" id="opt-D" onclick="cevapVer('D')">
+                        <span class="option-letter">D:</span>
+                        <span class="option-text" id="text-D">...</span>
+                    </button>
+                </div>
+                
+                <!-- Withdraw button -->
+                <div class="text-center mt-8">
+                    <button id="cekil-btn" onclick="cekil()" class="text-gray-400 hover:text-[#f7931a] transition text-sm font-semibold uppercase tracking-wider hidden">
+                        <i class="fas fa-hand-holding-usd mr-1"></i> Parayı Al ve Çekil
+                    </button>
+                </div>
+            </div>
+
+            <!-- Game Over Container -->
+            <div id="game-over-container" class="hidden text-center max-w-2xl bg-black/50 p-8 rounded-3xl border border-[#2354a3]">
+                <h2 class="text-4xl font-bold mb-4 text-[#f7931a]" id="go-title">Oyun Bitti!</h2>
+                <p class="text-xl mb-6 text-gray-300" id="go-msg">Kazandığınız Ödül:</p>
+                <div class="text-6xl font-black text-[#f7931a] mb-8" id="go-prize">0 HE-Coin</div>
+                
+                <a href="/hangisi/{{ oyun.id }}" class="inline-block px-8 py-3 bg-[#2354a3] hover:bg-[#3b76e1] text-white rounded-full font-bold transition">
+                    Yeniden Oyna
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Sidebar Money Tree -->
+        <div class="w-64 money-tree hidden md:flex" id="money-tree">
+            <!-- Will be generated by JS -->
+        </div>
+    </div>
+
+    <!-- Audience Joker Modal -->
+    <div id="modal-audience" class="joker-modal flex">
+        <div class="joker-content relative">
+            <button onclick="document.getElementById('modal-audience').style.display='none'" class="absolute top-2 right-4 text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+            <h3 class="text-xl font-bold mb-2"><i class="fas fa-users text-[#f7931a] mr-2"></i>Seyirci Oylaması</h3>
+            <p class="text-sm text-gray-300">Seyirciler soruya şu şekilde cevap verdi:</p>
+            <div class="bar-container" id="audience-bars">
+                <!-- Bars here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Phone Joker Modal -->
+    <div id="modal-phone" class="joker-modal flex">
+        <div class="joker-content relative">
+            <button onclick="document.getElementById('modal-phone').style.display='none'" class="absolute top-2 right-4 text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+            <h3 class="text-xl font-bold mb-4"><i class="fas fa-phone-alt text-[#f7931a] mr-2"></i>Arkadaşını Arıyorsun...</h3>
+            <div id="phone-typing" class="text-gray-300 italic mb-4">Çalıyor...</div>
+            <div id="phone-answer" class="text-lg font-semibold text-white hidden p-4 bg-black/30 rounded border border-[#2354a3]">
+                "Emin değilim ama bence cevap <span id="phone-letter" class="text-[#f7931a] text-2xl font-black mx-1">A</span> şıkkı."
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sorular = {{ sorular | tojson | safe }};
+        const moneyLadder = [
+            { step: 1, amount: 100, safe: false },
+            { step: 2, amount: 200, safe: false },
+            { step: 3, amount: 300, safe: false },
+            { step: 4, amount: 500, safe: false },
+            { step: 5, amount: 1000, safe: true },
+            { step: 6, amount: 2000, safe: false },
+            { step: 7, amount: 4000, safe: false },
+            { step: 8, amount: 8000, safe: false },
+            { step: 9, amount: 16000, safe: false },
+            { step: 10, amount: 32000, safe: true },
+            { step: 11, amount: 64000, safe: false },
+            { step: 12, amount: 125000, safe: false },
+            { step: 13, amount: 250000, safe: false },
+            { step: 14, amount: 500000, safe: false },
+            { step: 15, amount: 1000000, safe: true }
+        ];
+
+        let currentQuestionIndex = 0;
+        let guaranteedPrize = 0;
+        let isWaiting = false;
+        
+        let used50 = false;
+        let usedPhone = false;
+        let usedAudience = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('modal-audience').style.display = 'none';
+            document.getElementById('modal-phone').style.display = 'none';
+            buildMoneyTree();
+            loadQuestion();
+        });
+
+        function buildMoneyTree() {
+            const tree = document.getElementById('money-tree');
+            tree.innerHTML = '';
+            
+            // Render in reverse so 15 is at top
+            [...moneyLadder].reverse().forEach(level => {
+                const div = document.createElement('div');
+                div.className = `money-step flex ${level.safe ? 'safe' : ''}`;
+                div.id = `tree-step-${level.step}`;
+                
+                const stepNum = document.createElement('span');
+                stepNum.textContent = level.step;
+                
+                const amount = document.createElement('span');
+                amount.innerHTML = `${level.amount.toLocaleString('tr-TR')} <i class="fas fa-coins text-xs ml-1 opacity-70"></i>`;
+                
+                div.appendChild(stepNum);
+                div.appendChild(amount);
+                tree.appendChild(div);
+            });
+        }
+
+        function updateMoneyTree() {
+            // Reset all active
+            document.querySelectorAll('.money-step').forEach(el => el.classList.remove('active', 'passed'));
+            
+            // Mark passed
+            for(let i=1; i<=currentQuestionIndex; i++) {
+                const el = document.getElementById(`tree-step-${i}`);
+                if(el) el.classList.add('passed');
+            }
+            
+            // Mark active
+            const currentStep = currentQuestionIndex + 1;
+            if(currentStep <= 15) {
+                const activeEl = document.getElementById(`tree-step-${currentStep}`);
+                if(activeEl) activeEl.classList.add('active');
+            }
+            
+            if(currentQuestionIndex > 0) {
+                document.getElementById('cekil-btn').classList.remove('hidden');
+            }
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= 15 || currentQuestionIndex >= sorular.length) {
+                endGame(true);
+                return;
+            }
+
+            const s = sorular[currentQuestionIndex];
+            document.getElementById('q-text').textContent = s.soru_metni;
+            
+            // Reset options
+            ['A','B','C','D'].forEach(harf => {
+                const btn = document.getElementById(`opt-${harf}`);
+                btn.className = "mil-box option-box";
+                btn.disabled = false;
+                btn.style.visibility = 'visible';
+                document.getElementById(`text-${harf}`).textContent = s[`secenek_${harf.toLowerCase()}`];
+            });
+
+            isWaiting = false;
+            updateMoneyTree();
+        }
+
+        function cevapVer(harf) {
+            if (isWaiting) return;
+            isWaiting = true;
+
+            const s = sorular[currentQuestionIndex];
+            const secilenBtn = document.getElementById(`opt-${harf}`);
+            const dogruBtn = document.getElementById(`opt-${s.dogru_cevap}`);
+
+            // 1. Durum: Seçildi efekti (sarı)
+            secilenBtn.classList.add('state-selected');
+
+            // Gerilimli bekleme
+            setTimeout(() => {
+                secilenBtn.classList.remove('state-selected');
+                
+                if (harf === s.dogru_cevap) {
+                    // DOĞRU
+                    dogruBtn.classList.add('state-correct');
+                    
+                    // Update guaranteed prize
+                    const currentLevel = moneyLadder.find(l => l.step === currentQuestionIndex + 1);
+                    if(currentLevel.safe) {
+                        guaranteedPrize = currentLevel.amount;
+                    }
+
+                    setTimeout(() => {
+                        currentQuestionIndex++;
+                        loadQuestion();
+                    }, 2500);
+
+                } else {
+                    // YANLIŞ
+                    secilenBtn.classList.add('state-wrong');
+                    
+                    // Doğruyu göster
+                    setTimeout(() => {
+                        dogruBtn.classList.add('state-correct');
+                    }, 1000);
+
+                    setTimeout(() => {
+                        endGame(false);
+                    }, 3500);
+                }
+            }, 3000); // 3 seconds suspense
+        }
+
+        function cekil() {
+            if (isWaiting) return;
+            // Get current won amount (previous step)
+            if(currentQuestionIndex === 0) return;
+            const wonAmount = moneyLadder[currentQuestionIndex - 1].amount;
+            endGame(false, wonAmount);
+        }
+
+        function endGame(wonAll, manualAmount = null) {
+            document.getElementById('lifelines-container').style.display = 'none';
+            document.getElementById('game-container').style.display = 'none';
+            
+            const goContainer = document.getElementById('game-over-container');
+            const goTitle = document.getElementById('go-title');
+            const goPrize = document.getElementById('go-prize');
+            
+            goContainer.classList.remove('hidden');
+
+            let finalPrize = 0;
+            if (wonAll) {
+                finalPrize = 1000000;
+                goTitle.textContent = "İNANILMAZ! MİLYONER OLDUN!";
+                confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+            } else if (manualAmount !== null) {
+                finalPrize = manualAmount;
+                goTitle.textContent = "MANTIKLI KARAR!";
+            } else {
+                finalPrize = guaranteedPrize;
+                goTitle.textContent = "MAALESEF YANLIŞ CEVAP!";
+                goTitle.style.color = "#ff3b3b";
+            }
+
+            goPrize.textContent = finalPrize.toLocaleString('tr-TR') + " HE-Coin";
+
+            // Skor kaydetme isteği gönderilebilir
+            if(finalPrize > 0) {
+                fetch('/api/skor_kaydet', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        oyun_id: {{ oyun.id }},
+                        puan: finalPrize,
+                        dogru_sayisi: currentQuestionIndex
+                    })
+                }).catch(e => console.log('Skor kaydedilemedi.'));
+            }
+        }
+
+        // --- LİFELİNES ---
+        
+        function kullanJoker50() {
+            if(used50 || isWaiting) return;
+            used50 = true;
+            document.getElementById('joker-50').classList.add('used');
+            
+            const s = sorular[currentQuestionIndex];
+            const yanlisHarfler = ['A','B','C','D'].filter(h => h !== s.dogru_cevap);
+            
+            // Randomly pick 2 wrong options to hide
+            const hide1 = yanlisHarfler.splice(Math.floor(Math.random() * yanlisHarfler.length), 1)[0];
+            const hide2 = yanlisHarfler.splice(Math.floor(Math.random() * yanlisHarfler.length), 1)[0];
+            
+            document.getElementById(`opt-${hide1}`).style.visibility = 'hidden';
+            document.getElementById(`opt-${hide2}`).style.visibility = 'hidden';
+        }
+
+        function kullanJokerSeyirci() {
+            if(usedAudience || isWaiting) return;
+            usedAudience = true;
+            document.getElementById('joker-audience').classList.add('used');
+            
+            const modal = document.getElementById('modal-audience');
+            modal.style.display = 'flex';
+            
+            const s = sorular[currentQuestionIndex];
+            const dogruHarf = s.dogru_cevap;
+            
+            // Generate realistic percentages
+            // If easy questions (early), audience is very right. If hard (late), audience is divided.
+            let rightProb = 85;
+            if(currentQuestionIndex > 4) rightProb = 65;
+            if(currentQuestionIndex > 9) rightProb = 40;
+            
+            let percents = {A:0, B:0, C:0, D:0};
+            
+            // Check hidden options (if 50:50 used)
+            let activeOptions = [];
+            ['A','B','C','D'].forEach(h => {
+                if(document.getElementById(`opt-${h}`).style.visibility !== 'hidden') {
+                    activeOptions.push(h);
+                }
+            });
+
+            if(activeOptions.length === 2) {
+                // 50:50 was used
+                percents[dogruHarf] = rightProb + Math.floor(Math.random()*10);
+                let wrongHarf = activeOptions.find(h => h !== dogruHarf);
+                percents[wrongHarf] = 100 - percents[dogruHarf];
+            } else {
+                // Generate 4 random pieces summing to 100
+                percents[dogruHarf] = rightProb;
+                let remain = 100 - rightProb;
+                
+                let wrong1 = Math.floor(Math.random() * remain);
+                remain -= wrong1;
+                let wrong2 = Math.floor(Math.random() * remain);
+                remain -= wrong2;
+                let wrong3 = remain;
+                
+                const wrongs = ['A','B','C','D'].filter(h => h !== dogruHarf);
+                percents[wrongs[0]] = wrong1;
+                percents[wrongs[1]] = wrong2;
+                percents[wrongs[2]] = wrong3;
+            }
+
+            // Draw bars
+            const container = document.getElementById('audience-bars');
+            container.innerHTML = '';
+            
+            ['A','B','C','D'].forEach(h => {
+                const p = percents[h];
+                const wrapper = document.createElement('div');
+                wrapper.className = 'bar-wrapper';
+                
+                wrapper.innerHTML = `
+                    <div class="bar-pct">0%</div>
+                    <div class="bar" style="height: 0%"></div>
+                    <div class="bar-label">${h}</div>
+                `;
+                container.appendChild(wrapper);
+                
+                // Animate
+                setTimeout(() => {
+                    wrapper.querySelector('.bar').style.height = `${p}%`;
+                    wrapper.querySelector('.bar-pct').textContent = `${p}%`;
+                }, 100);
+            });
+        }
+
+        function kullanJokerTelefon() {
+            if(usedPhone || isWaiting) return;
+            usedPhone = true;
+            document.getElementById('joker-phone').classList.add('used');
+            
+            const modal = document.getElementById('modal-phone');
+            modal.style.display = 'flex';
+            
+            document.getElementById('phone-typing').style.display = 'block';
+            document.getElementById('phone-answer').style.display = 'none';
+            
+            const s = sorular[currentQuestionIndex];
+            const dogruHarf = s.dogru_cevap;
+            
+            // Logic: friend gets it right more often early, struggles later.
+            let rightProb = currentQuestionIndex > 9 ? 0.5 : 0.9;
+            let guessedHarf = dogruHarf;
+            
+            if(Math.random() > rightProb) {
+                // Wrong guess
+                const activeWrongs = ['A','B','C','D'].filter(h => h !== dogruHarf && document.getElementById(`opt-${h}`).style.visibility !== 'hidden');
+                if(activeWrongs.length > 0) {
+                    guessedHarf = activeWrongs[Math.floor(Math.random() * activeWrongs.length)];
+                }
+            }
+
+            // Responses
+            const responses = [
+                `Emin değilim ama bence cevap şıkkı`,
+                `Bu konuyu daha önce okumuştum, kesinlikle`,
+                `Çok zor bir soru, tam emin olamamakla birlikte`,
+                `İçime doğdu, bence doğru cevap`
+            ];
+            
+            setTimeout(() => {
+                document.getElementById('phone-typing').style.display = 'none';
+                const answerBox = document.getElementById('phone-answer');
+                answerBox.style.display = 'block';
+                
+                const prefix = responses[Math.floor(Math.random() * responses.length)];
+                answerBox.innerHTML = `"${prefix} <span class='text-[#f7931a] text-2xl font-black mx-1'>${guessedHarf}</span> olmalı."`;
+            }, 3000);
+        }
+
+    </script>
+</body>
+</html>
