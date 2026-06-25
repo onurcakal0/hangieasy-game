@@ -10,7 +10,7 @@ import threading
 from datetime import date
 
 # --- FLASK VE EKLENTİLER ---
-from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, emit, join_room
 from flask_cors import CORS
@@ -1728,6 +1728,9 @@ def hangisi_tepki_ver():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 400
 
+@app.route('/ads.txt')
+def serve_ads_txt():
+    return send_from_directory('static', 'ads.txt')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
