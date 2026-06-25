@@ -1118,6 +1118,11 @@ def oyun_sil(oyun_id):
 
 @app.route('/kayit', methods=['GET', 'POST'])
 def kayit():
+    # Misafir olarak skor kaydedip gelenleri yakala
+    if request.args.get('hangisi_oyun_id') and request.args.get('hangisi_skor'):
+        session['pending_hangisi_oyun_id'] = request.args.get('hangisi_oyun_id')
+        session['pending_hangisi_skor'] = request.args.get('hangisi_skor')
+
     if request.method == 'POST':
         ad_soyad = request.form.get('ad_soyad')
         kullanici_adi = request.form.get('kullanici_adi')
@@ -1194,6 +1199,25 @@ def dogrula():
             session.pop('onay_bekleyen_eposta', None)
             session['kullanici_adi'] = kullanici.kullanici_adi
             session['onayli_mi'] = True
+            
+            # --- MİSAFİR TRIVIA SKOR KAYDI KONTROLÜ ---
+            pending_oyun = session.get('pending_hangisi_oyun_id')
+            pending_skor = session.get('pending_hangisi_skor')
+            if pending_oyun and pending_skor:
+                try:
+                    yeni_skor = HangisiSkor(
+                        oyun_id=int(pending_oyun),
+                        kullanici_adi=kullanici.kullanici_adi,
+                        puan=int(pending_skor)
+                    )
+                    db.session.add(yeni_skor)
+                    db.session.commit()
+                    # Temizle
+                    session.pop('pending_hangisi_oyun_id', None)
+                    session.pop('pending_hangisi_skor', None)
+                except Exception as e:
+                    pass
+            # ------------------------------------------
             
             return render_template('dogrulama_basarili.html')
         else:

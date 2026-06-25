@@ -38,14 +38,19 @@
             padding: 20px; position: relative; z-index: 2; overflow-y: auto;
         }
         
-        .progress-bar { width: 100%; max-width: 600px; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 30px; overflow: hidden; }
+        .progress-bar { width: 100%; max-width: 600px; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 15px; overflow: hidden; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #00f2fe, #4facfe); width: 0%; transition: 0.3s; }
+
+        /* TIMER BAR */
+        .timer-bar-container { width: 100%; max-width: 600px; height: 15px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 20px; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.1); }
+        .timer-fill { height: 100%; background: #2ecc71; width: 100%; transition: width 1s linear, background-color 0.5s; }
+        .timer-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; letter-spacing: 1px; color: #fff; text-shadow: 0 0 5px #000; }
 
         .question-box {
             width: 100%; max-width: 600px; background: rgba(10, 20, 50, 0.8);
             border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 20px;
             padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px); position: relative;
         }
         .q-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 20px; display: none; }
         .q-text { font-size: 24px; font-weight: 800; margin-bottom: 30px; line-height: 1.4; }
@@ -62,6 +67,52 @@
         .option-btn.correct { background: rgba(46, 204, 113, 0.2); border-color: #2ecc71; color: #2ecc71; }
         .option-btn.wrong { background: rgba(231, 76, 60, 0.2); border-color: #e74c3c; color: #e74c3c; }
 
+        /* END SCREEN */
+        .end-screen {
+            display: none; width: 100%; max-width: 800px; text-align: center; z-index: 10;
+        }
+        .score-display { font-size: 60px; font-weight: 900; color: #00f2fe; text-shadow: 0 0 20px rgba(0,242,254,0.5); margin-bottom: 10px; }
+        
+        /* KAYIT OL BUTONU (MİSAFİR İÇİN) */
+        .guest-signup-box {
+            background: rgba(255, 85, 136, 0.1); border: 1px dashed #ff5588; border-radius: 15px;
+            padding: 20px; margin: 20px auto; max-width: 500px;
+        }
+        .guest-signup-btn {
+            display: inline-block; background: linear-gradient(45deg, #ff0055, #ff5588); color: #fff;
+            padding: 10px 25px; border-radius: 30px; font-weight: 800; text-decoration: none;
+            margin-top: 10px; box-shadow: 0 5px 15px rgba(255,0,85,0.4); transition: 0.3s;
+        }
+        .guest-signup-btn:hover { transform: scale(1.05); }
+
+        .reactions-bar { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .react-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 5px 15px; cursor: pointer; color: #fff; font-size: 16px;
+            display: flex; align-items: center; gap: 5px; transition: 0.2s;
+        }
+        .react-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
+
+        /* CEVAPLARIM EKRANI */
+        .answers-summary { display: none; text-align: left; margin-top: 30px; }
+        .answers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 10px; }
+        .ans-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .ans-img { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+        .ans-badge { font-size: 10px; padding: 3px 6px; border-radius: 5px; font-weight: bold; margin-bottom: 5px; display: inline-block; }
+        .bg-green { background: rgba(46,204,113,0.2); color: #2ecc71; }
+        .bg-red { background: rgba(231,76,60,0.2); color: #e74c3c; }
+
+        .related-quizzes { margin-top: 40px; text-align: left; }
+        .related-title { font-size: 18px; font-weight: 800; margin-bottom: 15px; color: #81d4fa; }
+        .related-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .related-card {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; padding: 15px; text-decoration: none; color: #fff;
+            display: flex; align-items: center; gap: 15px; transition: 0.2s;
+        }
+        .related-card:hover { background: rgba(0,242,254,0.1); border-color: #00f2fe; }
+        .related-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
+        
         /* RIGHT SIDEBAR - LEADERBOARD */
         .right-sidebar {
             width: 300px; background: rgba(0, 10, 30, 0.9); border-left: 1px solid rgba(0, 242, 254, 0.2);
@@ -78,35 +129,6 @@
         .lb-item.top-2 { color: #bdc3c7; font-weight: bold; }
         .lb-item.top-3 { color: #cd7f32; font-weight: bold; }
 
-        /* REACTIONS & SHARE */
-        .reactions-bar {
-            display: flex; gap: 10px; justify-content: center; margin-top: 20px;
-        }
-        .react-btn {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px; padding: 5px 15px; cursor: pointer; color: #fff; font-size: 16px;
-            display: flex; align-items: center; gap: 5px; transition: 0.2s;
-        }
-        .react-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
-
-        /* END SCREEN */
-        .end-screen {
-            display: none; width: 100%; max-width: 800px; text-align: center; z-index: 10;
-        }
-        .score-display { font-size: 60px; font-weight: 900; color: #00f2fe; text-shadow: 0 0 20px rgba(0,242,254,0.5); margin-bottom: 20px; }
-        
-        .related-quizzes { margin-top: 40px; text-align: left; }
-        .related-title { font-size: 18px; font-weight: 800; margin-bottom: 15px; color: #81d4fa; }
-        .related-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .related-card {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px; padding: 15px; text-decoration: none; color: #fff;
-            display: flex; align-items: center; gap: 15px; transition: 0.2s;
-        }
-        .related-card:hover { background: rgba(0,242,254,0.1); border-color: #00f2fe; }
-        .related-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
-        
-        /* MOBILE LB TOGGLE */
         .lb-toggle {
             display: none; position: fixed; bottom: 20px; right: 20px;
             background: #00f2fe; color: #000; width: 50px; height: 50px;
@@ -124,6 +146,13 @@
             position: absolute; inset: 0; z-index: 0;
             background: radial-gradient(circle at center, rgba(0,242,254,0.05) 0%, transparent 70%);
         }
+        
+        .btn-blue {
+            background: rgba(0,242,254,0.1); border: 1px solid #00f2fe; color: #00f2fe;
+            padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: bold;
+            transition: 0.3s; margin-top: 15px;
+        }
+        .btn-blue:hover { background: #00f2fe; color: #000; }
     </style>
 </head>
 <body>
@@ -139,6 +168,11 @@
         <!-- OYUN ALANI -->
         <div class="quiz-area" id="quiz-area">
             <div class="progress-bar"><div class="progress-fill" id="p-fill"></div></div>
+            
+            <div class="timer-bar-container" id="timer-box">
+                <div class="timer-fill" id="timer-fill"></div>
+                <div class="timer-text" id="timer-text">20 Saniye</div>
+            </div>
             
             <div class="question-box" id="q-box">
                 <img src="" id="q-img" class="q-img">
@@ -156,6 +190,21 @@
             <div class="end-screen" id="end-screen">
                 <h2 style="font-size: 24px; margin-bottom: 10px;">Test Tamamlandı!</h2>
                 <div class="score-display" id="final-score">0 Puan</div>
+                
+                {% if kullanici_adi == 'Misafir' %}
+                <div class="guest-signup-box" id="guest-signup-box">
+                    <h3 style="color:#ff5588; margin-bottom:10px;">Skorunu Kaybetme!</h3>
+                    <p style="font-size:13px; color:#ddd; margin-bottom:15px;">Liderlik tablosuna adını yazdırmak için hemen kayıt ol, skorunu otomatik kaydedelim.</p>
+                    <a href="#" id="guest-register-link" class="guest-signup-btn">Hemen Kayıt Ol</a>
+                </div>
+                {% endif %}
+                
+                <button class="btn-blue" onclick="cevaplarimiGoster()">Cevaplarımı Gör</button>
+                
+                <div class="answers-summary" id="answers-summary">
+                    <h3 style="margin-bottom:15px; color:#00f2fe;">Verdiğin Cevaplar:</h3>
+                    <div class="answers-grid" id="answers-grid"></div>
+                </div>
                 
                 <div class="reactions-bar">
                     <button class="react-btn" onclick="tepkiVer('ates')">🔥 <span id="r-ates">{{ tepkiler.get('ates', 0) }}</span></button>
@@ -212,6 +261,12 @@
         let siradakiSoru = 0;
         let puan = 0;
         let kilit = false;
+        
+        let timerInterval;
+        let kalanSure = 20;
+        const TIMER_SANIYE = 20;
+        
+        let kullaniciCevaplari = [];
 
         function soruyuYukle() {
             if (siradakiSoru >= sorular.length) {
@@ -232,23 +287,88 @@
                 document.getElementById('q-img').style.display = 'none';
             }
             
-            document.getElementById('btn-A').innerText = s.secenek_a; document.getElementById('btn-A').className = 'option-btn';
-            document.getElementById('btn-B').innerText = s.secenek_b; document.getElementById('btn-B').className = 'option-btn';
-            document.getElementById('btn-C').innerText = s.secenek_c; document.getElementById('btn-C').className = 'option-btn';
-            document.getElementById('btn-D').innerText = s.secenek_d; document.getElementById('btn-D').className = 'option-btn';
+            // Gizle / Göster butonları (Sadece dolu olanları göster)
+            const butonlar = ['A', 'B', 'C', 'D'];
+            butonlar.forEach(harf => {
+                let btn = document.getElementById('btn-' + harf);
+                btn.className = 'option-btn'; // Reset classes
+                let metin = s['secenek_' + harf.toLowerCase()];
+                if(metin && metin.trim() !== '') {
+                    btn.innerText = metin;
+                    btn.style.display = 'block';
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+            
+            zamanlayiciyiBaslat();
+        }
+        
+        function zamanlayiciyiBaslat() {
+            clearInterval(timerInterval);
+            kalanSure = TIMER_SANIYE;
+            guncelleTimerUI();
+            
+            timerInterval = setInterval(() => {
+                kalanSure--;
+                guncelleTimerUI();
+                
+                if(kalanSure <= 0) {
+                    clearInterval(timerInterval);
+                    sureBitti();
+                }
+            }, 1000);
+        }
+        
+        function guncelleTimerUI() {
+            let fill = document.getElementById('timer-fill');
+            let txt = document.getElementById('timer-text');
+            
+            let yuzde = (kalanSure / TIMER_SANIYE) * 100;
+            fill.style.width = yuzde + '%';
+            txt.innerText = kalanSure + ' Saniye';
+            
+            if(kalanSure > 10) fill.style.backgroundColor = '#2ecc71';
+            else if(kalanSure > 5) fill.style.backgroundColor = '#f1c40f';
+            else fill.style.backgroundColor = '#e74c3c';
+        }
+
+        function sureBitti() {
+            if(kilit) return;
+            kilit = true;
+            let s = sorular[siradakiSoru];
+            let dogru = s.dogru_cevap;
+            document.getElementById('btn-' + dogru).classList.add('correct');
+            
+            kullaniciCevaplari.push({
+                soru: s, secilen: 'Zaman Aşımı', dogru_mu: false
+            });
+            
+            setTimeout(() => {
+                siradakiSoru++;
+                soruyuYukle();
+            }, 1500);
         }
 
         function cevapVer(secim) {
             if (kilit) return;
             kilit = true;
+            clearInterval(timerInterval); // Durdur
             
             let s = sorular[siradakiSoru];
             let dogru = s.dogru_cevap;
             
             document.getElementById('btn-' + dogru).classList.add('correct');
             
-            if (secim === dogru) {
-                puan += 100; // Fast response bonus could be added here
+            let isCorrect = (secim === dogru);
+            kullaniciCevaplari.push({
+                soru: s, secilen: s['secenek_' + secim.toLowerCase()], dogru_mu: isCorrect
+            });
+            
+            if (isCorrect) {
+                // Dinamik Puan: Taban Puan (100) + Hız Bonusu (Kalan saniye * 10)
+                let kazanilanPuan = 100 + (kalanSure * 10);
+                puan += kazanilanPuan;
                 confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 }, colors: ['#00f2fe', '#4facfe'] });
             } else {
                 document.getElementById('btn-' + secim).classList.add('wrong');
@@ -261,13 +381,21 @@
         }
 
         function oyunuBitir() {
+            clearInterval(timerInterval);
             document.getElementById('q-box').style.display = 'none';
+            document.getElementById('timer-box').style.display = 'none';
             document.getElementById('p-fill').style.width = '100%';
             document.getElementById('end-screen').style.display = 'block';
             
+            // Misafir kayıt linkini güncelle
+            let registerLink = document.getElementById('guest-register-link');
+            if(registerLink) {
+                registerLink.href = `/kayit?hangisi_oyun_id=${oyunId}&hangisi_skor=${puan}`;
+            }
+            
             // Animate score
             let cur = 0;
-            let inc = puan / 50;
+            let inc = puan / 50 || 1;
             let iv = setInterval(() => {
                 cur += inc;
                 if(cur >= puan) { cur = puan; clearInterval(iv); }
@@ -276,8 +404,8 @@
             
             confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
             
-            // Save to DB
-            if (puan > 0) {
+            // Kayıtlıysa skor kaydet
+            if (kullaniciAdi !== 'Misafir' && puan > 0) {
                 fetch('/api/hangisi/skor_kaydet', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -285,8 +413,39 @@
                 });
             }
         }
+        
+        function cevaplarimiGoster() {
+            let container = document.getElementById('answers-summary');
+            let grid = document.getElementById('answers-grid');
+            
+            if(container.style.display === 'block') {
+                container.style.display = 'none';
+                return;
+            }
+            
+            grid.innerHTML = '';
+            kullaniciCevaplari.forEach((cvp, index) => {
+                let dogruMetin = cvp.soru['secenek_' + cvp.soru.dogru_cevap.toLowerCase()];
+                let badge = cvp.dogru_mu ? `<div class="ans-badge bg-green">DOĞRU</div>` : `<div class="ans-badge bg-red">YANLIŞ</div>`;
+                
+                grid.innerHTML += `
+                    <div class="ans-card">
+                        ${cvp.soru.resim_url ? `<img src="${cvp.soru.resim_url}" class="ans-img">` : ''}
+                        ${badge}
+                        <div style="font-size:11px; margin-bottom:5px; color:#ccc;">Senin Cevabın:<br><strong style="color:#fff;">${cvp.secilen}</strong></div>
+                        ${!cvp.dogru_mu ? `<div style="font-size:11px; color:#2ecc71;">Doğrusu:<br><strong>${dogruMetin}</strong></div>` : ''}
+                    </div>
+                `;
+            });
+            
+            container.style.display = 'block';
+        }
 
         function tepkiVer(tip) {
+            if(kullaniciAdi === 'Misafir') {
+                alert("Tepki bırakmak için giriş yapmalısınız!");
+                return;
+            }
             fetch('/api/hangisi/tepki', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -303,7 +462,10 @@
         }
 
         if(sorular.length > 0) soruyuYukle();
-        else document.getElementById('q-text').innerText = "Bu testte henüz soru yok.";
+        else {
+            document.getElementById('timer-box').style.display = 'none';
+            document.getElementById('q-text').innerText = "Bu testte henüz soru yok.";
+        }
     </script>
 </body>
 </html>
