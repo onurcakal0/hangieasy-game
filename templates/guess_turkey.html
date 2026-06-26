@@ -205,6 +205,7 @@
             <h2 id="bitis-baslik" style="font-size: 40px; margin-bottom: 10px;">SÜRE DOLDU!</h2>
             <div id="bitis-skor" style="font-size: 60px; font-weight: 900; color: #facc15; margin-bottom: 30px;">0 / 81</div>
             <a href="/dashboard" class="btn-anasayfa">🏠 Ana Sayfaya Dön</a>
+            <button onclick="document.getElementById('bitis-ekrani').style.display='none'" class="btn-anasayfa" style="background: #3498db; margin-left: 10px;">🗺️ Haritayı İncele</button>
         </div>
     </div>
 
@@ -302,8 +303,12 @@
                 .enter().append("path")
                 .attr("class", "il-path")
                 .attr("id", d => {
-                    let name = d.properties.name;
+                    let name = d.properties.name || "";
                     if(name === "Afyon") name = "Afyonkarahisar";
+                    if(name === "K. Maras") name = "Kahramanmaras";
+                    if(name === "Kinkkale") name = "Kirikkale";
+                    if(name === "Zinguldak") name = "Zonguldak";
+                    if(name === "Gümüshane") name = "Gumushane";
                     return "path-" + normalize(name);
                 })
                 .attr("d", path);
