@@ -195,7 +195,7 @@
                 <h2 style="font-size: 24px; margin-bottom: 10px;">Test Tamamlandı!</h2>
                 <div class="score-display" id="final-score">0 Puan</div>
                 
-                {% if kullanici_adi == 'Misafir' %}
+                {% if kullanici_adi == 'Misafir' and '4 İşlem' not in oyun.baslik %}
                 <div class="guest-signup-box" id="guest-signup-box">
                     <h3 style="color:#ff5588; margin-bottom:10px;">Skorunu Kaybetme!</h3>
                     <p style="font-size:13px; color:#ddd; margin-bottom:15px;">Liderlik tablosuna adını yazdırmak için hemen kayıt ol, skorunu otomatik kaydedelim.</p>
@@ -238,6 +238,7 @@
         </div>
 
         <!-- LİDERLİK TABLOSU -->
+        {% if '4 İşlem' not in oyun.baslik %}
         <div class="right-sidebar" id="right-sidebar">
             <div class="lb-title">🏆 Skor Tablosu</div>
             <div class="lb-list">
@@ -251,11 +252,14 @@
                 {% endfor %}
             </div>
         </div>
+        {% endif %}
     </div>
 
+    {% if '4 İşlem' not in oyun.baslik %}
     <div class="lb-toggle" onclick="document.getElementById('right-sidebar').classList.toggle('open')">
         <i class="fa-solid fa-trophy"></i>
     </div>
+    {% endif %}
 
     <script>
         const sorular = {{ sorular | tojson }};
@@ -267,8 +271,8 @@
         let kilit = false;
         
         let timerInterval;
-        let kalanSure = 20;
-        const TIMER_SANIYE = 20;
+        const TIMER_SANIYE = "{{ oyun.baslik }}".includes("4 İşlem") ? 10 : 20;
+        let kalanSure = TIMER_SANIYE;
         
         let kullaniciCevaplari = [];
 
