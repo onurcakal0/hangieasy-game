@@ -237,15 +237,26 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;
         }
-        /* Kategori Kaydırıcı Stilleri */
-        .kategori-seksiyon { margin-bottom: 50px; }
+        .kategori-seksiyon { margin-bottom: 50px; position: relative; }
         .kategori-baslik { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .slider-wrapper { position: relative; width: 100%; display: flex; align-items: center; }
         .kategori-slider {
             display: flex; gap: 25px; overflow-x: auto; padding-bottom: 20px; 
             scroll-snap-type: x mandatory; scroll-behavior: smooth;
-            -ms-overflow-style: none; scrollbar-width: none;
+            -ms-overflow-style: none; scrollbar-width: none; width: 100%;
         }
         .kategori-slider::-webkit-scrollbar { display: none; }
+        .slider-ok {
+            background: rgba(0, 0, 0, 0.6); color: white; border: 1px solid rgba(255,255,255,0.1);
+            position: absolute; top: 40%; transform: translateY(-50%); z-index: 10;
+            width: 40px; height: 40px; border-radius: 50%; font-size: 18px; display: flex;
+            align-items: center; justify-content: center; cursor: pointer; opacity: 0.6;
+            transition: all 0.3s ease; backdrop-filter: blur(5px);
+        }
+        .slider-ok:hover { opacity: 1; border-color: #00f2fe; box-shadow: 0 0 15px rgba(0, 242, 254, 0.4); transform: translateY(-50%) scale(1.1); }
+        .sol-ok { left: -15px; }
+        .sag-ok { right: -15px; }
+        @media (max-width: 768px) { .sol-ok { left: 0; } .sag-ok { right: 0; } }
         .oyun-karti {
             flex: 0 0 320px; scroll-snap-align: start;
             background: rgba(25, 25, 35, 0.5); backdrop-filter: blur(10px);
@@ -699,30 +710,34 @@
             {% for kat in kategoriler %}
             <div class="kategori-seksiyon">
                 <h3 class="kategori-baslik">🏷️ {{ kat }} Testleri</h3>
-                <div class="kategori-slider">
-                    {% for oyun in oyunlar %}
-                        {% if oyun.kategori == kat %}
-                        <div class="oyun-karti" 
-                             data-baslik="{{ oyun.baslik }}" 
-                             data-aciklama="{{ oyun.aciklama }}" 
-                             data-resim="{{ oyun.resim_url }}" 
-                             data-yazar="{{ oyun.olusturan.kullanici_adi | default('Onur Çakal') }}" 
-                             data-tarih="{{ oyun.olusturma_tarihi | default('Yakın Zamanda') }}"
-                             data-link-tek="{{ url_for('oyun_sayfasi', oyun_id=oyun.id) }}"
-                             data-link-vs="{{ url_for('duello_kur', oyun_id=oyun.id) }}"
-                             data-link-yayin="{{ url_for('yayin_baslat', oyun_id=oyun.id) }}"
-                             data-oyun-modu="{{ oyun.oyun_modu }}"
-                             onclick="modalAc(this)">
-                             
-                            <img src="{{ oyun.resim_url }}" alt="Oyun Resmi" class="oyun-resmi" loading="lazy">
-                            <div class="kart-icerik">
-                                <div class="kategori-etiketi">{{ oyun.kategori }} • {{ oyun.oyun_modu|upper }}</div>
-                                <h3 class="kart-baslik">{{ oyun.baslik }}</h3>
-                                <p class="kart-aciklama">{{ oyun.aciklama }}</p>
+                <div class="slider-wrapper">
+                    <button class="slider-ok sol-ok" onclick="kaydir(this, -345)">❮</button>
+                    <div class="kategori-slider">
+                        {% for oyun in oyunlar %}
+                            {% if oyun.kategori == kat %}
+                            <div class="oyun-karti" 
+                                 data-baslik="{{ oyun.baslik }}" 
+                                 data-aciklama="{{ oyun.aciklama }}" 
+                                 data-resim="{{ oyun.resim_url }}" 
+                                 data-yazar="{{ oyun.olusturan.kullanici_adi | default('Onur Çakal') }}" 
+                                 data-tarih="{{ oyun.olusturma_tarihi | default('Yakın Zamanda') }}"
+                                 data-link-tek="{{ url_for('oyun_sayfasi', oyun_id=oyun.id) }}"
+                                 data-link-vs="{{ url_for('duello_kur', oyun_id=oyun.id) }}"
+                                 data-link-yayin="{{ url_for('yayin_baslat', oyun_id=oyun.id) }}"
+                                 data-oyun-modu="{{ oyun.oyun_modu }}"
+                                 onclick="modalAc(this)">
+                                 
+                                <img src="{{ oyun.resim_url }}" alt="Oyun Resmi" class="oyun-resmi" loading="lazy">
+                                <div class="kart-icerik">
+                                    <div class="kategori-etiketi">{{ oyun.kategori }} • {{ oyun.oyun_modu|upper }}</div>
+                                    <h3 class="kart-baslik">{{ oyun.baslik }}</h3>
+                                    <p class="kart-aciklama">{{ oyun.aciklama }}</p>
+                                </div>
                             </div>
-                        </div>
-                        {% endif %}
-                    {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <button class="slider-ok sag-ok" onclick="kaydir(this, 345)">❯</button>
                 </div>
             </div>
             {% endfor %}
@@ -879,6 +894,24 @@
             noktalar.forEach(n => n.classList.remove('aktif'));
             if(noktalar[suAnkiSlayt]) noktalar[suAnkiSlayt].classList.add('aktif');
         }
+
+        // --- KATEGORİ SLİDER OKLARI ---
+        function kaydir(btn, miktar) {
+            let slider = btn.parentElement.querySelector('.kategori-slider');
+            slider.scrollBy({ left: miktar, behavior: 'smooth' });
+        }
+        
+        // Okların görünürlüğünü dinamik güncelle (opsiyonel)
+        document.querySelectorAll('.kategori-slider').forEach(slider => {
+            slider.addEventListener('scroll', function() {
+                let leftArrow = this.parentElement.querySelector('.sol-ok');
+                let rightArrow = this.parentElement.querySelector('.sag-ok');
+                if(this.scrollLeft <= 10) { leftArrow.style.opacity = "0.2"; } else { leftArrow.style.opacity = "0.6"; }
+                if(this.scrollLeft + this.clientWidth >= this.scrollWidth - 10) { rightArrow.style.opacity = "0.2"; } else { rightArrow.style.opacity = "0.6"; }
+            });
+            // İlk tetikleme
+            slider.dispatchEvent(new Event('scroll'));
+        });
 
         if(toplamSlayt > 1) {
             setInterval(() => {
