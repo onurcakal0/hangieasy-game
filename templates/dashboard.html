@@ -237,9 +237,17 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;
         }
-        .oyun-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
-
+        /* Kategori Kaydırıcı Stilleri */
+        .kategori-seksiyon { margin-bottom: 50px; }
+        .kategori-baslik { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .kategori-slider {
+            display: flex; gap: 25px; overflow-x: auto; padding-bottom: 20px; 
+            scroll-snap-type: x mandatory; scroll-behavior: smooth;
+            -ms-overflow-style: none; scrollbar-width: none;
+        }
+        .kategori-slider::-webkit-scrollbar { display: none; }
         .oyun-karti {
+            flex: 0 0 320px; scroll-snap-align: start;
             background: rgba(25, 25, 35, 0.5); backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px;
             overflow: hidden; transition: all 0.4s ease; cursor: pointer; display: flex; flex-direction: column;
@@ -677,28 +685,44 @@
     </div>
     {% endif %}
 
-    <!-- OYUN GRİD ALANI -->
+    <!-- OYUN KATEGORİ LİSTESİ ALANI -->
     <div class="icerik">
         <h2 class="vitrin-basligi" id="vitrin-baslik">🎮 Tesisin Tamamı (Tüm Testler)</h2>
-        <div class="oyun-grid" id="oyun-listesi">
+        <div id="oyun-listesi">
+            {% set kategoriler = [] %}
             {% for oyun in oyunlar %}
-            <div class="oyun-karti" 
-                 data-baslik="{{ oyun.baslik }}" 
-                 data-aciklama="{{ oyun.aciklama }}" 
-                 data-resim="{{ oyun.resim_url }}" 
-                 data-yazar="{{ oyun.olusturan.kullanici_adi | default('Onur Çakal') }}" 
-                 data-tarih="{{ oyun.olusturma_tarihi | default('Yakın Zamanda') }}"
-                 data-link-tek="{{ url_for('oyun_sayfasi', oyun_id=oyun.id) }}"
-                 data-link-vs="{{ url_for('duello_kur', oyun_id=oyun.id) }}"
-                 data-link-yayin="{{ url_for('yayin_baslat', oyun_id=oyun.id) }}"
-                 data-oyun-modu="{{ oyun.oyun_modu }}"
-                 onclick="modalAc(this)">
-                 
-                <img src="{{ oyun.resim_url }}" alt="Oyun Resmi" class="oyun-resmi" loading="lazy">
-                <div class="kart-icerik">
-                    <div class="kategori-etiketi">{{ oyun.kategori }} • {{ oyun.oyun_modu|upper }}</div>
-                    <h3 class="kart-baslik">{{ oyun.baslik }}</h3>
-                    <p class="kart-aciklama">{{ oyun.aciklama }}</p>
+                {% if oyun.kategori not in kategoriler %}
+                    {% set _ = kategoriler.append(oyun.kategori) %}
+                {% endif %}
+            {% endfor %}
+
+            {% for kat in kategoriler %}
+            <div class="kategori-seksiyon">
+                <h3 class="kategori-baslik">🏷️ {{ kat }} Testleri</h3>
+                <div class="kategori-slider">
+                    {% for oyun in oyunlar %}
+                        {% if oyun.kategori == kat %}
+                        <div class="oyun-karti" 
+                             data-baslik="{{ oyun.baslik }}" 
+                             data-aciklama="{{ oyun.aciklama }}" 
+                             data-resim="{{ oyun.resim_url }}" 
+                             data-yazar="{{ oyun.olusturan.kullanici_adi | default('Onur Çakal') }}" 
+                             data-tarih="{{ oyun.olusturma_tarihi | default('Yakın Zamanda') }}"
+                             data-link-tek="{{ url_for('oyun_sayfasi', oyun_id=oyun.id) }}"
+                             data-link-vs="{{ url_for('duello_kur', oyun_id=oyun.id) }}"
+                             data-link-yayin="{{ url_for('yayin_baslat', oyun_id=oyun.id) }}"
+                             data-oyun-modu="{{ oyun.oyun_modu }}"
+                             onclick="modalAc(this)">
+                             
+                            <img src="{{ oyun.resim_url }}" alt="Oyun Resmi" class="oyun-resmi" loading="lazy">
+                            <div class="kart-icerik">
+                                <div class="kategori-etiketi">{{ oyun.kategori }} • {{ oyun.oyun_modu|upper }}</div>
+                                <h3 class="kart-baslik">{{ oyun.baslik }}</h3>
+                                <p class="kart-aciklama">{{ oyun.aciklama }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
             {% endfor %}
@@ -820,6 +844,10 @@
                     kart.style.display = "none";
                 }
             });
+            document.querySelectorAll('.kategori-seksiyon').forEach(sec => {
+                let anyVisible = Array.from(sec.querySelectorAll('.oyun-karti')).some(k => k.style.display === "flex");
+                sec.style.display = anyVisible ? "block" : "none";
+            });
             sidebarKapat();
         }
 
@@ -831,6 +859,10 @@
                 let baslik = kart.querySelector('.kart-baslik').innerText.toLowerCase();
                 let kategori = kart.querySelector('.kategori-etiketi').innerText.toLowerCase();
                 kart.style.display = (baslik.includes(arananKelime) || kategori.includes(arananKelime)) ? "flex" : "none";
+            });
+            document.querySelectorAll('.kategori-seksiyon').forEach(sec => {
+                let anyVisible = Array.from(sec.querySelectorAll('.oyun-karti')).some(k => k.style.display === "flex");
+                sec.style.display = anyVisible ? "block" : "none";
             });
         });
 
