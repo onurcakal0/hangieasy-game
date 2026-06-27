@@ -3,7 +3,7 @@ name: HangiEasy Otomatik Canlıya Alma (CI/CD)
 on:
   push:
     branches:
-      - main  # Eğer ana dalının adı 'master' ise burayı master yap kral
+      - main
 
 jobs:
   deploy:
