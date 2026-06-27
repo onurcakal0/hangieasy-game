@@ -194,6 +194,10 @@
         <h2 style="color:white;">Yükleniyor...</h2>
     </div>
 
+    <div id="klasik-oyun-sonu" style="display: none; max-width: 700px; margin: 0 auto;">
+        {% include 'components/oyun_sonu.html' %}
+    </div>
+
     <script>
         const OYUN_ID = "{{ aktif_oyun }}";
         const OYUN_BASLIGI = "{{ oyun_basligi }}";
@@ -315,10 +319,11 @@
                         <h4 style="color: #00f2fe; margin-bottom: 15px; font-weight: 800; display:flex; align-items:center; gap:10px;"><span style="font-size:24px;">🤖</span> HangiEasy AI Analizi</h4>
                         <p id="ai-analiz-metni" style="color: #ddd; font-size: 15px; line-height: 1.6;"></p>
                     </div>
-
-                    <a href="/" class="btn-anasayfa">🏠 Stüdyoya Dön</a>
                 </div>
             `;
+            
+            let osb = document.getElementById('klasik-oyun-sonu');
+            if(osb) osb.style.display = 'block';
 
             // AI Analizi
             fetch('/api/ai_analiz', {

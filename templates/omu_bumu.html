@@ -149,6 +149,10 @@
             <p id="ai-analiz-metni" style="font-style: italic; color: #fff; font-size: 18px; line-height: 1.6;">Yapay zeka seçimlerini analiz ediyor...</p>
         </div>
 
+    <div id="omu-oyun-sonu" style="display: none; max-width: 700px; margin: 0 auto;">
+        {% include 'components/oyun_sonu.html' %}
+    </div>
+
     <script>
         const OYUN_ID = "{{ aktif_oyun }}";
         const AKTIF_DIL = "{{ aktif_dil }}"; 
@@ -289,19 +293,13 @@
                             <img src="${sampiyon.resim}" onerror="this.src='https://via.placeholder.com/400x400/151520/FFFFFF?text=Resim+Yok'" style="height: 400px; border-bottom-color: #f39c12;">
                             <h3 style="font-size: 32px; color: #f39c12; padding: 20px 0;">${sampiyon.isim}</h3>
                         </div>
-                        
-                        <div style="margin-top: 40px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                            <a href="${wpLink}" target="_blank" style="background: linear-gradient(45deg, #25D366, #128C7E); color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; font-weight: 800; display: flex; align-items: center; transition: 0.3s; box-shadow: 0 10px 20px rgba(37, 211, 102, 0.4);">
-                                ${T.wp_btn}
-                            </a>
-                            <a href="${xLink}" target="_blank" style="background: linear-gradient(45deg, #0f0f13, #1a1a24); border: 1px solid #333; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; font-weight: 800; display: flex; align-items: center; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
-                                ${T.x_btn}
-                            </a>
-                        </div>
-                        <button class="buton-mavi" style="margin-top:20px;" onclick="location.href='/'">${T.anasayfa_btn}</button>
                     </div>
                 `;
             }
+            
+            // Yeni Oyun Sonu Bileşenini Göster
+            let omuSonu = document.getElementById('omu-oyun-sonu');
+            if(omuSonu) omuSonu.style.display = 'block';
 
             // 🧠 AI ANALİZİ ÇAĞIR
             fetch('/api/ai_analiz', {

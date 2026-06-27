@@ -210,11 +210,9 @@
                     <div class="answers-grid" id="answers-grid"></div>
                 </div>
                 
-                <div class="reactions-bar">
-                    <button class="react-btn" onclick="tepkiVer('ates')">🔥 <span id="r-ates">{{ tepkiler.get('ates', 0) }}</span></button>
-                    <button class="react-btn" onclick="tepkiVer('beyin')">🤯 <span id="r-beyin">{{ tepkiler.get('beyin', 0) }}</span></button>
-                    <button class="react-btn" onclick="tepkiVer('komik')">😂 <span id="r-komik">{{ tepkiler.get('komik', 0) }}</span></button>
-                </div>
+                <div class="reactions-bar" style="display:none;"></div>
+                
+                {% include 'components/oyun_sonu.html' %}
 
                 <div class="related-quizzes">
                     <div class="related-title">Bunları da beğenebilirsin:</div>

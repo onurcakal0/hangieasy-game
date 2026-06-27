@@ -1,0 +1,269 @@
+<style>
+/* ORTAK OYUN SONU EKRANI BİLEŞENLERİ */
+.os-components {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.os-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+}
+
+.os-card h3 {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+/* TEKRAR OYNA */
+.btn-tekrar {
+    background: #ffcc00;
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 25px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+.btn-tekrar:hover {
+    background: #fff000;
+    transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+}
+
+/* YILDIZLAR */
+.os-yildizlar {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1.8rem;
+    color: rgba(255,255,255,0.2);
+    cursor: pointer;
+}
+.os-yildizlar i { transition: all 0.3s ease; }
+.os-yildizlar i:hover, .os-yildizlar i.active {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    transform: scale(1.1);
+}
+
+/* EMOJİLER */
+.os-emojiler {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.os-emoji {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+.os-emoji:hover, .os-emoji.secildi {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-3px);
+}
+.os-emoji span { font-size: 1.5rem; line-height: 1; }
+.os-emoji small { color: #ccc; font-weight: bold; font-size: 0.8rem; }
+
+/* PAYLAŞ BUTONLARI */
+.os-paylas {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+.os-paylas-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: rgba(255,255,255,0.1);
+}
+.os-paylas-btn.whatsapp:hover { background: #25D366; }
+.os-paylas-btn.twitter:hover { background: #000000; }
+.os-paylas-btn.facebook:hover { background: #1877F2; }
+.os-paylas-btn.reddit:hover { background: #FF4500; }
+.os-paylas-btn.kopyala:hover { background: #00f2fe; }
+</style>
+
+<div class="os-components">
+    
+    <!-- TEKRAR OYNA -->
+    <button class="btn-tekrar" onclick="location.reload();">
+        <i class="fas fa-redo"></i> TEKRAR OYNA
+    </button>
+
+    <!-- PUAN VER -->
+    <div class="os-card">
+        <h3>Puan Ver</h3>
+        <div class="os-yildizlar" id="os-yildiz-alani">
+            <i class="fas fa-star" data-rating="1"></i>
+            <i class="fas fa-star" data-rating="2"></i>
+            <i class="fas fa-star" data-rating="3"></i>
+            <i class="fas fa-star" data-rating="4"></i>
+            <i class="fas fa-star" data-rating="5"></i>
+            <i class="fas fa-star" data-rating="6"></i>
+            <i class="fas fa-star" data-rating="7"></i>
+            <i class="fas fa-star" data-rating="8"></i>
+            <i class="fas fa-star" data-rating="9"></i>
+            <i class="fas fa-star" data-rating="10"></i>
+        </div>
+    </div>
+
+    <!-- TEPKİLER -->
+    <div class="os-card">
+        <div class="os-emojiler" id="os-emoji-alani">
+            <div class="os-emoji" data-emoji="like"><span>👍</span><small class="count">0</small></div>
+            <div class="os-emoji" data-emoji="love"><span>❤️</span><small class="count">0</small></div>
+            <div class="os-emoji" data-emoji="laugh"><span>😂</span><small class="count">0</small></div>
+            <div class="os-emoji" data-emoji="wow"><span>😯</span><small class="count">0</small></div>
+            <div class="os-emoji" data-emoji="sad"><span>😢</span><small class="count">0</small></div>
+            <div class="os-emoji" data-emoji="angry"><span>😡</span><small class="count">0</small></div>
+        </div>
+    </div>
+
+    <!-- PAYLAŞ -->
+    <div class="os-card">
+        <h3>Paylaş</h3>
+        <div class="os-paylas">
+            <a href="#" class="os-paylas-btn whatsapp" onclick="shareTest('whatsapp'); return false;"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" class="os-paylas-btn twitter" onclick="shareTest('twitter'); return false;"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="#" class="os-paylas-btn facebook" onclick="shareTest('facebook'); return false;"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="os-paylas-btn reddit" onclick="shareTest('reddit'); return false;"><i class="fab fa-reddit-alien"></i></a>
+            <a href="#" class="os-paylas-btn kopyala" onclick="copyTestLink(); return false;" title="Linki Kopyala"><i class="fas fa-link"></i></a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Yıldızlar
+    const stars = document.querySelectorAll('#os-yildiz-alani i');
+    let currentRating = 0;
+
+    stars.forEach(star => {
+        star.addEventListener('mouseover', function() {
+            let rating = this.getAttribute('data-rating');
+            updateStars(rating);
+        });
+
+        star.addEventListener('mouseout', function() {
+            updateStars(currentRating);
+        });
+
+        star.addEventListener('click', function() {
+            currentRating = this.getAttribute('data-rating');
+            updateStars(currentRating);
+            showToast("Puanın başarıyla kaydedildi! (" + currentRating + "/10)");
+        });
+    });
+
+    function updateStars(rating) {
+        stars.forEach(s => {
+            if (s.getAttribute('data-rating') <= rating) {
+                s.classList.add('active');
+            } else {
+                s.classList.remove('active');
+            }
+        });
+    }
+
+    // Emojiler
+    const emojis = document.querySelectorAll('.os-emoji');
+    let hasReacted = false;
+
+    emojis.forEach(box => {
+        let countEl = box.querySelector('.count');
+        countEl.textContent = Math.floor(Math.random() * 40) + 2; 
+        
+        box.addEventListener('click', function() {
+            if (hasReacted) return;
+            hasReacted = true;
+            this.classList.add('secildi');
+            countEl.textContent = parseInt(countEl.textContent) + 1;
+            showToast("Tepkin eklendi!");
+        });
+    });
+});
+
+function shareTest(platform) {
+    const url = encodeURIComponent(window.location.href);
+    let titleEl = document.querySelector('h1, h2');
+    let shareText = encodeURIComponent(`HangiEasy'de bu testi çözdüm: ${titleEl ? titleEl.innerText : 'Harika bir test'}\nSen de dene! `);
+
+    let shareUrl = '';
+    if (platform === 'whatsapp') shareUrl = `https://api.whatsapp.com/send?text=${shareText}${url}`;
+    else if (platform === 'twitter') shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${shareText}`;
+    else if (platform === 'facebook') shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+    else if (platform === 'reddit') shareUrl = `https://reddit.com/submit?url=${url}&title=${shareText}`;
+
+    if (shareUrl) window.open(shareUrl, '_blank', 'width=600,height=400');
+}
+
+function copyTestLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+        showToast("Bağlantı kopyalandı!");
+    });
+}
+
+function showToast(msg) {
+    let exist = document.getElementById('os-toast');
+    if(exist) exist.remove();
+    let t = document.createElement('div');
+    t.id = 'os-toast';
+    t.innerText = msg;
+    t.style.position = 'fixed';
+    t.style.bottom = '30px';
+    t.style.left = '50%';
+    t.style.transform = 'translateX(-50%)';
+    t.style.background = 'rgba(0,242,254,0.9)';
+    t.style.color = '#000';
+    t.style.fontWeight = 'bold';
+    t.style.padding = '12px 25px';
+    t.style.borderRadius = '30px';
+    t.style.zIndex = '9999';
+    t.style.boxShadow = '0 0 20px rgba(0,242,254,0.5)';
+    t.style.animation = 'fadeInOut 3s forwards';
+    document.body.appendChild(t);
+    setTimeout(() => { if(t.parentElement) t.remove(); }, 3000);
+}
+
+const style = document.createElement('style');
+style.innerHTML = `
+@keyframes fadeInOut {
+    0% { opacity: 0; bottom: 10px; }
+    10% { opacity: 1; bottom: 30px; }
+    90% { opacity: 1; bottom: 30px; }
+    100% { opacity: 0; bottom: 10px; }
+}
+`;
+document.head.appendChild(style);
+</script>
