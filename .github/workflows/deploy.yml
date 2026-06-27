@@ -1,4 +1,4 @@
-name: HangiEasy Otomatik Canlıya Alma (CI/CD)
+name: HangiEasy Otomatik Canlıya Alma
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Sunucuya Sız ve Kodları Güncelle
+      - name: Sunucuya Sız ve Kodu Güncelle
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
