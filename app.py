@@ -221,19 +221,6 @@ class HangisiTepki(db.Model):
     tepki = db.Column(db.String(50), nullable=False) # e.g. 'ates', 'beyin', 'gulme'
     tarih = db.Column(db.DateTime, default=datetime.utcnow)
 
-class OyunSonuEtkilesim(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    oyun_turu = db.Column(db.String(50), nullable=False) # 'omu_bumu', 'hangisi', 'klasik', 'sesli'
-    oyun_id = db.Column(db.String(50), nullable=False) # Oyunun string veya integer ID'si
-    yildiz_toplam = db.Column(db.Integer, default=0)
-    yildiz_kisi = db.Column(db.Integer, default=0)
-    like_count = db.Column(db.Integer, default=0)
-    love_count = db.Column(db.Integer, default=0)
-    laugh_count = db.Column(db.Integer, default=0)
-    wow_count = db.Column(db.Integer, default=0)
-    sad_count = db.Column(db.Integer, default=0)
-    angry_count = db.Column(db.Integer, default=0)
-
 # Veritabanını kuran kodun (Burası doğru, kalsın)
 with app.app_context():
     db.create_all()
@@ -1792,61 +1779,6 @@ def hangisi_tepki_ver():
         return jsonify({'status': 'success', 'tepkiler': tepkiler})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 400
-
-@app.route('/api/etkilesim_getir')
-def etkilesim_getir():
-    tur = request.args.get('tur')
-    oyun_id = request.args.get('id')
-    if not tur or not oyun_id:
-        return jsonify({'error': 'Missing parameters'}), 400
-    
-    etkilesim = OyunSonuEtkilesim.query.filter_by(oyun_turu=tur, oyun_id=str(oyun_id)).first()
-    if not etkilesim:
-        return jsonify({
-            'yildiz_ortalama': 0, 'yildiz_kisi': 0,
-            'emojiler': {'like': 0, 'love': 0, 'laugh': 0, 'wow': 0, 'sad': 0, 'angry': 0}
-        })
-    
-    ortalama = round(etkilesim.yildiz_toplam / etkilesim.yildiz_kisi, 1) if etkilesim.yildiz_kisi > 0 else 0
-    return jsonify({
-        'yildiz_ortalama': ortalama,
-        'yildiz_kisi': etkilesim.yildiz_kisi,
-        'emojiler': {
-            'like': etkilesim.like_count, 'love': etkilesim.love_count,
-            'laugh': etkilesim.laugh_count, 'wow': etkilesim.wow_count,
-            'sad': etkilesim.sad_count, 'angry': etkilesim.angry_count
-        }
-    })
-
-@app.route('/api/etkilesim_kaydet', methods=['POST'])
-def etkilesim_kaydet():
-    data = request.json
-    tur = data.get('tur')
-    oyun_id = str(data.get('id'))
-    islem = data.get('islem') # 'yildiz' or 'emoji'
-    deger = data.get('deger')
-    
-    if not tur or not oyun_id or not islem or not deger:
-        return jsonify({'error': 'Missing parameters'}), 400
-        
-    etkilesim = OyunSonuEtkilesim.query.filter_by(oyun_turu=tur, oyun_id=oyun_id).first()
-    if not etkilesim:
-        etkilesim = OyunSonuEtkilesim(oyun_turu=tur, oyun_id=oyun_id)
-        db.session.add(etkilesim)
-        
-    if islem == 'yildiz':
-        etkilesim.yildiz_toplam += int(deger)
-        etkilesim.yildiz_kisi += 1
-    elif islem == 'emoji':
-        if deger == 'like': etkilesim.like_count += 1
-        elif deger == 'love': etkilesim.love_count += 1
-        elif deger == 'laugh': etkilesim.laugh_count += 1
-        elif deger == 'wow': etkilesim.wow_count += 1
-        elif deger == 'sad': etkilesim.sad_count += 1
-        elif deger == 'angry': etkilesim.angry_count += 1
-        
-    db.session.commit()
-    return jsonify({'status': 'success'})
 
 @app.route('/ads.txt')
 def serve_ads_txt():

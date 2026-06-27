@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 /* ORTAK OYUN SONU EKRANI BİLEŞENLERİ */
 .os-components {
@@ -166,34 +165,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Yıldızlar
     const stars = document.querySelectorAll('#os-yildiz-alani i');
-    const emojis = document.querySelectorAll('.os-emoji');
     let currentRating = 0;
-    let hasReacted = false;
-
-    let o_turu = window.location.pathname.split('/')[1] || 'oyun';
-    let o_id = typeof OYUN_ID !== 'undefined' ? OYUN_ID : (window.location.pathname.split('/')[2] || '1');
-
-    // Sunucudan mevcut verileri çek
-    fetch(`/api/etkilesim_getir?tur=${o_turu}&id=${o_id}`)
-    .then(r => r.json())
-    .then(data => {
-        if(data.yildiz_ortalama > 0) {
-            currentRating = Math.round(data.yildiz_ortalama);
-            updateStars(currentRating);
-        }
-        emojis.forEach(box => {
-            let tip = box.getAttribute('data-emoji');
-            let countEl = box.querySelector('.count');
-            if(data.emojiler && data.emojiler[tip] !== undefined) {
-                countEl.textContent = data.emojiler[tip];
-            }
-        });
-    }).catch(e => console.log('Etkileşim yüklenemedi'));
 
     stars.forEach(star => {
         star.addEventListener('mouseover', function() {
-            if (currentRating > 0 && hasReacted) return; // If already rated
             let rating = this.getAttribute('data-rating');
             updateStars(rating);
         });
@@ -203,15 +180,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         star.addEventListener('click', function() {
-            if(currentRating > 0 && hasReacted) return; // Zaten oyladı
             currentRating = this.getAttribute('data-rating');
-            hasReacted = true; // prevent re-rating
             updateStars(currentRating);
-            
-            fetch('/api/etkilesim_kaydet', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({tur: o_turu, id: o_id, islem: 'yildiz', deger: currentRating})
-            });
             showToast("Puanın başarıyla kaydedildi! (" + currentRating + "/10)");
         });
     });
@@ -226,20 +196,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Emojiler
+    const emojis = document.querySelectorAll('.os-emoji');
+    let hasReacted = false;
+
     emojis.forEach(box => {
+        let countEl = box.querySelector('.count');
+        countEl.textContent = Math.floor(Math.random() * 40) + 2; 
+        
         box.addEventListener('click', function() {
             if (hasReacted) return;
             hasReacted = true;
             this.classList.add('secildi');
-            let countEl = this.querySelector('.count');
             countEl.textContent = parseInt(countEl.textContent) + 1;
-            
-            let tip = this.getAttribute('data-emoji');
-            fetch('/api/etkilesim_kaydet', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({tur: o_turu, id: o_id, islem: 'emoji', deger: tip})
-            });
-            
             showToast("Tepkin eklendi!");
         });
     });
