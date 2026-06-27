@@ -1,0 +1,23 @@
+name: HangiEasy Otomatik Canlıya Alma (CI/CD)
+
+on:
+  push:
+    branches:
+      - main  # Eğer ana dalının adı 'master' ise burayı master yap kral
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sunucuya Sız ve Kodları Güncelle
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/hangieasy-game
+            git pull
+            source venv/bin/activate
+            pip install -r requirements.txt
+            sudo systemctl restart hangieasy
