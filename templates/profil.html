@@ -497,6 +497,32 @@
                 {% endfor %}
             </div>
         {% endif %}
+        
+        {% if kendi_profili_mi %}
+        <h3 class="seksiyon-basligi" style="color: #ef4444; border-bottom-color: rgba(239, 68, 68, 0.2); margin-top: 40px;">⚠️ Tehlikeli Bölge</h3>
+        <div class="buyume-paneli" style="margin-bottom: 40px; grid-template-columns: 1fr;">
+            <div class="vip-kart" style="border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05);">
+                <div class="vip-baslik" style="color: #ef4444;">Hesabımı Sil</div>
+                <p style="color: #94a3b8; font-size: 13px; margin-top: 10px; margin-bottom: 20px;">Hesabını sildiğinde profilin, skorların, ürettiğin testler ve HE Coin bakiyen tamamen yok olur. Bu işlem geri alınamaz.</p>
+                <button onclick="hesapSilOnayAc()" class="btn" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; max-width: 200px;">Hesabımı Sil</button>
+            </div>
+        </div>
+        {% endif %}
+
+    <!-- HESAP SİLME MODALI -->
+    <div id="hesap-sil-modal" class="takip-modal" onclick="hesapSilKapat()">
+        <div class="takip-kutu" onclick="event.stopPropagation()" style="text-align: center; max-width: 400px; padding: 30px;">
+            <div class="takip-baslik" style="border-bottom: none; justify-content: center; color: #ef4444; font-size: 24px;">
+                ⚠️ Hesabını Sil
+            </div>
+            <p style="color: #ccc; font-size: 14px; margin-bottom: 20px; line-height: 1.5;">Hesabını ve tüm verilerini kalıcı olarak silmek üzeresin. Onaylamak için aşağıdaki kutuya <strong>hesabımı sil</strong> yazmalısın.</p>
+            <form action="/hesabi-sil" method="POST" onsubmit="return hesapSilKontrol()">
+                <input type="text" id="hesap-sil-input" placeholder="hesabımı sil" autocomplete="off" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: #fff; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 16px;">
+                <button type="submit" class="btn" style="background: #ef4444; color: #fff;">Kalıcı Olarak Sil</button>
+                <button type="button" class="btn" onclick="hesapSilKapat()" style="background: transparent; color: #aaa; margin-top: 10px;">Vazgeç</button>
+            </form>
+        </div>
+    </div>
 
     <!-- TAKİP MODALI -->
     <div id="takip-modal" class="takip-modal" onclick="takipModalKapat()">
@@ -618,6 +644,24 @@
 
         function takipModalKapat() {
             document.getElementById('takip-modal').style.display = 'none';
+        }
+
+        // --- HESAP SİLME İŞLEMLERİ ---
+        function hesapSilOnayAc() {
+            document.getElementById('hesap-sil-modal').style.display = 'flex';
+        }
+        function hesapSilKapat() {
+            document.getElementById('hesap-sil-modal').style.display = 'none';
+            document.getElementById('hesap-sil-input').value = '';
+        }
+        function hesapSilKontrol() {
+            var input = document.getElementById('hesap-sil-input').value.trim().toLowerCase();
+            // Türkçe karakter farklılıkları ihtimaline karşı normalize edebiliriz
+            if (input !== 'hesabımı sil' && input !== 'hesabimi sil') {
+                alert('Lütfen kutuya tam olarak "hesabımı sil" yazın.');
+                return false;
+            }
+            return true;
         }
     </script>
 </body>

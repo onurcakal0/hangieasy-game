@@ -1823,6 +1823,39 @@ def serve_ads_txt():
 def serve_sitemap_xml():
     return send_from_directory('static', 'sitemap.xml')
 
+@app.route('/hesabi-sil', methods=['POST'])
+def hesabi_sil():
+    kullanici_id = session.get('kullanici_id')
+    if not kullanici_id:
+        return redirect(url_for('giris_yap'))
+        
+    kullanici = Kullanici.query.get(kullanici_id)
+    if kullanici:
+        # Kullanıcının ürettiği tüm oyunları, onlara bağlı soruları vb. admin_kullanici_sil mantığıyla sileriz.
+        # Oyunlara bağlı Soru ve İstatistikler ondelete cascade ile siliniyorsa silinir, değilse elle silmek en güvenlisi.
+        oyunlar = Oyun.query.filter_by(olusturan_id=kullanici_id).all()
+        for oyun in oyunlar:
+            Soru.query.filter_by(oyun_id=oyun.id).delete()
+            db.session.delete(oyun)
+            
+        hangisi_oyunlar = HangisiOyun.query.filter_by(olusturan_id=kullanici_id).all()
+        for h_oyun in hangisi_oyunlar:
+            HangisiSoru.query.filter_by(oyun_id=h_oyun.id).delete()
+            HangisiSkor.query.filter_by(oyun_id=h_oyun.id).delete()
+            HangisiTepki.query.filter_by(oyun_id=h_oyun.id).delete()
+            db.session.delete(h_oyun)
+            
+        # Kullanıcıya ait bildirimleri de temizle
+        Bildirim.query.filter_by(kullanici_id=kullanici_id).delete()
+        
+        # Son olarak kullanıcıyı sil
+        db.session.delete(kullanici)
+        db.session.commit()
+    
+    session.clear()
+    flash("Hesabın ve tüm verilerin kalıcı olarak silindi. Seni özleyeceğiz!", "success")
+    return redirect(url_for('anasayfa'))
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
     socketio.run(app, host='0.0.0.0', port=port, debug=True)
