@@ -1209,5 +1209,45 @@
             .catch(err => console.error(err));
         }, 10000); // 10 saniyede bir kontrol et
     </script>
+
+    {% if session.get('kullanici_id') == 23 or session.get('kullanici_adi') == 'asdegr' %}
+    <!-- 🎂 ASUDE İÇİN ÖZEL DOĞUM GÜNÜ MODALI -->
+    <div id="birthday-modal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 99999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
+        <!-- Animasyonlu Papatyalar -->
+        <div class="daisy" style="left: 10%; animation-delay: 0s;">🌼</div>
+        <div class="daisy" style="left: 30%; animation-delay: 2s;">🌼</div>
+        <div class="daisy" style="left: 50%; animation-delay: 4s;">🌼</div>
+        <div class="daisy" style="left: 70%; animation-delay: 1s;">🌼</div>
+        <div class="daisy" style="left: 90%; animation-delay: 3s;">🌼</div>
+        <div class="daisy" style="left: 20%; animation-delay: 5s;">🌼</div>
+        <div class="daisy" style="left: 60%; animation-delay: 2.5s;">🌼</div>
+        <div class="daisy" style="left: 80%; animation-delay: 0.5s;">🌼</div>
+
+        <div style="background: linear-gradient(135deg, #fff, #f0f0f0); padding: 50px; border-radius: 20px; text-align: center; position: relative; max-width: 90%; width: 500px; box-shadow: 0 0 50px rgba(255, 215, 0, 0.5); border: 5px solid #ffd700; transform: scale(0); animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; animation-delay: 0.5s;">
+            <button onclick="document.getElementById('birthday-modal').remove()" style="position: absolute; top: 15px; right: 20px; background: transparent; border: none; font-size: 32px; cursor: pointer; color: #333; font-weight: bold; transition: 0.3s;" onmouseover="this.style.color='#ff0000'" onmouseout="this.style.color='#333'">×</button>
+            <h1 style="color: #ff1493; font-size: 36px; margin-bottom: 20px; font-family: 'Poppins', sans-serif; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">Doğum Günün Kutlu Olsun<br>Asude Gür! 🎂🥳</h1>
+            <p style="color: #333; font-size: 18px; line-height: 1.6; font-weight: 600;">HangiEasy ailesi olarak yeni yaşını kutlarız! Bu platformda bizimle olduğun için çok şanslıyız. İyi ki doğdun! 🌼💛</p>
+        </div>
+    </div>
+
+    <style>
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+        .daisy {
+            position: absolute;
+            bottom: -50px;
+            font-size: 40px;
+            animation: floatUp 8s linear infinite;
+            opacity: 0;
+            z-index: -1;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+    {% endif %}
 </body>
 </html>
