@@ -1357,15 +1357,17 @@ def god_mode():
     
     # ... geri kalan kodlar ...
     toplam_kullanici = Kullanici.query.count()
-    toplam_test = Oyun.query.count()
+    toplam_test = Oyun.query.count() + HangisiOyun.query.count()
     tum_kullanicilar = Kullanici.query.order_by(Kullanici.he_coin.desc()).all() 
     tum_oyunlar = Oyun.query.all()
+    tum_hangisi_oyunlar = HangisiOyun.query.all()
     
     return render_template('admin.html', 
                            tk=toplam_kullanici, 
                            tt=toplam_test, 
                            kullanicilar=tum_kullanicilar,
-                           oyunlar=tum_oyunlar)
+                           oyunlar=tum_oyunlar,
+                           hangisi_oyunlar=tum_hangisi_oyunlar)
 # 🚀 CEO İNFAZ MOTORU: KULLANICI BANLAMA
 # 🚀 CEO İNFAZ MOTORU: KULLANICI BANLAMA (SQLAlchemy Versiyonu)
 @app.route('/admin-kullanici-sil/<int:id>', methods=['POST'])
@@ -1383,6 +1385,24 @@ def kullanici_sil(id):
     return redirect(url_for('god_mode'))
 
 
+# 🚀 CEO İNFAZ MOTORU: KULLANICI DÜZENLEME (HE COIN, RÜTBE, ONAY)
+@app.route('/admin-kullanici-duzenle/<int:id>', methods=['POST'])
+def kullanici_duzenle(id):
+    kullanici = Kullanici.query.get_or_404(id)
+    he_coin = request.form.get('he_coin', type=int)
+    rutbe = request.form.get('rutbe')
+    onayli_mi = request.form.get('onayli_mi') == 'on'
+    
+    if he_coin is not None:
+        kullanici.he_coin = he_coin
+    if rutbe:
+        kullanici.rutbe = rutbe
+    kullanici.onayli_mi = onayli_mi
+    
+    db.session.commit()
+    flash(f"Patron, {kullanici.kullanici_adi} adlı üyenin verileri güncellendi!", "success")
+    return redirect(url_for('god_mode'))
+
 # 🚀 CEO İNFAZ MOTORU: TEST SİLME (SQLAlchemy Versiyonu)
 @app.route('/admin-test-sil/<int:id>', methods=['POST'])
 def test_sil(id):
@@ -1396,6 +1416,21 @@ def test_sil(id):
     db.session.commit()
     
     # İşlem bitince hemen CEO paneline geri dön
+    return redirect(url_for('god_mode'))
+
+# 🚀 CEO İNFAZ MOTORU: HANGİSİ TEST SİLME
+@app.route('/admin-hangisi-test-sil/<int:id>', methods=['POST'])
+def hangisi_test_sil(id):
+    silinecek_test = HangisiOyun.query.get_or_404(id)
+    
+    # Teste bağlı soruları, skorları ve tepkileri temizle
+    HangisiSoru.query.filter_by(oyun_id=id).delete()
+    HangisiSkor.query.filter_by(oyun_id=id).delete()
+    HangisiTepki.query.filter_by(oyun_id=id).delete()
+    
+    db.session.delete(silinecek_test)
+    db.session.commit()
+    
     return redirect(url_for('god_mode'))
 
 @app.route('/aydinlatma-metni') # Bak burada tire (-) var!
