@@ -221,9 +221,83 @@ class HangisiTepki(db.Model):
     tepki = db.Column(db.String(50), nullable=False) # e.g. 'ates', 'beyin', 'gulme'
     tarih = db.Column(db.DateTime, default=datetime.utcnow)
 
+class BlogMakale(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    baslik = db.Column(db.String(255), nullable=False)
+    slug = db.Column(db.String(255), unique=True, nullable=False)
+    ozet = db.Column(db.Text, nullable=False)
+    icerik = db.Column(db.Text, nullable=False)
+    resim_url = db.Column(db.String(500), nullable=True)
+    goruntulenme = db.Column(db.Integer, default=0)
+    tarih = db.Column(db.DateTime, default=datetime.utcnow)
+
 # Veritabanını kuran kodun (Burası doğru, kalsın)
 with app.app_context():
     db.create_all()
+
+    # Eğer blog tablosu boşsa, AdSense onayı için otomatik SEO uyumlu 5 makale ekleyelim
+    if BlogMakale.query.count() == 0:
+        ornek_makaleler = [
+            BlogMakale(
+                baslik="Yeni Nesil Bilgi Yarışmaları: HangiEasy Nasıl Çalışır?",
+                slug="yeni-nesil-bilgi-yarismalari-hangieasy",
+                ozet="İnternette arkadaşlarınızla rekabet edebileceğiniz, yepyeni nesil bilgi yarışması HangiEasy'nin mimarisi ve sağladığı interaktif deneyim.",
+                icerik="""<h2>Bilgi Yarışmalarında Yeni Dönem</h2>
+                <p>Geleneksel bilgi yarışmaları artık yerini dinamik, hızlı ve etkileşimli dijital platformlara bırakıyor. HangiEasy, kullanıcıların tamamen kendi içeriklerini üretebildiği ve bu içeriklerle küresel çapta rekabet edebildiği eşsiz bir ekosistemdir.</p>
+                <h3>Neden HangiEasy?</h3>
+                <p>Platformumuz, sadece bir oyun değil, aynı zamanda bilgi paylaşımının interaktif bir yoludur. 'O mu, Bu mu?', harita oyunları, genel kültür testleri ve boss arenaları ile kullanıcı deneyimini en üst noktaya taşıyoruz. İleri seviye Python ve modern web teknolojileri ile geliştirilen HangiEasy, saniyeler içinde binlerce kullanıcının aynı anda yarışmasına olanak tanır.</p>
+                <p>Siz de kendi testinizi oluşturarak topluluğa katkı sağlayabilir, skor tablolarında adınızı altın harflerle yazdırabilirsiniz.</p>""",
+                resim_url="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800"
+            ),
+            BlogMakale(
+                baslik="Kendi Testini Oluştur: Etkileşimin Gücü",
+                slug="kendi-testini-olustur-etkilesim",
+                ozet="HangiEasy üzerinde kendi bilgi testinizi oluşturmanın adımları ve dijital platformlarda kullanıcı etkileşiminin önemi hakkında kapsamlı bir rehber.",
+                icerik="""<h2>Kullanıcı Tarafından Üretilen İçerik (UGC)</h2>
+                <p>Web 3.0 ve ötesine geçerken kullanıcıların sadece tüketici değil, aynı zamanda üretici olması büyük önem taşıyor. HangiEasy bu vizyonla, herkesin kendi uzmanlık alanında veya ilgi duyduğu konularda testler oluşturmasını sağlıyor.</p>
+                <h3>Adım Adım Test Oluşturma</h3>
+                <p>Öncelikle platforma kayıt olmalısınız. Ardından 'Stüdyom' bölümüne girerek sorularınızı, seçenekleri ve doğru cevapları sisteme girebilirsiniz. Yüklediğiniz görseller ve yazdığınız açıklayıcı metinler, testinizin kalitesini belirleyecektir.</p>
+                <p>Unutmayın, en çok oynanan ve en çok beğenilen testlerin yaratıcıları 'HE Coin' ödülleri kazanmakta ve platformda üst rütbelere tırmanmaktadır.</p>""",
+                resim_url="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800"
+            ),
+            BlogMakale(
+                baslik="Siber Komuta ve Rütbe Sistemi",
+                slug="siber-komuta-ve-rutbe-sistemi",
+                ozet="HangiEasy'nin sunduğu oyunlaştırma (gamification) öğeleri, rütbe sistemi ve HE Coin ekonomisi üzerine detaylı bir analiz.",
+                icerik="""<h2>Oyunlaştırma (Gamification) Nedir?</h2>
+                <p>Oyunlaştırma, oyun tasarım unsurlarının oyun dışı ortamlarda kullanılarak kullanıcı motivasyonunu artırma stratejisidir. HangiEasy, bu stratejiyi kusursuz bir şekilde uygular.</p>
+                <h3>Rütbeler ve Ödüller</h3>
+                <p>Kullanıcılar 'Stajyer' olarak başladıkları kariyer yolculuklarında, çözdükleri testler ve ürettikleri içeriklerle 'CEO' statüsüne kadar yükselebilirler. Her doğru cevap, kazanılan her kupa, kullanıcının dijital cüzdanına 'HE Coin' olarak yansır.</p>
+                <p>Elde edilen bu dijital varlıklarla mağazadan özel profil çerçeveleri, unvanlar ve çeşitli kozmetik geliştirmeler satın alınabilir. Bu döngü, sitenin etkileşim oranını devasa boyutlara taşır.</p>""",
+                resim_url="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&q=80&w=800"
+            ),
+            BlogMakale(
+                baslik="Web Teknolojilerinde Hız ve Güvenlik",
+                slug="web-teknolojilerinde-hiz-ve-guvenlik",
+                ozet="Modern web uygulamalarının performans optimizasyonu ve HangiEasy'nin güvenli mimarisi hakkında teknik detaylar.",
+                icerik="""<h2>Güvenilir Altyapı</h2>
+                <p>Binlerce anlık isteği (request) yönetebilmek güçlü bir arka plan mimarisi gerektirir. Flask, PostgreSQL ve WebSocket teknolojileriyle inşa edilen sistemimiz, güvenlikten ödün vermeden maksimum hız sunar.</p>
+                <h3>Veri Gizliliği</h3>
+                <p>Kullanıcılarımızın kişisel verileri kriptolojik algoritmalarla korunmaktadır. Parolalar asla düz metin (plain text) olarak saklanmaz. Sistem düzenli olarak zafiyet taramalarından geçirilerek güncel tehditlere karşı korunaklı tutulur.</p>
+                <p>Performans tarafında ise, statik varlıkların (görseller, CSS ve JS dosyaları) CDN üzerinden dağıtılması ve veritabanı sorgularının optimize edilmesi sayesinde sayfa yüklenme hızları milisaniyeler seviyesine indirilmiştir.</p>""",
+                resim_url="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800"
+            ),
+            BlogMakale(
+                baslik="O Mu, Bu Mu? Psikolojik Tercihler ve İstatistikler",
+                slug="o-mu-bu-mu-psikolojik-tercihler",
+                ozet="Kullanıcıların popüler kültüre dair yaptığı tercihlerin (O mu, Bu mu oyunu) sosyolojik ve psikolojik analizleri.",
+                icerik="""<h2>Karar Verme Mekanizması</h2>
+                <p>'O mu, Bu mu?' oyun formatı, insan psikolojisinin hızlı karar verme reflekslerini ölçer. Sunulan iki güçlü seçenek arasından birini seçmek, bireyin kültürel birikimini ve anlık sezgilerini yansıtır.</p>
+                <h3>Büyük Veri (Big Data) ve Eğilimler</h3>
+                <p>Yüz binlerce kullanıcının katılımıyla oluşan veriler, toplumun genel eğilimlerini gözler önüne serer. Hangi filmin daha çok sevildiği, hangi teknolojinin daha çok benimsendiği gibi soruların cevabı, şeffaf yüzdelik dilimlerle (örn. %65'e %35) anında kullanıcılara sunulur.</p>
+                <p>Bu anlık istatistikler, platformun sadakatini ve etkileşimini artıran en güçlü donelerden biridir.</p>""",
+                resim_url="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800"
+            )
+        ]
+        for makale in ornek_makaleler:
+            db.session.add(makale)
+        db.session.commit()
+        print("✅ AdSense dostu SEO blog yazıları veritabanına eklendi.")
 
     # --- GÜVENLİ MIGRATION: Eksik kolonları PostgreSQL'e ekle ---
     # db.create_all() mevcut tablolara yeni kolon EKLEMEZ.
@@ -1855,6 +1929,28 @@ def hesabi_sil():
     session.clear()
     flash("Hesabın ve tüm verilerin kalıcı olarak silindi. Seni özleyeceğiz!", "success")
     return redirect(url_for('anasayfa'))
+
+@app.route('/blog')
+def blog_index():
+    kullanici_adi = session.get('kullanici_adi')
+    makaleler = BlogMakale.query.order_by(BlogMakale.tarih.desc()).all()
+    return render_template('blog.html', makaleler=makaleler, kullanici_adi=kullanici_adi)
+
+@app.route('/blog/<slug>')
+def blog_detay(slug):
+    kullanici_adi = session.get('kullanici_adi')
+    makale = BlogMakale.query.filter_by(slug=slug).first_or_404()
+    
+    # Görüntülenme sayısını artır
+    makale.goruntulenme += 1
+    db.session.commit()
+    
+    return render_template('blog_detay.html', makale=makale, kullanici_adi=kullanici_adi)
+
+@app.route('/hakkimizda')
+def hakkimizda():
+    kullanici_adi = session.get('kullanici_adi')
+    return render_template('hakkimizda.html', kullanici_adi=kullanici_adi)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))

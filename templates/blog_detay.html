@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ makale.baslik }} | HangiEasy Blog</title>
+    <meta name="description" content="{{ makale.ozet }}">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: #0b0c10; color: #ffffff; 
+            overflow-x: hidden; position: relative; min-height: 100vh;
+        }
+        
+        /* 🌌 IŞILTILI RGB ARKAPLAN — ORB'LAR */
+        .orb-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(120px); animation: orbFloat 15s infinite alternate ease-in-out; }
+        .orb-1 { width: 55vw; height: 55vw; background: rgba(138, 35, 135, 0.18); top: -12%; left: -12%; }
+        .orb-2 { width: 50vw; height: 50vw; background: rgba(0, 242, 254, 0.15); bottom: -12%; right: -12%; animation-delay: -6s; animation-direction: alternate-reverse; }
+        
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 90px) scale(1.18); }
+        }
+
+        /* ---------------- NAVBAR ---------------- */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 4%; background: rgba(15, 15, 20, 0.8);
+            backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky; top: 0; z-index: 100; gap: 15px; flex-wrap: wrap;
+        }
+        .logo { 
+            font-size: 26px; font-weight: 800; 
+            background: linear-gradient(90deg, #f39c12, #ff007a); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none; letter-spacing: 1px; flex-shrink: 0;
+        }
+
+        .sag-menu { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+        .profil-btn {
+            padding: 8px 15px; border-radius: 30px; text-decoration: none;
+            font-weight: 700; transition: all 0.3s ease; font-size: 12px; text-transform: uppercase; white-space: nowrap;
+        }
+        .btn-yesil { background: linear-gradient(45deg, #00b09b, #96c93d); color: white; border: none;}
+        .btn-sari { background: linear-gradient(45deg, #f39c12, #f1c40f); color: #000; border: none;}
+
+        /* BLOG DETAY YAPI */
+        .makale-container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 40px;
+            background: rgba(20, 20, 30, 0.8);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .geri-don {
+            display: inline-block;
+            color: #00f2fe;
+            text-decoration: none;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .geri-don:hover { color: #fff; transform: translateX(-5px); }
+
+        .makale-baslik {
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            color: #fff;
+        }
+
+        .makale-meta {
+            display: flex;
+            gap: 20px;
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+        }
+
+        .makale-resim {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* MAKALE İÇERİK STİLLERİ (SEO DOSTU) */
+        .makale-icerik {
+            color: #d1d5db;
+            font-size: 18px;
+            line-height: 1.8;
+            font-weight: 400;
+        }
+        .makale-icerik h2 {
+            color: #00f2fe;
+            font-size: 28px;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+        .makale-icerik h3 {
+            color: #f39c12;
+            font-size: 22px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        .makale-icerik p {
+            margin-bottom: 20px;
+        }
+        .makale-icerik strong {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="orb-wrap">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="sol-grup">
+            <a href="/" class="logo">HangiEasy</a>
+        </div>
+        <div class="sag-menu">
+            <a href="/blog" class="profil-btn btn-yesil">Blog</a>
+            {% if kullanici_adi %}
+                <a href="/profil/{{ kullanici_adi }}" class="profil-btn btn-sari">Profilim</a>
+            {% else %}
+                <a href="/giris" class="profil-btn btn-sari">Giriş Yap</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- MAKALE -->
+    <div class="makale-container">
+        <a href="/blog" class="geri-don"><i class="fas fa-arrow-left"></i> Blog'a Dön</a>
+        
+        <h1 class="makale-baslik">{{ makale.baslik }}</h1>
+        <div class="makale-meta">
+            <span><i class="far fa-calendar-alt"></i> {{ makale.tarih.strftime('%d.%m.%Y') }}</span>
+            <span><i class="far fa-eye"></i> {{ makale.goruntulenme }} Okunma</span>
+            <span><i class="fas fa-user-edit"></i> Onur Çakal A.Ş. Editörlüğü</span>
+        </div>
+
+        {% if makale.resim_url %}
+            <img src="{{ makale.resim_url }}" class="makale-resim" alt="{{ makale.baslik }}">
+        {% endif %}
+
+        <div class="makale-icerik">
+            {{ makale.icerik | safe }}
+        </div>
+    </div>
+</body>
+</html>

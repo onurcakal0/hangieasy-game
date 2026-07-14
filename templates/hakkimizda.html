@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hakkımızda | HangiEasy - Onur Çakal A.Ş.</title>
+    <meta name="description" content="HangiEasy'nin kuruluş vizyonu, teknolojik altyapısı ve geleceğin interaktif oyun platformu olma hedefi hakkında her şey.">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: #0b0c10; color: #ffffff; 
+            overflow-x: hidden; position: relative; min-height: 100vh;
+        }
+        
+        .orb-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(120px); animation: orbFloat 15s infinite alternate ease-in-out; }
+        .orb-1 { width: 55vw; height: 55vw; background: rgba(0, 242, 254, 0.15); top: -12%; left: -12%; }
+        .orb-2 { width: 50vw; height: 50vw; background: rgba(243, 156, 18, 0.15); bottom: -12%; right: -12%; animation-delay: -6s; animation-direction: alternate-reverse; }
+        
+        @keyframes orbFloat { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 90px) scale(1.18); } }
+
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 4%; background: rgba(15, 15, 20, 0.8); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); position: sticky; top: 0; z-index: 100; gap: 15px; flex-wrap: wrap; }
+        .logo { font-size: 26px; font-weight: 800; background: linear-gradient(90deg, #f39c12, #ff007a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; letter-spacing: 1px; flex-shrink: 0; }
+        .sag-menu { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+        .profil-btn { padding: 8px 15px; border-radius: 30px; text-decoration: none; font-weight: 700; transition: all 0.3s ease; font-size: 12px; text-transform: uppercase; white-space: nowrap; }
+        .btn-yesil { background: linear-gradient(45deg, #00b09b, #96c93d); color: white; border: none;}
+        .btn-sari { background: linear-gradient(45deg, #f39c12, #f1c40f); color: #000; border: none;}
+
+        .hakkimizda-container {
+            max-width: 1000px; margin: 60px auto; padding: 40px;
+            background: rgba(20, 20, 30, 0.7); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6); position: relative; z-index: 10;
+        }
+
+        .hakkimizda-baslik { text-align: center; margin-bottom: 50px; }
+        .hakkimizda-baslik h1 { font-size: 52px; font-weight: 900; color: #fff; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; }
+        .hakkimizda-baslik h1 span { background: linear-gradient(90deg, #f39c12, #ff0055); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hakkimizda-baslik p { color: #aaa; font-size: 20px; max-width: 700px; margin: 0 auto; }
+
+        .vizyon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 50px; }
+        @media (max-width: 768px) { .vizyon-grid { grid-template-columns: 1fr; } }
+        
+        .vizyon-kart { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; transition: 0.3s; }
+        .vizyon-kart:hover { border-color: #00f2fe; transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0, 242, 254, 0.1); }
+        .vizyon-kart i { font-size: 40px; color: #00f2fe; margin-bottom: 20px; }
+        .vizyon-kart h3 { font-size: 24px; color: #fff; margin-bottom: 15px; font-weight: 800; }
+        .vizyon-kart p { color: #ccc; font-size: 15px; line-height: 1.7; }
+
+        .seo-metni { background: rgba(255,255,255,0.02); padding: 40px; border-radius: 20px; border-left: 5px solid #f39c12; margin-top: 40px; }
+        .seo-metni h2 { font-size: 32px; color: #fff; margin-bottom: 25px; font-weight: 900; }
+        .seo-metni p { color: #d1d5db; font-size: 16px; line-height: 1.8; margin-bottom: 20px; }
+        .seo-metni strong { color: #f39c12; }
+    </style>
+</head>
+<body>
+    <div class="orb-wrap"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+
+    <div class="navbar">
+        <div class="sol-grup"><a href="/" class="logo">HangiEasy</a></div>
+        <div class="sag-menu">
+            <a href="/blog" class="profil-btn btn-yesil">Blog & Rehber</a>
+            {% if kullanici_adi %}
+                <a href="/profil/{{ kullanici_adi }}" class="profil-btn btn-sari">Profilim</a>
+            {% else %}
+                <a href="/giris" class="profil-btn btn-sari">Giriş Yap</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="hakkimizda-container">
+        <div class="hakkimizda-baslik">
+            <h1>Onur Çakal A.Ş. <span>Vizyonu</span></h1>
+            <p>Sıradan testleri unutun. Biz, kullanıcıların hem yarışıp hem kazandığı yeni nesil bir interaktif ekosistem kuruyoruz.</p>
+        </div>
+
+        <div class="vizyon-grid">
+            <div class="vizyon-kart">
+                <i class="fas fa-rocket"></i>
+                <h3>Platformun Amacı</h3>
+                <p>HangiEasy, bilgi yarışmalarını pasif bir okuma deneyiminden çıkarıp, tamamen kullanıcı odaklı ve rekabetçi bir arenaya dönüştürmeyi hedefler. Sisteme dahil olan herkes kendi testlerini üreterek bu dijital dünyanın bir mimarı haline gelebilir.</p>
+            </div>
+            <div class="vizyon-kart">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Güvenlik & Teknoloji</h3>
+                <p>Sistem altyapımız, anlık binlerce bağlantıyı sorunsuz kaldırabilecek modern Python tabanlı frameworkler ve güçlü veritabanı yönetim sistemleriyle donatılmıştır. Kullanıcı deneyimi, hız ve güvenlik ilk önceliğimizdir.</p>
+            </div>
+        </div>
+
+        <div class="seo-metni">
+            <h2>HangiEasy Nedir ve Nasıl Çalışır?</h2>
+            <p>İnternet dünyasındaki içerik tüketim alışkanlıkları değişirken, <strong>HangiEasy</strong> bu değişimin tam merkezinde yer alıyor. Sadece içerik tüketilen değil, bizzat <strong>kullanıcıların ürettiği testler</strong>, anketler ve "O mu, Bu mu?" formatındaki kapışmalarla organik bir büyüme sağlayan eşsiz bir platformdur.</p>
+            
+            <p>HangiEasy bünyesinde yer alan oyunlaştırma (gamification) dinamikleri sayesinde kullanıcılar; çözdükleri her test, verdikleri her doğru cevap ve yarattıkları her popüler içerik için <strong>HE Coin</strong> isimli sanal para birimini kazanırlar. Bu ödül sistemi, kullanıcıların sistemdeki kalma sürelerini (session duration) maksimize ederken, genel kültür ve bilgi seviyelerini eğlenceli bir şekilde artırmalarını sağlar.</p>
+
+            <p>Gelişmiş arka plan (backend) mimarisi ile, kullanıcıların anlık reaksiyonları, tepkileri ve oyun skorları saliseler içerisinde işlenerek global liderlik tablolarına (Leaderboard) yansıtılır. Şeffaf, rekabetçi ve adil bu ortam, "Onur Çakal A.Ş." vizyonunun bir ürünüdür ve sürekli olarak yenilenen algoritmalarla Türkiye'nin en aktif bilgi yarışması ağı olma yolunda emin adımlarla ilerlemektedir.</p>
+        </div>
+    </div>
+</body>
+</html>
