@@ -988,7 +988,86 @@
     <div id="bildirim-toast" style="position:fixed;bottom:30px;left:30px;background:linear-gradient(45deg,#ff0055,#00f2fe);color:#fff;padding:15px 25px;border-radius:12px;font-weight:800;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,0.5);transform:translateY(150px);opacity:0;transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);z-index:9999;">
         🔔 Bildirim!
     </div>
+    <!-- 📰 SON YAZILAR VE REHBERLER (SEO) -->
+    <div style="max-width: 1200px; margin: 40px auto; padding: 20px;">
+        <h2 style="font-size: 24px; color: #fff; margin-bottom: 20px; font-weight: 800; border-bottom: 2px solid #f39c12; display: inline-block; padding-bottom: 5px;">📚 Güncel Rehberler ve Taktikler</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            {% if son_makaleler %}
+                {% for makale in son_makaleler %}
+                <a href="{{ url_for('blog_detay', slug=makale.slug) }}" style="text-decoration: none; color: inherit;">
+                    <div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; overflow: hidden; transition: transform 0.3s ease;">
+                        <div style="height: 160px; background-image: url('{{ makale.resim_url }}'); background-size: cover; background-position: center;"></div>
+                        <div style="padding: 15px;">
+                            <h3 style="font-size: 16px; margin-bottom: 10px; color: #00f2fe;">{{ makale.baslik }}</h3>
+                            <p style="font-size: 12px; color: #ccc; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{ makale.ozet }}</p>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div style="text-align: right; margin-top: 15px;">
+            <a href="/blog" style="color: #f39c12; text-decoration: none; font-weight: bold; font-size: 14px;">Tüm Yazıları Gör ➔</a>
+        </div>
+    </div>
 
+    <!-- ❓ SIKÇA SORULAN SORULAR (FAQ - SEO) -->
+    <div style="max-width: 1200px; margin: 0 auto 40px; padding: 20px;">
+        <h2 style="font-size: 24px; color: #fff; margin-bottom: 20px; font-weight: 800; border-bottom: 2px solid #00f2fe; display: inline-block; padding-bottom: 5px;">❓ Sıkça Sorulan Sorular (SSS)</h2>
+        
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <details style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer;">
+                <summary style="font-size: 16px; font-weight: bold; color: #f39c12; outline: none;">HangiEasy nedir ve nasıl oynanır?</summary>
+                <p style="margin-top: 10px; font-size: 14px; color: #ccc; line-height: 1.6;">HangiEasy, popüler kültürden spora, coğrafyadan sinemaya kadar yüzlerce farklı kategoride test çözebileceğiniz ve kendi testlerinizi oluşturabileceğiniz interaktif bir platformdur. Kayıt olduktan sonra ana sayfadaki oyunlara hemen katılabilirsiniz.</p>
+            </details>
+            <details style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer;">
+                <summary style="font-size: 16px; font-weight: bold; color: #f39c12; outline: none;">HE Coin nedir ve ne işe yarar?</summary>
+                <p style="margin-top: 10px; font-size: 14px; color: #ccc; line-height: 1.6;">HE Coin, platformumuzun sanal para birimidir. Doğru bildiğiniz sorulardan, günlük girişlerden ve popüler olan testlerinizden kazanırsınız. Bu coinleri Kozmetik Mağazası'nda özel profil çerçeveleri ve unvanlar almak için harcayabilirsiniz.</p>
+            </details>
+            <details style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer;">
+                <summary style="font-size: 16px; font-weight: bold; color: #f39c12; outline: none;">Kendi bilgi testimi (Quiz) nasıl oluştururum?</summary>
+                <p style="margin-top: 10px; font-size: 14px; color: #ccc; line-height: 1.6;">Sol taraftaki menüden 'Stüdyom' veya 'Yeni Test Oluştur' butonuna tıklayarak kendi sorularınızı, seçeneklerinizi ve görsellerinizi yükleyebilirsiniz. Testiniz onaylandıktan sonra tüm dünyadaki oyunculara açılır.</p>
+            </details>
+            <details style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer;">
+                <summary style="font-size: 16px; font-weight: bold; color: #f39c12; outline: none;">Boss Arenası mantığı nedir?</summary>
+                <p style="margin-top: 10px; font-size: 14px; color: #ccc; line-height: 1.6;">Boss Arenası, zorluk derecesi çok yüksek olan özel testlerin bulunduğu bölümdür. Asimetrik bir rekabet sistemine dayanır; bir kişi 'Patron' olur, diğerleri onu yenmeye çalışır. Başarısız olan oyuncular, Patron'a HE Coin kazandırır.</p>
+            </details>
+        </div>
+    </div>
+    
+    <!-- JSON-LD SCHEMA MARKUP (SEO İÇİN) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "HangiEasy nedir ve nasıl oynanır?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "HangiEasy, popüler kültürden spora, coğrafyadan sinemaya kadar yüzlerce farklı kategoride test çözebileceğiniz ve kendi testlerinizi oluşturabileceğiniz interaktif bir platformdur."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "HE Coin nedir ve ne işe yarar?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "HE Coin, platformumuzun sanal para birimidir. Doğru bildiğiniz sorulardan, günlük girişlerden ve popüler olan testlerinizden kazanırsınız. Bu coinleri Kozmetik Mağazası'nda harcayabilirsiniz."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Boss Arenası mantığı nedir?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Boss Arenası, zorluk derecesi çok yüksek olan özel testlerin bulunduğu bölümdür. Asimetrik bir rekabet sistemine dayanır; bir kişi 'Patron' olur, diğerleri onu yenmeye çalışır."
+          }
+        }
+      ]
+    }
+    </script>
 
     <!-- 📝 SEO METNİ (AdSense İçin) -->
     <div style="max-width: 1200px; margin: 40px auto; padding: 40px 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);">

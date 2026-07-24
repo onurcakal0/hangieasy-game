@@ -235,69 +235,130 @@ class BlogMakale(db.Model):
 with app.app_context():
     db.create_all()
 
-    # Eğer blog tablosu boşsa, AdSense onayı için otomatik SEO uyumlu 5 makale ekleyelim
-    if BlogMakale.query.count() == 0:
-        ornek_makaleler = [
+    # Eğer blog tablosu az sayıda makale barındırıyorsa (AdSense onayı için ekstra makaleler eklenecek)
+    if BlogMakale.query.count() < 15:
+        # Mevcut makalelerin slug'larını alalım
+        mevcut_slugs = [m.slug for m in BlogMakale.query.all()]
+        
+        yeni_makaleler = [
             BlogMakale(
-                baslik="Yeni Nesil Bilgi Yarışmaları: HangiEasy Nasıl Çalışır?",
-                slug="yeni-nesil-bilgi-yarismalari-hangieasy",
-                ozet="İnternette arkadaşlarınızla rekabet edebileceğiniz, yepyeni nesil bilgi yarışması HangiEasy'nin mimarisi ve sağladığı interaktif deneyim.",
-                icerik="""<h2>Bilgi Yarışmalarında Yeni Dönem</h2>
-                <p>Geleneksel bilgi yarışmaları artık yerini dinamik, hızlı ve etkileşimli dijital platformlara bırakıyor. HangiEasy, kullanıcıların tamamen kendi içeriklerini üretebildiği ve bu içeriklerle küresel çapta rekabet edebildiği eşsiz bir ekosistemdir.</p>
-                <h3>Neden HangiEasy?</h3>
-                <p>Platformumuz, sadece bir oyun değil, aynı zamanda bilgi paylaşımının interaktif bir yoludur. 'O mu, Bu mu?', harita oyunları, genel kültür testleri ve boss arenaları ile kullanıcı deneyimini en üst noktaya taşıyoruz. İleri seviye Python ve modern web teknolojileri ile geliştirilen HangiEasy, saniyeler içinde binlerce kullanıcının aynı anda yarışmasına olanak tanır.</p>
-                <p>Siz de kendi testinizi oluşturarak topluluğa katkı sağlayabilir, skor tablolarında adınızı altın harflerle yazdırabilirsiniz.</p>""",
-                resim_url="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800"
+                baslik="E-Spor Dünyasının Yükselişi ve Dijital Turnuvalar",
+                slug="e-spor-dunyasi-yukselisi",
+                ozet="E-sporun tarihçesi, dünya çapındaki dev turnuvaların evrimi ve HangiEasy'nin dijital rekabete sunduğu katkılar.",
+                icerik="""<h2>Geleneksel Spordan Dijital Arenaya</h2>
+                <p>E-spor, son on yılda sadece bir eğlence aracı olmaktan çıkıp milyarlarca dolarlık bir endüstriye dönüştü. Profesyonel oyuncular, büyük stadyumları dolduran taraftarlar ve canlı yayın platformları sayesinde, dijital turnuvalar geleneksel sporlarla yarışır hale geldi.</p>
+                <h3>Turnuva Ağacı (Bracket) Mantığı</h3>
+                <p>HangiEasy'nin sunduğu 'World Cup 2026' gibi turnuva ağacı yapılı testler, tam olarak e-spor rekabetinin köklerinden ilham alır. Elemeli sistemde ilerleyerek finale ulaşmak, kullanıcıda yüksek dopamin salınımı yaratır.</p>
+                <p>Dijital rekabet artık sadece reflekslere değil, bilgi birikimine de dayanıyor. Kendini kanıtlamak isteyen herkes, global sıralama (leaderboard) sistemimizde yerini alabilir.</p>""",
+                resim_url="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=800"
             ),
             BlogMakale(
-                baslik="Kendi Testini Oluştur: Etkileşimin Gücü",
-                slug="kendi-testini-olustur-etkilesim",
-                ozet="HangiEasy üzerinde kendi bilgi testinizi oluşturmanın adımları ve dijital platformlarda kullanıcı etkileşiminin önemi hakkında kapsamlı bir rehber.",
-                icerik="""<h2>Kullanıcı Tarafından Üretilen İçerik (UGC)</h2>
-                <p>Web 3.0 ve ötesine geçerken kullanıcıların sadece tüketici değil, aynı zamanda üretici olması büyük önem taşıyor. HangiEasy bu vizyonla, herkesin kendi uzmanlık alanında veya ilgi duyduğu konularda testler oluşturmasını sağlıyor.</p>
-                <h3>Adım Adım Test Oluşturma</h3>
-                <p>Öncelikle platforma kayıt olmalısınız. Ardından 'Stüdyom' bölümüne girerek sorularınızı, seçenekleri ve doğru cevapları sisteme girebilirsiniz. Yüklediğiniz görseller ve yazdığınız açıklayıcı metinler, testinizin kalitesini belirleyecektir.</p>
-                <p>Unutmayın, en çok oynanan ve en çok beğenilen testlerin yaratıcıları 'HE Coin' ödülleri kazanmakta ve platformda üst rütbelere tırmanmaktadır.</p>""",
-                resim_url="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800"
+                baslik="Coğrafya Bilgisi Hayatımızı Nasıl Şekillendirir?",
+                slug="cografya-bilgisi-hayatimiz",
+                ozet="Türkiye ve Dünya haritası oyunlarıyla hem eğlenmenin hem de stratejik coğrafya bilgisini artırmanın yolları.",
+                icerik="""<h2>Sınırların Ötesini Keşfetmek</h2>
+                <p>Coğrafya bilgisi, sadece harita üzerindeki yerleri ezberlemek değil, o bölgenin kültürünü, tarihini ve jeopolitik önemini kavramaktır. Harita oyunları, bu bağlamda en etkili öğrenme araçlarından biridir.</p>
+                <h3>Harita Oyunları ve Görsel Hafıza</h3>
+                <p>HangiEasy'deki 'Türkiye Şehirlerini Tahmin Et' (Guess Turkey) veya 'Dünya Ülkeleri' oyunları, görsel hafızanızı doğrudan tetikler. Saniyeler içinde doğru konumu bulmaya çalışırken beyniniz, nöronal bağlarını güçlendirir.</p>
+                <p>Oyunlaştırılmış eğitim modeli sayesinde sıkıcı ders kitapları yerine, adrenalin dolu bir zaman karşı yarış deneyimi yaşayarak dünyayı öğrenebilirsiniz.</p>""",
+                resim_url="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=800"
             ),
             BlogMakale(
-                baslik="Siber Komuta ve Rütbe Sistemi",
-                slug="siber-komuta-ve-rutbe-sistemi",
-                ozet="HangiEasy'nin sunduğu oyunlaştırma (gamification) öğeleri, rütbe sistemi ve HE Coin ekonomisi üzerine detaylı bir analiz.",
-                icerik="""<h2>Oyunlaştırma (Gamification) Nedir?</h2>
-                <p>Oyunlaştırma, oyun tasarım unsurlarının oyun dışı ortamlarda kullanılarak kullanıcı motivasyonunu artırma stratejisidir. HangiEasy, bu stratejiyi kusursuz bir şekilde uygular.</p>
-                <h3>Rütbeler ve Ödüller</h3>
-                <p>Kullanıcılar 'Stajyer' olarak başladıkları kariyer yolculuklarında, çözdükleri testler ve ürettikleri içeriklerle 'CEO' statüsüne kadar yükselebilirler. Her doğru cevap, kazanılan her kupa, kullanıcının dijital cüzdanına 'HE Coin' olarak yansır.</p>
-                <p>Elde edilen bu dijital varlıklarla mağazadan özel profil çerçeveleri, unvanlar ve çeşitli kozmetik geliştirmeler satın alınabilir. Bu döngü, sitenin etkileşim oranını devasa boyutlara taşır.</p>""",
-                resim_url="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&q=80&w=800"
+                baslik="Oyunlaştırma (Gamification) Pazarlamanın Geleceği mi?",
+                slug="oyunlastirma-pazarlama-gelecegi",
+                ozet="HE Coin ekonomisi ve kullanıcı ödüllendirme sistemlerinin, sadakat oluşturmadaki psikolojik etkileri.",
+                icerik="""<h2>Kullanıcı Sadakatinde Devrim</h2>
+                <p>Günümüzde markalar, kullanıcıları ellerinde tutmak için klasik yöntemlerin ötesine geçmek zorundalar. Oyunlaştırma (gamification), bu noktada devreye girerek kullanıcıya bir amaç, bir hedef ve bir ödül sunar.</p>
+                <h3>Sanal Ekonominin Gücü: HE Coin</h3>
+                <p>HangiEasy sisteminde entegre edilmiş HE Coin, sadece bir puan değil, bir prestij sembolüdür. Kullanıcılar soruları bildikçe veya popüler testler oluşturdukça bu coini kazanır ve Kozmetik Mağazası'nda harcarlar.</p>
+                <p>Sanal kimliklerini süsleme (profil çerçevesi, özel unvanlar) arzusu, platform içi etkileşimi organik olarak %400'e kadar artırmaktadır. Bu, modern web uygulamalarının mihenk taşıdır.</p>""",
+                resim_url="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&q=80&w=800"
             ),
             BlogMakale(
-                baslik="Web Teknolojilerinde Hız ve Güvenlik",
-                slug="web-teknolojilerinde-hiz-ve-guvenlik",
-                ozet="Modern web uygulamalarının performans optimizasyonu ve HangiEasy'nin güvenli mimarisi hakkında teknik detaylar.",
-                icerik="""<h2>Güvenilir Altyapı</h2>
-                <p>Binlerce anlık isteği (request) yönetebilmek güçlü bir arka plan mimarisi gerektirir. Flask, PostgreSQL ve WebSocket teknolojileriyle inşa edilen sistemimiz, güvenlikten ödün vermeden maksimum hız sunar.</p>
-                <h3>Veri Gizliliği</h3>
-                <p>Kullanıcılarımızın kişisel verileri kriptolojik algoritmalarla korunmaktadır. Parolalar asla düz metin (plain text) olarak saklanmaz. Sistem düzenli olarak zafiyet taramalarından geçirilerek güncel tehditlere karşı korunaklı tutulur.</p>
-                <p>Performans tarafında ise, statik varlıkların (görseller, CSS ve JS dosyaları) CDN üzerinden dağıtılması ve veritabanı sorgularının optimize edilmesi sayesinde sayfa yüklenme hızları milisaniyeler seviyesine indirilmiştir.</p>""",
-                resim_url="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800"
+                baslik="Popüler Kültür Testlerinin Sosyolojik Analizi",
+                slug="populer-kultur-testleri-sosyoloji",
+                ozet="Kim Milyoner tarzı testlerin ve 'O mu, Bu mu' ikilemlerinin toplumun kültürel nabzını nasıl tuttuğuna dair inceleme.",
+                icerik="""<h2>Toplumun Aynası: İstatistikler</h2>
+                <p>Web üzerindeki anketler ve bilgi testleri, sadece kişisel bir eğlence aracı değildir; aynı zamanda büyük bir veri madenciliği (data mining) örneğidir. Yüz binlerce insanın aynı sorulara verdiği cevaplar, kültürel eğilimleri net şekilde gösterir.</p>
+                <h3>Hızlı Karar Verme ve Sezgiler</h3>
+                <p>'O mu, Bu mu' tarzı ikilemli oyunlar, mantıktan ziyade sezgilere ve aidiyet duygusuna hitap eder. Hangi aktörün daha sevildiği veya hangi yemeğin daha popüler olduğu gibi masum sorular bile toplumsal dinamikleri yansıtır.</p>
+                <p>HangiEasy'nin sunduğu anlık global istatistikler, her kullanıcının kendini toplumun geneliyle kıyaslamasına ve "acaba yalnız mıyım?" sorusuna eğlenceli bir cevap bulmasına olanak tanır.</p>""",
+                resim_url="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=800"
             ),
             BlogMakale(
-                baslik="O Mu, Bu Mu? Psikolojik Tercihler ve İstatistikler",
-                slug="o-mu-bu-mu-psikolojik-tercihler",
-                ozet="Kullanıcıların popüler kültüre dair yaptığı tercihlerin (O mu, Bu mu oyunu) sosyolojik ve psikolojik analizleri.",
-                icerik="""<h2>Karar Verme Mekanizması</h2>
-                <p>'O mu, Bu mu?' oyun formatı, insan psikolojisinin hızlı karar verme reflekslerini ölçer. Sunulan iki güçlü seçenek arasından birini seçmek, bireyin kültürel birikimini ve anlık sezgilerini yansıtır.</p>
-                <h3>Büyük Veri (Big Data) ve Eğilimler</h3>
-                <p>Yüz binlerce kullanıcının katılımıyla oluşan veriler, toplumun genel eğilimlerini gözler önüne serer. Hangi filmin daha çok sevildiği, hangi teknolojinin daha çok benimsendiği gibi soruların cevabı, şeffaf yüzdelik dilimlerle (örn. %65'e %35) anında kullanıcılara sunulur.</p>
-                <p>Bu anlık istatistikler, platformun sadakatini ve etkileşimini artıran en güçlü donelerden biridir.</p>""",
-                resim_url="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800"
+                baslik="Kullanıcı Sözleşmeleri ve Veri Gizliliği Neden Önemlidir?",
+                slug="kullanici-sozlesmeleri-veri-gizliligi",
+                ozet="İnternette ayak izimizi korumak ve güvenli bir platform inşa etmek için uygulanan güvenlik politikaları.",
+                icerik="""<h2>Siber Güvenlikte Son Kale: Veri İzolasyonu</h2>
+                <p>Gelişen web teknolojileriyle birlikte, kullanıcı verilerinin güvenliği en kritik konu haline gelmiştir. GDPR ve KVKK gibi standartlar, platformların verileri nasıl işlemesi gerektiğini kati kurallarla belirler.</p>
+                <h3>Şeffaf Aydınlatma Metinleri</h3>
+                <p>Bir web sitesine kayıt olurken kabul edilen sözleşmeler, genellikle okunmadan geçilir. Ancak HangiEasy gibi vizyoner platformlar, kullanıcılarına verilerinin (e-posta, şifre hashleri, oyun skorları) nasıl şifrelendiğini açıkça beyan eder.</p>
+                <p>Biz, veri minimizasyonu ilkesini benimsiyoruz. Sadece platform deneyimini artıracak temel istatistikleri anonimleştirerek saklıyor ve kullanıcılarımıza 'Hesabımı Kalıcı Olarak Sil' opsiyonunu kayıtsız şartsız sunuyoruz.</p>""",
+                resim_url="https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?auto=format&fit=crop&q=80&w=800"
+            ),
+            BlogMakale(
+                baslik="Kelime Oyunlarının Beyin Egzersizi Olarak Faydaları",
+                slug="kelime-oyunlari-beyin-egzersizi",
+                ozet="Kelime bulmaca (Wordle tarzı) oyunların hafıza güçlendirme ve Alzheimer gibi hastalıklara karşı önleyici etkisi.",
+                icerik="""<h2>Kelimelerin Büyülü Dünyası</h2>
+                <p>Sadece 5 harfli bir kelimeyi tahmin etmek, dışarıdan basit bir eylem gibi görünebilir. Ancak beynin dil merkezini ve problem çözme (frontal lob) alanlarını aynı anda senkronize çalıştıran muazzam bir egzersizdir.</p>
+                <h3>Nöroplastisite ve Hafıza</h3>
+                <p>Düzenli olarak kelime tahmini ve harf kombinasyonu oyunları oynamak, beynin yeni nöral bağlar kurmasını (nöroplastisite) destekler. HangiEasy bünyesinde yer alan "Kelimeyi Tahmin Et" konsepti, sadece kelime dağarcığınızı zorlamakla kalmaz, aynı zamanda olasılık hesaplama yeteneğinizi artırır.</p>
+                <p>Bu tarz zihinsel jimnastiklerin, yaşa bağlı bilişsel gerilemeyi yavaşlattığı bilimsel olarak kanıtlanmıştır. Günde sadece 10 dakika oynamak bile zihninizi keskin tutar.</p>""",
+                resim_url="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&q=80&w=800"
+            ),
+            BlogMakale(
+                baslik="Modern Web Mimarisi: Flask ve WebSocket Entegrasyonu",
+                slug="flask-ve-websocket-mimarisi",
+                ozet="Python tabanlı Flask frameworkünün gerçek zamanlı uygulamalarda (real-time apps) nasıl bir performans sunduğu.",
+                icerik="""<h2>Gerçek Zamanlı Veri Akışı</h2>
+                <p>Eskiden web siteleri, sadece kullanıcı sayfayı yenilediğinde güncellenirdi. Günümüzde ise WebSocket teknolojisi sayesinde sunucu ile tarayıcı arasında sürekli, çift yönlü bir iletişim kanalı açık tutulur.</p>
+                <h3>Flask'ın Esnekliği</h3>
+                <p>HangiEasy, gücünü Python'un minimalist ama son derece yetenekli web framework'ü olan Flask'tan alır. Veritabanı yönetiminde SQLAlchemy (ORM) kullanarak SQL enjeksiyon (SQL Injection) gibi güvenlik açıklarını sıfıra indirir.</p>
+                <p>Oyun esnasında rakiplerin skorlarının saniyeler içinde ekrana düşmesi, arka planda çalışan SocketIO asenkron eventleri sayesinde gerçekleşir. Bu, modern interaktif web uygulamalarının olmazsa olmazıdır.</p>""",
+                resim_url="https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&q=80&w=800"
+            ),
+            BlogMakale(
+                baslik="Boss Arenası: Tek Kişiye Karşı Tüm Topluluk",
+                slug="boss-arenasi-mekanigi",
+                ozet="Asimetrik çok oyunculu (asymmetrical multiplayer) kavramının web tabanlı oyunlara uyarlanması ve Boss Arenası mantığı.",
+                icerik="""<h2>Asimetrik Rekabet Nedir?</h2>
+                <p>Genellikle oyunlar 1v1 veya eşit takımlar (5v5) üzerinden tasarlanır. Ancak "Asimetrik Tasarım", bir tarafa inanılmaz bir güç verirken, diğer tarafın kalabalık olmasını ve işbirliği yapmasını gerektirir.</p>
+                <h3>Kendi Testinin 'Patronu' Olmak</h3>
+                <p>Platformumuzdaki Boss Arenası, tam olarak bu felsefeyle oluşturulmuştur. Bir kullanıcı, yüksek zorluk derecesine sahip özel bir test hazırlar ve "Boss" (Patron) unvanını alır. Diğer tüm kullanıcılar, bu testi hatasız geçmeye çalışarak Patron'u devirmeye çalışır.</p>
+                <p>Patron, testini geçemeyen her kurbandan HE Coin kazanır. Bu risk/ödül mekaniği, oyun teorisinin (game theory) en saf ve en zevkli hallerinden biridir.</p>""",
+                resim_url="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&q=80&w=800"
+            ),
+            BlogMakale(
+                baslik="Karanlık Mod (Dark Mode) Göz Sağlığı İçin Neden Gerekli?",
+                slug="karanlik-mod-ve-goz-sagligi",
+                ozet="Siberpunk tasarımların ve koyu temaların sadece estetik değil, aynı zamanda medikal olarak faydaları.",
+                icerik="""<h2>Dijital Yorgunluğa Son</h2>
+                <p>Günde ortalama 7 saatimizi ekranlara bakarak geçiriyoruz. Beyaz ve parlak arka planlar, yaydıkları mavi ışık (blue light) sebebiyle sirkadiyen ritmimizi bozabilir ve göz kuruluğuna yol açabilir.</p>
+                <h3>Siberpunk Estetiği ve Fonksiyonellik</h3>
+                <p>HangiEasy'nin koyu renkli, neon detaylı arayüzü (UI) sadece "havalı" görünmek için tasarlanmadı. #0b0c10 kodlu arka plan rengimiz, kontrast oranını gözü yormayacak şekilde dengeler.</p>
+                <p>Açık renkli metinler (beyaz ve açık gri) ile neon butonlar, okunabilirliği artırırken uzun süreli oyun seanslarında bile kullanıcının konforunu maksimize eder. Karanlık mod, modern web tasarımının lüksü değil, standardıdır.</p>""",
+                resim_url="https://images.unsplash.com/photo-1547394765-185e1e68f34e?auto=format&fit=crop&q=80&w=800"
+            ),
+            BlogMakale(
+                baslik="Bağımsız Geliştirici (Indie Developer) Olmanın Zorlukları",
+                slug="bagimsiz-gelistirici-olmak",
+                ozet="Büyük stüdyolara karşı tek başına veya küçük ekiplerle devasa projeler inşa etmenin arkasındaki tutku.",
+                icerik="""<h2>Sıfırdan Bir Ekosistem Yaratmak</h2>
+                <p>Silikon Vadisi devleri binlerce mühendis ve devasa sunucu çiftlikleriyle çalışırken, bağımsız geliştiriciler (indie developers) yaratıcılıkları, esneklikleri ve tutkularıyla hayatta kalır.</p>
+                <h3>Tutku Odaklı Kodlama</h3>
+                <p>HangiEasy projesi, ticari kaygılardan ziyade "Daha iyi bir interaktif deneyim nasıl sunulur?" sorusuna verilmiş bir cevaptır. Onur Çakal A.Ş. vizyonuyla ortaya çıkan bu yapı, kodların sadece bir iş değil, bir sanat formu olduğunu kanıtlar.</p>
+                <p>Sabahlara kadar süren debug (hata ayıklama) süreçleri, kullanıcı geri bildirimleriyle şekillenen arayüzler ve her gün eklenen yeni özellikler, bu platformu soğuk bir şirket ürününden ziyade, yaşayan ve nefes alan bir organizma haline getiriyor.</p>""",
+                resim_url="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800"
             )
         ]
-        for makale in ornek_makaleler:
-            db.session.add(makale)
+        
+        for makale in yeni_makaleler:
+            if makale.slug not in mevcut_slugs:
+                db.session.add(makale)
+                
         db.session.commit()
-        print("✅ AdSense dostu SEO blog yazıları veritabanına eklendi.")
+        print("✅ AdSense onayı için ekstra 10 SEO bloğu veritabanına eklendi.")
 
     # --- GÜVENLİ MIGRATION: Eksik kolonları PostgreSQL'e ekle ---
     # db.create_all() mevcut tablolara yeni kolon EKLEMEZ.
@@ -765,8 +826,10 @@ def dashboard():
     kadi = session.get('kullanici_adi')
     if kadi and not kadi.startswith('Misafir_'):
         kullanici = Kullanici.query.filter_by(kullanici_adi=kadi).first()
+        
+    son_makaleler = BlogMakale.query.order_by(BlogMakale.tarih.desc()).limit(4).all()
     
-    return render_template('dashboard.html', oyunlar=oyunlar, kullanici=kullanici)
+    return render_template('dashboard.html', oyunlar=oyunlar, kullanici=kullanici, son_makaleler=son_makaleler)
 
 @app.route('/world-cup-2026')
 def world_cup_2026():
