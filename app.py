@@ -2015,6 +2015,52 @@ def hakkimizda():
     kullanici_adi = session.get('kullanici_adi')
     return render_template('hakkimizda.html', kullanici_adi=kullanici_adi)
 
+@app.route('/iletisim')
+def iletisim():
+    kullanici_adi = session.get('kullanici_adi')
+    return render_template('iletisim.html', kullanici_adi=kullanici_adi)
+
+@app.route('/robots.txt')
+def robots_txt():
+    content = "User-agent: *\nAllow: /\nSitemap: https://hangieasy.com/sitemap.xml\n"
+    return content, 200, {'Content-Type': 'text/plain'}
+
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    makaleler = BlogMakale.query.all()
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    
+    # Statik sayfalar
+    sayfalar = ['/', '/blog', '/hakkimizda', '/iletisim', '/veri-gizlilik', '/kullanici-sozlesmesi', '/aydinlatma-metni', '/magaza']
+    for sayfa in sayfalar:
+        xml += '  <url>\n'
+        xml += f'    <loc>https://hangieasy.com{sayfa}</loc>\n'
+        xml += '    <changefreq>weekly</changefreq>\n'
+        xml += '    <priority>0.8</priority>\n'
+        xml += '  </url>\n'
+        
+    # Dinamik Oyunlar (Ana Oyunlar)
+    oyunlar = ['/omu-bumu', '/world-cup-2026', '/piksel-avcisi', '/guess-word', '/guess-world', '/guess-turkey', '/guess-lol', '/guess-valorant']
+    for oyun in oyunlar:
+        xml += '  <url>\n'
+        xml += f'    <loc>https://hangieasy.com{oyun}</loc>\n'
+        xml += '    <changefreq>monthly</changefreq>\n'
+        xml += '    <priority>0.9</priority>\n'
+        xml += '  </url>\n'
+
+    # Blog Yazıları
+    for m in makaleler:
+        xml += '  <url>\n'
+        xml += f'    <loc>https://hangieasy.com/blog/{m.slug}</loc>\n'
+        xml += f'    <lastmod>{m.tarih.strftime("%Y-%m-%d")}</lastmod>\n'
+        xml += '    <changefreq>monthly</changefreq>\n'
+        xml += '    <priority>0.7</priority>\n'
+        xml += '  </url>\n'
+        
+    xml += '</urlset>'
+    return xml, 200, {'Content-Type': 'application/xml'}
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
     socketio.run(app, host='0.0.0.0', port=port, debug=True)
