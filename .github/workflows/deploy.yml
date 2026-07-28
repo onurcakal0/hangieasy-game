@@ -20,6 +20,6 @@ jobs:
             git pull
             source venv/bin/activate
             pip install -r requirements.txt
-            sudo sed -i 's/--workers [0-9]*/--workers 1/g' /etc/systemd/system/hangieasy.service || true
-            sudo systemctl daemon-reload || true
+            sudo sed -i 's|ExecStart=.*|ExecStart=/home/ubuntu/hangieasy-game/venv/bin/gunicorn --workers 1 -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker --bind 127.0.0.1:5000 app:app|' /etc/systemd/system/hangieasy.service
+            sudo systemctl daemon-reload
             sudo systemctl restart hangieasy
