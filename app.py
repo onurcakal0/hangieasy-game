@@ -2172,6 +2172,14 @@ def sitemap_xml():
     xml += '</urlset>'
     return xml, 200, {'Content-Type': 'application/xml'}
 
+@app.route('/admin/systemd-config')
+def admin_systemd_config():
+    try:
+        with open('/etc/systemd/system/hangieasy.service', 'r') as f:
+            return f.read(), 200, {'Content-Type': 'text/plain'}
+    except Exception as e:
+        return str(e)
+
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5001))
+    port = int(os.environ.get("PORT", 5000))
     socketio.run(app, host='0.0.0.0', port=port, debug=True)
