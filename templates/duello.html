@@ -138,7 +138,8 @@ body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden;}
   <div class="soru-alan">
     <div class="soru-no" id="soru-no">SORU 1</div>
     <div class="soru-resim-wrap" id="resim-wrap" style="display:none;">
-      <img id="soru-resim" class="soru-resim" src="" alt="">
+      <img id="soru-resim" class="soru-resim" src="" alt="" style="display:none;">
+      <audio id="soru-audio" controls style="display:none; width:100%; max-width:400px; margin: 0 auto; outline:none; border-radius: 30px;"></audio>
     </div>
     <div class="secenekler" id="secenekler"></div>
   </div>
@@ -246,16 +247,30 @@ function soruGoster() {
   const soru = SORULAR[soruIdx];
   document.getElementById('soru-no').textContent = `SORU ${soruIdx + 1} / ${SORULAR.length}`;
 
-  // Resim
+  // Resim veya Ses
   const resimUrl = (soru.resim_url || '').split(',')[0].trim();
   const resimWrap = document.getElementById('resim-wrap');
+  const img = document.getElementById('soru-resim');
+  const ses = document.getElementById('soru-audio');
+  
   if (resimUrl) {
-    const img = document.getElementById('soru-resim');
-    img.src = resimUrl;
-    img.onerror = () => resimWrap.style.display = 'none';
-    resimWrap.style.display = 'block';
+    if (resimUrl.toLowerCase().endsWith('.mp3') || resimUrl.toLowerCase().endsWith('.wav')) {
+        img.style.display = 'none';
+        ses.style.display = 'block';
+        ses.src = resimUrl;
+        ses.play().catch(e => console.log("Otomatik oynatma engellendi: " + e));
+        resimWrap.style.display = 'block';
+    } else {
+        ses.style.display = 'none';
+        ses.pause();
+        img.style.display = 'block';
+        img.src = resimUrl;
+        img.onerror = () => resimWrap.style.display = 'none';
+        resimWrap.style.display = 'block';
+    }
   } else {
     resimWrap.style.display = 'none';
+    ses.pause();
   }
 
   // Seçenekler
