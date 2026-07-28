@@ -198,6 +198,21 @@ class HangisiOyun(db.Model):
 class HangisiSoru(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     oyun_id = db.Column(db.Integer, db.ForeignKey('hangisi_oyun.id'), nullable=False)
+
+class DuelloOdasi(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    oda_kodu = db.Column(db.String(20), unique=True, nullable=False)
+    oyun_id = db.Column(db.Integer, db.ForeignKey('oyun.id'), nullable=False)
+    veri = db.Column(db.Text, default='{"oyuncular": [], "skorlar": {}, "bitenler": []}')
+    olusturulma = db.Column(db.DateTime, default=datetime.utcnow)
+
+class YayinOdasi(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    yayin_kodu = db.Column(db.String(20), unique=True, nullable=False)
+    oyun_id = db.Column(db.Integer, db.ForeignKey('oyun.id'), nullable=False)
+    yayinci = db.Column(db.String(100), nullable=False)
+    veri = db.Column(db.Text, default='{"izleyiciler": {}, "aktif_soru_index": 0}')
+    olusturulma = db.Column(db.DateTime, default=datetime.utcnow)
     soru_metni = db.Column(db.Text, nullable=False)
     resim_url = db.Column(db.String(500), nullable=True)
     secenek_a = db.Column(db.String(200), nullable=False)
@@ -614,7 +629,16 @@ def duello_kur(oyun_id):
         session['kullanici_adi'] = f"Misafir_{random.randint(1000, 9999)}"
         
     oda_kodu = str(random.randint(10000, 99999))
-    aktif_odalar[oda_kodu] = {'oyun_id': oyun_id, 'oyuncular': [], 'skorlar': {}}
+    
+    # Veritabanına kaydet
+    yeni_oda = DuelloOdasi(
+        oda_kodu=oda_kodu,
+        oyun_id=oyun_id,
+        veri=json.dumps({'oyuncular': [], 'skorlar': {}, 'bitenler': []})
+    )
+    db.session.add(yeni_oda)
+    db.session.commit()
+    
     return redirect(url_for('duello_lobisi', oda_kodu=oda_kodu))
 
 @app.route('/duello/<oda_kodu>')
@@ -622,10 +646,11 @@ def duello_lobisi(oda_kodu):
     if 'kullanici_adi' not in session:
         session['kullanici_adi'] = f"Misafir_{random.randint(1000, 9999)}"
         
-    if oda_kodu not in aktif_odalar: return "Böyle bir düello odası yok, maç bitmiş olabilir."
+    oda = DuelloOdasi.query.filter_by(oda_kodu=oda_kodu).first()
+    if not oda:
+        return "Böyle bir düello odası yok, maç bitmiş olabilir."
     
-    oyun_id = aktif_odalar[oda_kodu]['oyun_id']
-    oyun = Oyun.query.get_or_404(oyun_id)
+    oyun = Oyun.query.get_or_404(oda.oyun_id)
     return render_template('duello.html', oda_kodu=oda_kodu, oyun=oyun)
 
 @app.route('/odaya-katil', methods=['POST'])
@@ -633,13 +658,13 @@ def odaya_katil():
     oda_kodu = request.form.get('oda_kodu', '').strip()
 
     # ⚔️ 1. ÖNCE DÜELLO ODASI MI?
-    if oda_kodu in aktif_odalar:
+    if DuelloOdasi.query.filter_by(oda_kodu=oda_kodu).first():
         if 'kullanici_adi' not in session:
             session['kullanici_adi'] = f"Misafir_{random.randint(1000, 9999)}"
         return redirect(url_for('duello_lobisi', oda_kodu=oda_kodu))
 
     # 🎥 2. SONRA YAYIN ODASI MI?
-    if oda_kodu in aktif_yayinlar:
+    if YayinOdasi.query.filter_by(yayin_kodu=oda_kodu).first():
         return redirect(url_for('canli_yayin_izle', oda_kodu=oda_kodu))
 
     # ❌ İKİSİ DE DEĞİLSE
@@ -647,11 +672,11 @@ def odaya_katil():
     return redirect(url_for('dashboard'))
 @app.route('/canli-izle/<oda_kodu>')
 def canli_yayin_izle(oda_kodu):
-    if oda_kodu not in aktif_yayinlar:
+    oda = YayinOdasi.query.filter_by(yayin_kodu=oda_kodu).first()
+    if not oda:
         return redirect(url_for('dashboard'))
         
-    oyun_id = aktif_yayinlar[oda_kodu]['oyun_id']
-    oyun = Oyun.query.get(oyun_id) # Veritabanından oyunu çek
+    oyun = Oyun.query.get(oda.oyun_id) # Veritabanından oyunu çek
     
     # İŞTE BURASI: Hazırladığın o neon tasarımlı izleyici HTML'ini çağırıyoruz!
     # (Parantez içine o HTML dosyasının adını tam olarak yaz, örn: 'izleyici_ekrani.html')
@@ -662,14 +687,20 @@ def socket_odaya_katil(data):
     oda = data.get('oda')
     oyuncu = session.get('kullanici_adi') or f"Misafir_{random.randint(1000,9999)}"
 
-    if oda not in aktif_odalar:
+    oda_db = DuelloOdasi.query.filter_by(oda_kodu=oda).first()
+    if not oda_db:
         return
 
     join_room(oda)
 
-    oyuncular = aktif_odalar[oda]['oyuncular']
+    veri = json.loads(oda_db.veri)
+    oyuncular = veri.get('oyuncular', [])
+    
     if oyuncu not in oyuncular:
         oyuncular.append(oyuncu)
+        veri['oyuncular'] = oyuncular
+        oda_db.veri = json.dumps(veri)
+        db.session.commit()
 
     # Lobi güncellemesi — kim geldi haber ver
     emit('lobi_guncelle', {'oyuncular': oyuncular}, room=oda)
@@ -685,11 +716,19 @@ def cevap_yolla(data):
     oyuncu = data.get('oyuncu') or session.get('kullanici_adi', 'Bilinmeyen')
     puan   = data.get('puan', 0)
 
-    if oda not in aktif_odalar:
+    oda_db = DuelloOdasi.query.filter_by(oda_kodu=oda).first()
+    if not oda_db:
         return
 
-    aktif_odalar[oda]['skorlar'][oyuncu] = puan
-    emit('skor_guncelle', aktif_odalar[oda]['skorlar'], room=oda)
+    veri = json.loads(oda_db.veri)
+    if 'skorlar' not in veri:
+        veri['skorlar'] = {}
+        
+    veri['skorlar'][oyuncu] = puan
+    oda_db.veri = json.dumps(veri)
+    db.session.commit()
+    
+    emit('skor_guncelle', veri['skorlar'], room=oda)
 
 
 @socketio.on('oyun_bitti')
@@ -699,19 +738,27 @@ def oyun_bitti_handler(data):
     oyuncu = data.get('oyuncu') or session.get('kullanici_adi', 'Bilinmeyen')
     puan   = data.get('puan', 0)
 
-    if oda not in aktif_odalar:
+    oda_db = DuelloOdasi.query.filter_by(oda_kodu=oda).first()
+    if not oda_db:
         return
 
-    aktif_odalar[oda]['skorlar'][oyuncu] = puan
+    veri = json.loads(oda_db.veri)
+    if 'skorlar' not in veri:
+        veri['skorlar'] = {}
+        
+    veri['skorlar'][oyuncu] = puan
 
-    if 'bitenler' not in aktif_odalar[oda]:
-        aktif_odalar[oda]['bitenler'] = []
-    if oyuncu not in aktif_odalar[oda]['bitenler']:
-        aktif_odalar[oda]['bitenler'].append(oyuncu)
+    if 'bitenler' not in veri:
+        veri['bitenler'] = []
+    if oyuncu not in veri['bitenler']:
+        veri['bitenler'].append(oyuncu)
+        
+    oda_db.veri = json.dumps(veri)
+    db.session.commit()
 
     # İki oyuncu da bitirdiyse maç sonu
-    if len(aktif_odalar[oda]['bitenler']) >= 2:
-        emit('mac_bitti', aktif_odalar[oda]['skorlar'], room=oda)
+    if len(veri['bitenler']) >= 2:
+        emit('mac_bitti', veri['skorlar'], room=oda)
 
 
 
