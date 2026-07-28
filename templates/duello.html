@@ -159,6 +159,7 @@ const socket = io();
 const ODA  = "{{ oda_kodu }}";
 const OYUN = "{{ oyun.id }}";
 const BEN  = "{{ session.kullanici_adi }}";
+const OYUN_MODU = "{{ oyun.oyun_modu }}";
 
 let SORULAR = [];
 let soruIdx = 0;
@@ -254,7 +255,7 @@ function soruGoster() {
   const ses = document.getElementById('soru-audio');
   
   if (resimUrl) {
-    if (resimUrl.toLowerCase().endsWith('.mp3') || resimUrl.toLowerCase().endsWith('.wav')) {
+    if (OYUN_MODU === 'sesli_quiz' || resimUrl.toLowerCase().endsWith('.mp3') || resimUrl.toLowerCase().endsWith('.wav') || resimUrl.includes('.mp3?')) {
         img.style.display = 'none';
         ses.style.display = 'block';
         ses.src = resimUrl;
