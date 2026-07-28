@@ -188,6 +188,41 @@ function showToast(msg) {
     setTimeout(() => { if(t.parentElement) t.remove(); }, 3000);
 }
 
+function renderYanitDokumu(sorular, benimCevaplar) {
+    let exist = document.getElementById('os-yanit-dokumu');
+    if (exist) exist.remove();
+
+    let dokumHTML = `
+      <div id="os-yanit-dokumu" style="margin-top: 30px; width: 100%; max-width: 600px; background: rgba(0,0,0,0.4); border-radius: 15px; padding: 20px; text-align: left; margin-left:auto; margin-right:auto;">
+        <h3 style="color: #fff; text-align: center; margin-bottom: 20px; font-size: 20px; text-transform:none;">📝 Yanıt Dökümü</h3>
+        <div style="display: flex; justify-content: space-between; font-weight: bold; color: #aaa; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+          <span style="flex:1; text-align:center;">Soru</span>
+          <span style="flex:2; text-align:left; padding-left:10px;">Cevabın</span>
+          <span style="flex:1; text-align:center;">Sonuç</span>
+        </div>
+    `;
+
+    for (let i = 0; i < sorular.length; i++) {
+      let durum = benimCevaplar[i] ? '✅ Doğru' : '❌ Yanlış';
+      let renk = benimCevaplar[i] ? '#2ecc71' : '#e74c3c';
+      let soruMetni = "Soru " + (i+1);
+      
+      dokumHTML += `
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 16px;">
+          <span style="flex:1; text-align:center; color:#777;">#${i+1}</span>
+          <span style="flex:2; text-align:left; padding-left:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${sorular[i].dogru_cevap || ''}">${sorular[i].dogru_cevap || '-'}</span>
+          <span style="flex:1; text-align:center; color: ${renk}; font-weight:bold;">${durum}</span>
+        </div>
+      `;
+    }
+    dokumHTML += `</div>`;
+    
+    const componentsDiv = document.querySelector('.os-components');
+    if (componentsDiv) {
+        componentsDiv.insertAdjacentHTML('afterend', dokumHTML);
+    }
+}
+
 const style = document.createElement('style');
 style.innerHTML = `
 @keyframes fadeInOut {

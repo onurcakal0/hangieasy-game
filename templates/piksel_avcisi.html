@@ -100,8 +100,8 @@
         let bulaniklikSeviyesi = 40; // Max blur (başlangıç)
         let kalanZamanYuzdesi = 100;
         let oyunTimer;
-        let resimTamamenNetMi = false;
         let cevapVerildiMi = false;
+        let benimCevaplar = [];
 
         window.onload = () => {
             fetch(`/api/sorular/${OYUN_ID}`)
@@ -199,12 +199,14 @@
             if(resimImg) resimImg.style.filter = "blur(0px)";
 
             if(secilenCevap === dogruCevap) {
+                benimCevaplar.push(true);
                 buton.classList.add('dogru');
                 let kazanilanPuan = Math.ceil(kalanZamanYuzdesi * 10); 
                 toplamSkor += kazanilanPuan;
                 let skorDeger = document.getElementById('skor-deger');
                 if(skorDeger) skorDeger.innerText = toplamSkor;
             } else {
+                benimCevaplar.push(false);
                 buton.classList.add('yanlis');
                 let butonlar = document.querySelectorAll('.btn-secenek');
                 butonlar.forEach(b => { if(b.innerText === dogruCevap) b.classList.add('dogru'); });
@@ -217,6 +219,7 @@
         }
 
         function sureBitti() {
+            benimCevaplar.push(false);
             cevapVerildiMi = true;
             let resimImg = document.getElementById('oyun-resmi');
             if(resimImg) resimImg.style.filter = "blur(0px)"; 
@@ -259,6 +262,11 @@
                     }
                 }
             }).catch(err => console.log("Coin API Hatası:", err));
+            
+            // Yanıt dökümü
+            if(typeof renderYanitDokumu === 'function') {
+                renderYanitDokumu(SORULAR, benimCevaplar);
+            }
         }
 
         function whatsappPaylas() {

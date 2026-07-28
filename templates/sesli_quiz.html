@@ -114,6 +114,7 @@
         let plakArayuzu = document.getElementById('oynat-butonu');
         let ikon = document.getElementById('ikon');
         let yapayZekaSecimleri = []; 
+        let benimCevaplar = [];
 
         window.onload = () => {
             fetch(`/api/sorular/${OYUN_ID}`)
@@ -203,11 +204,13 @@
             let dogruCevap = (SORULAR[aktifSoruIndex].dogru_cevap || "").trim();
 
             if(secilenCevap === dogruCevap) {
+                benimCevaplar.push(true);
                 buton.classList.add('dogru');
                 toplamSkor += 1;
                 let skorDeger = document.getElementById('skor-deger');
                 if(skorDeger) skorDeger.innerText = toplamSkor;
             } else {
+                benimCevaplar.push(false);
                 buton.classList.add('yanlis');
                 let butonlar = document.querySelectorAll('.btn-secenek');
                 butonlar.forEach(b => { if(b.innerText === dogruCevap) b.classList.add('dogru'); });
@@ -254,7 +257,6 @@
                 if(data.status === 'success') {
                     let bildirim = document.getElementById('coin-bildirim');
                     if(bildirim) {
-                        // Eğer id="coin-yazi" olan bir span/div varsa onu kullan, yoksa span bul
                         let coinYazi = document.getElementById('coin-yazi');
                         if(coinYazi) coinYazi.innerText = `+${data.kazanc} HE-Coin Kazandın!`;
                         else {
@@ -266,6 +268,11 @@
                     }
                 }
             }).catch(err => console.log("Coin API Hatası:", err));
+            
+            // Yanıt dökümü
+            if(typeof renderYanitDokumu === 'function') {
+                renderYanitDokumu(SORULAR, benimCevaplar);
+            }
         }
     </script>
 </body>

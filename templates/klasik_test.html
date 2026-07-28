@@ -207,6 +207,7 @@
         let skor = 0;
         let kilitli = false;
         let yapayZekaSecimleri = []; 
+        let benimCevaplar = [];
 
         const harfler = ["A", "B", "C", "D", "E", "F"];
 
@@ -283,10 +284,12 @@
             let dogruCevap = (SORULAR[aktifIndex].dogru_cevap || "").trim();
 
             if (secim === dogruCevap) {
+                benimCevaplar.push(true);
                 buton.classList.add('dogru');
                 skor += 10;
                 document.querySelector('.skor-kutusu').innerHTML = `Skor: ${skor}`;
             } else {
+                benimCevaplar.push(false);
                 buton.classList.add('yanlis');
                 
                 // Doğruyu bul ve yeşil yak
@@ -343,6 +346,11 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ miktar: 10 }) 
             }).catch(err => console.log("Coin Hatası:", err));
+            
+            // Yanıt dökümü
+            if(typeof renderYanitDokumu === 'function') {
+                renderYanitDokumu(SORULAR, benimCevaplar);
+            }
         }
     </script>
 </body>
