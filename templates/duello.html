@@ -167,6 +167,7 @@ let benimPuan = 0;
 let rakipPuan = 0;
 let rakipIsim = "Rakip";
 let kilitli = false;
+let benimCevaplar = [];
 
 // Bağlanınca lobiye gir
 socket.on('connect', () => {
@@ -225,8 +226,8 @@ socket.on('skor_guncelle', (skorlar) => {
 });
 
 // Maç bitti (her ikisi de bitince)
-socket.on('mac_bitti', (skorlar) => {
-  maciBitir(skorlar);
+socket.on('mac_bitti', (data) => {
+  maciBitir(data);
 });
 
 function soruGoster() {
@@ -234,11 +235,11 @@ function soruGoster() {
     document.getElementById('secenekler').innerHTML =
       "<p style='color:var(--mavi);text-align:center;font-size:18px;padding:30px;'>✅ Tüm sorular bitti!<br>Rakip bekleniyor...</p>";
     // Sunucuya 'bitirdim' sinyali gönder
-    socket.emit('oyun_bitti', { oda: ODA, oyuncu: BEN, puan: benimPuan });
+    socket.emit('oyun_bitti', { oda: ODA, oyuncu: BEN, puan: benimPuan, cevaplar: benimCevaplar });
     // 10 saniye içinde mac_bitti gelmediyse rakip bağlı değil demektir
     setTimeout(() => {
       if (document.getElementById('oyun').style.display !== 'none') {
-        maciBitir({ [BEN]: benimPuan });
+        maciBitir({ skorlar: { [BEN]: benimPuan }, cevaplar: { [BEN]: benimCevaplar } });
       }
     }, 10000);
     return;
@@ -301,6 +302,7 @@ function cevapVer(btn, secim) {
   });
 
   if (secim === dogru) {
+    benimCevaplar.push(true);
     btn.classList.add('dogru');
     benimPuan++;
     document.getElementById('puan-ben').textContent = benimPuan;
@@ -308,6 +310,7 @@ function cevapVer(btn, secim) {
     document.getElementById('prog-ben').style.width = yuzde + '%';
     socket.emit('cevap_yolla', { oda: ODA, oyuncu: BEN, puan: benimPuan });
   } else {
+    benimCevaplar.push(false);
     btn.classList.add('yanlis');
     socket.emit('cevap_yolla', { oda: ODA, oyuncu: BEN, puan: benimPuan });
   }
@@ -318,10 +321,13 @@ function cevapVer(btn, secim) {
   }, 1200);
 }
 
-function maciBitir(skorlar) {
+function maciBitir(data) {
   document.getElementById('oyun').style.display = 'none';
   const sonucDiv = document.getElementById('sonuc');
   sonucDiv.style.display = 'flex';
+
+  let skorlar = data.skorlar || {};
+  let cevaplar = data.cevaplar || {};
 
   let rakipSkor = 0;
   for (let o in skorlar) { if (o !== BEN) rakipSkor = skorlar[o]; }
@@ -354,6 +360,39 @@ function maciBitir(skorlar) {
     yazi.style.color  = '#f39c12';
     detay.textContent = `${benimPuan} - ${rakipSkor} | İki vizyon eşit çıktı!`;
   }
+
+  // 📝 Yanıt Dökümü Tablosu Ekle
+  let rakipCevaplar = [];
+  for (let o in cevaplar) { if (o !== BEN) rakipCevaplar = cevaplar[o]; }
+  
+  let dokumHTML = `
+    <div style="margin-top: 30px; width: 100%; max-width: 600px; background: rgba(0,0,0,0.4); border-radius: 15px; padding: 20px; text-align: left;">
+      <h3 style="color: #fff; text-align: center; margin-bottom: 20px; font-size: 20px;">📝 Yanıt Dökümü</h3>
+      <div style="display: flex; justify-content: space-between; font-weight: bold; color: #aaa; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+        <span style="flex:1; text-align:center;">Soru</span>
+        <span style="flex:1; text-align:center; color: var(--mavi);">Sen</span>
+        <span style="flex:1; text-align:center; color: var(--kirmizi);">${rakipIsim}</span>
+      </div>
+  `;
+
+  for (let i = 0; i < SORULAR.length; i++) {
+    let benimDurum = benimCevaplar[i] ? '✅' : '❌';
+    let rakipDurum = rakipCevaplar[i] ? '✅' : '❌';
+    if (rakipCevaplar.length <= i) rakipDurum = '⏳'; // Rakip cevaplamadıysa
+    
+    dokumHTML += `
+      <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 18px;">
+        <span style="flex:1; text-align:center; color:#777;">#${i+1}</span>
+        <span style="flex:1; text-align:center;">${benimDurum}</span>
+        <span style="flex:1; text-align:center;">${rakipDurum}</span>
+      </div>
+    `;
+  }
+  dokumHTML += `</div>`;
+  
+  const dokumDiv = document.createElement('div');
+  dokumDiv.innerHTML = dokumHTML;
+  sonucDiv.insertBefore(dokumDiv, document.querySelector('.btn-ana'));
 }
 
 function linkKopyala() {

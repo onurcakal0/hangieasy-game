@@ -737,6 +737,7 @@ def oyun_bitti_handler(data):
     oda    = data.get('oda')
     oyuncu = data.get('oyuncu') or session.get('kullanici_adi', 'Bilinmeyen')
     puan   = data.get('puan', 0)
+    cevaplar = data.get('cevaplar', [])
 
     oda_db = DuelloOdasi.query.filter_by(oda_kodu=oda).first()
     if not oda_db:
@@ -745,8 +746,11 @@ def oyun_bitti_handler(data):
     veri = json.loads(oda_db.veri)
     if 'skorlar' not in veri:
         veri['skorlar'] = {}
+    if 'cevaplar' not in veri:
+        veri['cevaplar'] = {}
         
     veri['skorlar'][oyuncu] = puan
+    veri['cevaplar'][oyuncu] = cevaplar
 
     if 'bitenler' not in veri:
         veri['bitenler'] = []
@@ -758,7 +762,7 @@ def oyun_bitti_handler(data):
 
     # İki oyuncu da bitirdiyse maç sonu
     if len(veri['bitenler']) >= 2:
-        emit('mac_bitti', veri['skorlar'], room=oda)
+        emit('mac_bitti', {'skorlar': veri['skorlar'], 'cevaplar': veri['cevaplar']}, room=oda)
 
 
 
