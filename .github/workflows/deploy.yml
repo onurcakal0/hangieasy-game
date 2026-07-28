@@ -20,4 +20,6 @@ jobs:
             git pull
             source venv/bin/activate
             pip install -r requirements.txt
+            sudo sed -i 's/--workers [0-9]*/--workers 1/g' /etc/systemd/system/hangieasy.service || true
+            sudo systemctl daemon-reload || true
             sudo systemctl restart hangieasy
