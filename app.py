@@ -497,7 +497,8 @@ def profil():
         taclanan_sampiyon=taclanan_sampiyon,
         takip_edilen=aktif.takip_ettikleri.count(),
         takipci_sayisi=aktif.takipcileri.count(),
-        kendi_profili_mi=True
+        kendi_profili_mi=True,
+        rutbe_bilgisi=get_rutbe_bilgisi(aktif.cozulen_test_sayisi)
     )
 
 @app.route('/profil/<kullanici_adi>')
@@ -533,7 +534,8 @@ def baska_profil(kullanici_adi):
         takip_edilen=hedef_kullanici.takip_ettikleri.count(),
         takipci_sayisi=hedef_kullanici.takipcileri.count(),
         kendi_profili_mi=False,
-        takip_ediyor_mu=takip_ediyor_mu
+        takip_ediyor_mu=takip_ediyor_mu,
+        rutbe_bilgisi=get_rutbe_bilgisi(hedef_kullanici.cozulen_test_sayisi)
     )
 
 @app.route('/api/takip/<kullanici_adi>', methods=['POST'])
@@ -811,6 +813,50 @@ def kapisma_oy_gonder(data):
     if oda in aktif_yayinlar and secim:
         # Yayıncı paneline özel oy event'i gönder
         emit('kapisma_oy', {'secim': secim}, room=oda)
+
+def get_rutbe_bilgisi(cozulen_test_sayisi):
+    rutbeler = [
+        (0, "Stajyer"),
+        (10, "Asistan"),
+        (25, "Uzman"),
+        (50, "Müdür"),
+        (100, "Direktör"),
+        (250, "Başkan Yardımcısı"),
+        (500, "CEO")
+    ]
+    
+    mevcut_rutbe = "Stajyer"
+    siradaki_rutbe = "Zirve"
+    hedef = 500
+    onceki_hedef = 0
+    
+    for i, (sinir, isim) in enumerate(rutbeler):
+        if cozulen_test_sayisi >= sinir:
+            mevcut_rutbe = isim
+            onceki_hedef = sinir
+            if i + 1 < len(rutbeler):
+                hedef = rutbeler[i+1][0]
+                siradaki_rutbe = rutbeler[i+1][1]
+            else:
+                hedef = sinir
+                siradaki_rutbe = "Zirve"
+        else:
+            break
+            
+    if siradaki_rutbe == "Zirve":
+        kalan = 0
+        yuzde = 100
+    else:
+        kalan = hedef - cozulen_test_sayisi
+        yuzde = ((cozulen_test_sayisi - onceki_hedef) / (hedef - onceki_hedef)) * 100
+        
+    return {
+        "mevcut": mevcut_rutbe,
+        "siradaki": siradaki_rutbe,
+        "hedef": hedef,
+        "kalan": kalan,
+        "yuzde": min(100, max(0, yuzde))
+    }
 
 # --- DIŞARIDAN GELENLER İÇİN YENİ ANA SAYFA ---
 # --- 🌍 HANGIEASY ANA SAYFA (LANSMAN BİTTİ, SİSTEM CANLI!) ---
@@ -1661,18 +1707,8 @@ def ilerleme_kaydet(kullanici_adi, kazanilan_puan=0):
     kullanici.gunluk_test_sayaci += 1
 
     # 3. RÜTBE ALGORİTMASI (Şirket Hiyerarşisi)
-    toplam_test = kullanici.cozulen_test_sayisi
-    
-    if toplam_test >= 100:
-        kullanici.rutbe = "CEO" # Patron sensin, ama 100 teste ulaşan oyuncu da CEO olur!
-    elif toplam_test >= 50:
-        kullanici.rutbe = "Müdür"
-    elif toplam_test >= 20:
-        kullanici.rutbe = "Uzman"
-    elif toplam_test >= 5:
-        kullanici.rutbe = "Asistan"
-    else:
-        kullanici.rutbe = "Stajyer"
+    rutbe_bilgisi = get_rutbe_bilgisi(kullanici.cozulen_test_sayisi)
+    kullanici.rutbe = rutbe_bilgisi['mevcut']
 
     # Kasayı Kilitle
     db.session.commit()

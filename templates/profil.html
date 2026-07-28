@@ -388,14 +388,18 @@
         <div class="buyume-paneli">
             <div class="vip-kart kart-rutbe">
                 <div class="vip-baslik">Kariyer Hedefi</div>
-                <div class="vip-deger">🛡️ {{ kullanici.rutbe }}</div>
+                <div class="vip-deger">🛡️ {{ rutbe_bilgisi.mevcut }}</div>
                 <p style="color: #64748b; font-size: 13px;">Onur Çakal A.Ş. bünyesinde çözülen test: <span style="color: #fff; font-weight: bold;">{{ kullanici.cozulen_test_sayisi }}</span></p>
                 
                 <div class="progress-bg">
-                    <div class="progress-bar" style="width: {{ (kullanici.cozulen_test_sayisi / 50) * 100 }}%;"></div>
+                    <div class="progress-bar" style="width: {{ rutbe_bilgisi.yuzde }}%;"></div>
                 </div>
                 <div class="progress-text">
-                    CEO olmaya <span style="color: #facc15; font-weight: bold;">{{ 50 - kullanici.cozulen_test_sayisi }}</span> test kaldı!
+                    {% if rutbe_bilgisi.siradaki == "Zirve" %}
+                    Şirketin zirvesindesin! 🏆
+                    {% else %}
+                    {{ rutbe_bilgisi.siradaki }} olmaya <span style="color: #facc15; font-weight: bold;">{{ rutbe_bilgisi.kalan }}</span> test kaldı!
+                    {% endif %}
                 </div>
             </div>
 
