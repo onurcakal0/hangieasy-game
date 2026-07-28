@@ -94,7 +94,7 @@
                     <i class="fas fa-envelope"></i>
                     <div>
                         <p>E-Posta Adresimiz:</p>
-                        <a href="mailto:iletisim@hangieasy.com">iletisim@hangieasy.com</a>
+                        <a href="mailto:hangieasy@gmail.com">hangieasy@gmail.com</a>
                     </div>
                 </div>
                 
@@ -121,22 +121,33 @@
 
             <div class="iletisim-form">
                 <h3>Mesaj Gönder</h3>
-                <form action="#" method="GET" onsubmit="alert('Mesajınız başarıyla alınmıştır. En kısa sürede dönüş yapılacaktır.'); return false;">
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div style="padding: 10px; margin-bottom: 15px; border-radius: 5px; background: {% if category == 'success' %}rgba(46, 204, 113, 0.2); border: 1px solid #2ecc71; color: #2ecc71;{% else %}rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; color: #e74c3c;{% endif %}">
+                        {{ message }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                <form action="/iletisim-gonder" method="POST">
                     <div class="form-group">
                         <label>Adınız Soyadınız</label>
-                        <input type="text" placeholder="Örn: Ahmet Yılmaz" required>
+                        <input type="text" name="adsoyad" placeholder="Örn: Ahmet Yılmaz" required>
                     </div>
                     <div class="form-group">
                         <label>E-Posta Adresiniz</label>
-                        <input type="email" placeholder="ornek@mail.com" required>
+                        <input type="email" name="eposta" placeholder="ornek@mail.com" required>
                     </div>
                     <div class="form-group">
                         <label>Konu</label>
-                        <input type="text" placeholder="Örn: Reklam İşbirliği" required>
+                        <input type="text" name="konu" placeholder="Örn: Reklam İşbirliği" required>
                     </div>
                     <div class="form-group">
                         <label>Mesajınız</label>
-                        <textarea rows="4" placeholder="Mesajınızı buraya yazın..." required></textarea>
+                        <textarea name="mesaj" rows="4" placeholder="Mesajınızı buraya yazın..." required></textarea>
                     </div>
                     <button type="submit" class="submit-btn">Gönder <i class="fas fa-paper-plane" style="margin-left: 5px;"></i></button>
                 </form>

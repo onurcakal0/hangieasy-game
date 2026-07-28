@@ -2020,6 +2020,34 @@ def iletisim():
     kullanici_adi = session.get('kullanici_adi')
     return render_template('iletisim.html', kullanici_adi=kullanici_adi)
 
+@app.route('/iletisim-gonder', methods=['POST'])
+def iletisim_gonder():
+    adsoyad = request.form.get('adsoyad')
+    eposta = request.form.get('eposta')
+    konu = request.form.get('konu')
+    mesaj = request.form.get('mesaj')
+    
+    html_content = f"""
+    <div style="font-family: sans-serif; padding: 20px; background: #f9f9f9; border-radius: 10px;">
+        <h2 style="color: #333;">Yeni İletişim Formu Mesajı</h2>
+        <p><strong>Ad Soyad:</strong> {adsoyad}</p>
+        <p><strong>E-Posta:</strong> {eposta}</p>
+        <p><strong>Konu:</strong> {konu}</p>
+        <div style="background: #fff; padding: 15px; border-left: 4px solid #f39c12; margin-top: 15px;">
+            <p style="margin: 0;"><strong>Mesaj:</strong><br>{mesaj}</p>
+        </div>
+    </div>
+    """
+    
+    success, err = send_email_via_resend('hangieasy@gmail.com', f"İletişim Formu: {konu}", html_content)
+    
+    if success:
+        flash("Mesajınız başarıyla gönderildi. En kısa sürede dönüş yapacağız.", "success")
+    else:
+        flash("Mesaj gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.", "danger")
+        
+    return redirect(url_for('iletisim'))
+
 @app.route('/robots.txt')
 def robots_txt():
     content = "User-agent: *\nAllow: /\nSitemap: https://hangieasy.com/sitemap.xml\n"
