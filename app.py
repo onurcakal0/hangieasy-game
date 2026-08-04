@@ -1769,10 +1769,7 @@ def kimim_ben():
     kullanicilar = Kullanici.query.all()
     liste = [f"{k.kullanici_adi} - {k.eposta}" for k in kullanicilar]
     return f"Sistemdeki Krallar: {liste}"
-@app.route('/robots.txt')
-def robots():
-    # Google botlarına "Bütün siteyi tarayabilirsin" emrini veriyoruz.
-    return "User-agent: *\nAllow: /"
+
 
 # --- 📱 MOBİL UYGULAMA API UÇ NOKTALARI (PHASE 1) ---
 
