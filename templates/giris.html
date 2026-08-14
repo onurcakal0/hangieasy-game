@@ -45,6 +45,7 @@
         {% endwith %}
 
         <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input type="text" name="kullanici_adi" placeholder="Kullanıcı Adı" required>
             <input type="password" name="sifre" placeholder="Şifre" required>
             <button type="submit">GİRİŞ YAP ➔</button>

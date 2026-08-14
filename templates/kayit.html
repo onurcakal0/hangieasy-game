@@ -95,6 +95,7 @@
         {% endwith %}
         
         <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input type="text" name="ad_soyad" placeholder="Ad Soyad" required>
             <input type="text" name="kullanici_adi" placeholder="Kullanıcı Adı" required>
             <input type="email" name="eposta" placeholder="E-posta Adresi" required>

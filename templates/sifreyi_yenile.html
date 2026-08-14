@@ -47,6 +47,7 @@
         {% endwith %}
 
         <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input type="password" name="sifre" placeholder="Yeni Şifreniz" required>
             <input type="password" name="sifre_tekrar" placeholder="Yeni Şifrenizi Tekrar Girin" required>
             <button type="submit">ŞİFREMİ YENİLE ➔</button>

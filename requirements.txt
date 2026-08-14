@@ -10,4 +10,5 @@ python-dotenv
 supabase
 stripe
 itsdangerous
-psycopg2-binary
+psycopg2-binaryFlask-WTF
+Flask-Limiter

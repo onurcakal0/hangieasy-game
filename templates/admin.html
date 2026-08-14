@@ -291,6 +291,7 @@
                                 <i class="fas fa-pen"></i> DÜZENLE
                             </button>
                             <form action="/admin-kullanici-sil/{{ p.id }}" method="POST" onsubmit="return confirm('Bu ajanı kalıcı olarak siliyorsun. Emin misin?');" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <button type="submit" class="btn btn-delete"><i class="fas fa-skull"></i> BANLA</button>
                             </form>
                         </td>
@@ -325,6 +326,7 @@
                         <td>
                             <a href="/oyun/{{ oyun.id }}" target="_blank" class="btn btn-view"><i class="fas fa-eye"></i> İNCELE</a>
                             <form action="/admin-test-sil/{{ oyun.id }}" method="POST" onsubmit="return confirm('Bu simülasyonu siliyorsun. Onaylıyor musun?');" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <button type="submit" class="btn btn-delete"><i class="fas fa-trash"></i> SİL</button>
                             </form>
                         </td>
@@ -359,6 +361,7 @@
                         <td>
                             <a href="/hangisi/{{ h.id }}" target="_blank" class="btn btn-view"><i class="fas fa-eye"></i> İNCELE</a>
                             <form action="/admin-hangisi-test-sil/{{ h.id }}" method="POST" onsubmit="return confirm('Bu bilgi yarışmasını kalıcı olarak siliyorsun. Emin misin?');" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <button type="submit" class="btn btn-delete"><i class="fas fa-trash"></i> SİL</button>
                             </form>
                         </td>
@@ -374,6 +377,7 @@
         <div class="modal-box">
             <div class="modal-header">AJAN PROTOKOLÜ</div>
             <form id="editForm" method="POST" action="">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <p style="color:#aaa; margin-bottom: 15px;">Ajan: <strong id="modalUsername" style="color:var(--neon-cyan);"></strong></p>
                 
                 <div class="form-group">

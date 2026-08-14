@@ -347,6 +347,7 @@
                {% if kendi_profili_mi %}
                <!-- 📸 ARKA PLANDA ÇALIŞAN GİZLİ YÜKLEME FORMU -->
                <form id="pp-form" action="/pp-guncelle" method="POST" enctype="multipart/form-data" style="display: none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                    <input type="file" id="pp-upload" name="profil_fotografi" accept="image/*" onchange="document.getElementById('pp-form').submit()">
                </form>
                {% endif %}
@@ -493,6 +494,7 @@
                             <a href="/oyun/{{ oyun.id }}" class="oyna-btn">İncele</a>
                             {% if kendi_profili_mi %}
                             <form action="/oyun-sil/{{ oyun.id }}" method="POST" onsubmit="return confirm('Bu şaheseri silmek istediğine emin misin? Tüm sorularıyla birlikte kalıcı olarak yok olacak!');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <button type="submit" class="sil-btn">Sil</button>
                             </form>
                             {% endif %}
@@ -522,6 +524,7 @@
             </div>
             <p style="color: #ccc; font-size: 14px; margin-bottom: 20px; line-height: 1.5;">Hesabını ve tüm verilerini kalıcı olarak silmek üzeresin. Onaylamak için aşağıdaki kutuya <strong>hesabımı sil</strong> yazmalısın.</p>
             <form action="/hesabi-sil" method="POST" onsubmit="return hesapSilKontrol()">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <input type="text" id="hesap-sil-input" placeholder="hesabımı sil" autocomplete="off" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: #fff; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 16px;">
                 <button type="submit" class="btn" style="background: #ef4444; color: #fff;">Kalıcı Olarak Sil</button>
                 <button type="button" class="btn" onclick="hesapSilKapat()" style="background: transparent; color: #aaa; margin-top: 10px;">Vazgeç</button>

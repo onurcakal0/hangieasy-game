@@ -47,6 +47,7 @@
         {% endwith %}
 
         <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <input type="email" name="eposta" placeholder="Kayıtlı E-posta Adresin" required>
             <button type="submit">Sıfırlama Linki Gönder ➔</button>
         </form>

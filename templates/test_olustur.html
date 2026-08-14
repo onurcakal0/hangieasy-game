@@ -120,6 +120,7 @@
         <h2>🚀 1. Aşama: Krallığın Kapağı</h2>
         
         <form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             
             <div class="grup">
                 <label>🏷️ Testin Başlığı</label>

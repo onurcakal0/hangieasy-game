@@ -14,6 +14,9 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for, s
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, emit, join_room
 from flask_cors import CORS
+from flask_wtf.csrf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import requests
 import json
 
@@ -39,6 +42,22 @@ app = Flask(__name__)
 # İki farklı secret key vardı, onları kasadan çekip tek bir mühürde birleştirdik.
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.secret_key = app.config['SECRET_KEY']
+
+# Oturum çerezleri güvenliği (Session Cookie Security)
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
+# CSRF Koruması
+csrf = CSRFProtect(app)
+
+# Rate Limiting (Kaba Kuvvet Koruması)
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
 # --- 📧 HANGIEASY POSTACI (RESEND API) ---
 def send_email_via_resend(to_email, subject, html_content):
     api_key = os.getenv('RESEND_API_KEY')
@@ -1352,6 +1371,7 @@ def oyun_sil(oyun_id):
     return redirect(url_for('profil', kadi=kadi))
 
 @app.route('/kayit', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def kayit():
     # Misafir olarak skor kaydedip gelenleri yakala
     if request.args.get('hangisi_oyun_id') and request.args.get('hangisi_skor'):
@@ -1460,6 +1480,7 @@ def dogrula():
             
     return render_template('dogrula.html', eposta=eposta)
 @app.route('/giris', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def giris():
     hata = None
     if request.method == 'POST':
@@ -1478,6 +1499,7 @@ def cikis():
     return redirect(url_for('dashboard'))
 
 @app.route('/sifremi-unuttum', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def sifremi_unuttum():
     if request.method == 'POST':
         eposta = request.form.get('eposta')

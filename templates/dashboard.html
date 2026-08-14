@@ -464,6 +464,7 @@
             <div style="margin-top: 15px; padding: 10px; background: rgba(0,242,254,0.05); border: 1px solid rgba(0,242,254,0.3); border-radius: 12px;">
                 <div style="font-size: 11px; color: #00f2fe; margin-bottom: 8px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">Özel Odaya Katıl</div>
                 <form action="/odaya-katil" method="POST" style="display: flex; gap: 5px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="text" name="oda_kodu" placeholder="Oda Kodu" style="flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px 10px; border-radius: 6px; outline: none; font-size: 13px;" required autocomplete="off">
                     <button type="submit" style="background: linear-gradient(45deg, #00f2fe, #4facfe); border: none; padding: 8px 12px; border-radius: 6px; color: #000; font-weight: 900; cursor: pointer; font-size: 12px;">KATIL</button>
                 </form>
@@ -473,6 +474,7 @@
         <div class="sidebar-bolum">
             <div class="sidebar-bolum-baslik">🎮 Özel Odaya Katıl</div>
             <form action="/odaya-katil" method="POST" style="display: flex; gap: 5px; padding: 0 10px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <input type="text" name="oda_kodu" placeholder="Oda Kodu" style="flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px 10px; border-radius: 6px; outline: none; font-size: 13px;" required autocomplete="off">
                 <button type="submit" style="background: linear-gradient(45deg, #00f2fe, #4facfe); border: none; padding: 8px 12px; border-radius: 6px; color: #000; font-weight: 900; cursor: pointer; font-size: 12px;">KATIL</button>
             </form>

@@ -133,6 +133,7 @@
                 {% endwith %}
 
                 <form action="/iletisim-gonder" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <div class="form-group">
                         <label>Adınız Soyadınız</label>
                         <input type="text" name="adsoyad" placeholder="Örn: Ahmet Yılmaz" required>

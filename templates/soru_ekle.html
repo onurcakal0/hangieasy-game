@@ -119,6 +119,7 @@
         <p class="alt-bilgi">🎬 {{ soru_sayisi }}. İçeriği Ekliyorsun</p>
         
         <form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             
             {% if oyun.oyun_modu == 'omu_bumu' or oyun.oyun_modu == 'surat_yarisi' or oyun.oyun_modu == 'kim_populer' %}
                 <div class="vs-alan-mavi">
