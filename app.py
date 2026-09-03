@@ -217,6 +217,14 @@ class HangisiOyun(db.Model):
 class HangisiSoru(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     oyun_id = db.Column(db.Integer, db.ForeignKey('hangisi_oyun.id'), nullable=False)
+    soru_metni = db.Column(db.Text, nullable=False)
+    resim_url = db.Column(db.String(500), nullable=True)
+    secenek_a = db.Column(db.String(200), nullable=False)
+    secenek_b = db.Column(db.String(200), nullable=False)
+    secenek_c = db.Column(db.String(200), nullable=False)
+    secenek_d = db.Column(db.String(200), nullable=False)
+    dogru_cevap = db.Column(db.String(1), nullable=False) # A, B, C or D
+    zorluk_derecesi = db.Column(db.String(20), default="Orta")
 
 class DuelloOdasi(db.Model):
     id = db.Column(db.Integer, primary_key=True)
