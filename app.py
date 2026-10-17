@@ -51,11 +51,11 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 # CSRF Koruması
 csrf = CSRFProtect(app)
 
-# Rate Limiting (Kaba Kuvvet Koruması)
+# Rate Limiting (Kaba Kuvvet Koruması - sadece belirtilen rotalara uygulanır)
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["200 per day", "50 per hour"],
+    default_limits=[],
     storage_uri="memory://"
 )
 # --- 📧 HANGIEASY POSTACI (RESEND API) ---
