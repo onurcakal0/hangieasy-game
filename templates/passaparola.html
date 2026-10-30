@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passaparola | HangiEasy</title>
+    <!-- Modern Geometrik Tipografi -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0b0c10;
+            --bg-surface: #14161f;
+            --bg-card: rgba(22, 25, 37, 0.82);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-bright: rgba(255, 255, 255, 0.18);
+            
+            /* Durum Renkleri */
+            --accent-primary: #8b5cf6;
+            --accent-blue: #38bdf8;
+            --color-correct: #10b981;
+            --color-correct-glow: rgba(16, 185, 129, 0.45);
+            --color-wrong: #ef4444;
+            --color-wrong-glow: rgba(239, 68, 68, 0.45);
+            --color-passed: #f59e0b;
+            --color-passed-glow: rgba(245, 158, 11, 0.45);
+            --color-active: #60a5fa;
+            --color-active-glow: rgba(96, 165, 250, 0.65);
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Arka Plan Glow Orbları */
+        .ambient-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(140px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.6;
+        }
+        .glow-1 {
+            width: 45vw;
+            height: 45vw;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.25), transparent 70%);
+            top: -10%;
+            left: -10%;
+            animation: floatGlow1 16s infinite alternate ease-in-out;
+        }
+        .glow-2 {
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.2), transparent 70%);
+            bottom: -15%;
+            right: -10%;
+            animation: floatGlow2 20s infinite alternate ease-in-out;
+        }
+        @keyframes floatGlow1 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 60px) scale(1.15); }
+        }
+        @keyframes floatGlow2 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-50px, -40px) scale(1.1); }
+        }
+
+        /* Üst Navigasyon Barı */
+        nav {
+            width: 100%;
+            padding: 14px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(11, 12, 16, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .nav-logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 30%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .nav-badge {
+            background: rgba(139, 92, 246, 0.15);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .nav-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--border-bright);
+        }
+
+        /* Ana İçerik Kapsayıcısı */
+        .game-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 900px;
+            padding: 20px 16px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        /* Üst Skor & Bilgi Paneli */
+        .hud-panel {
+            width: 100%;
+            max-width: 640px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .hud-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 12px 10px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            transition: transform 0.2s;
+        }
+        .hud-card:hover {
+            transform: translateY(-2px);
+        }
+        .hud-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        .hud-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .hud-timer .hud-value {
+            color: #38bdf8;
+            font-variant-numeric: tabular-nums;
+        }
+        .hud-timer.urgent .hud-value {
+            color: #ef4444;
+            animation: pulseUrgent 1s infinite;
+        }
+        @keyframes pulseUrgent {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        .hud-correct .hud-value { color: var(--color-correct); }
+        .hud-wrong .hud-value { color: var(--color-wrong); }
+        .hud-passed .hud-value { color: var(--color-passed); }
+
+        /* DAİRESEL OYUN SAHASI (PASSAPAROLA ÇARKI) */
+        .arena-container {
+            position: relative;
+            width: min(580px, 92vw);
+            height: min(580px, 92vw);
+            margin: 10px auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Çarkın Arka Plan Çember İzi */
+        .ring-track {
+            position: absolute;
+            width: 86%;
+            height: 86%;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.06);
+            pointer-events: none;
+        }
+        .ring-glow-pulse {
+            position: absolute;
+            width: 78%;
+            height: 78%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* Harf Düğmeleri (Node'lar) */
+        .letter-node {
+            position: absolute;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #181b26;
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            color: #cbd5e1;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translate(-50%, -50%);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+            cursor: default;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Harf Durumları */
+        .letter-node.unanswered {
+            background: #161925;
+            border-color: rgba(255, 255, 255, 0.14);
+            color: #94a3b8;
+        }
+
+        .letter-node.active {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-color: #ffffff;
+            color: #ffffff;
+            transform: translate(-50%, -50%) scale(1.35);
+            z-index: 25;
+            box-shadow: 0 0 24px var(--color-active-glow), 0 0 8px #ffffff;
+            animation: pulseNode 1.6s infinite ease-in-out;
+        }
+        @keyframes pulseNode {
+            0%, 100% { box-shadow: 0 0 16px var(--color-active-glow), 0 0 4px #ffffff; }
+            50% { box-shadow: 0 0 28px var(--color-active-glow), 0 0 10px #ffffff; }
+        }
+
+        .letter-node.correct {
+            background: var(--color-correct);
+            border-color: #34d399;
+            color: #ffffff;
+            box-shadow: 0 0 14px var(--color-correct-glow);
+        }
+
+        .letter-node.wrong {
+            background: var(--color-wrong);
+            border-color: #f87171;
+            color: #ffffff;
+            box-shadow: 0 0 14px var(--color-wrong-glow);
+        }
+
+        .letter-node.passed {
+            background: #231e15;
+            border-color: var(--color-passed);
+            color: #fde68a;
+            box-shadow: 0 0 12px var(--color-passed-glow);
+        }
+
+        /* MERKEZ SAHNE (CENTER STAGE) */
+        .center-stage {
+            position: absolute;
+            width: 66%;
+            height: 66%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 30%, #1e2235 0%, #11131c 100%);
+            border: 1px solid var(--border-bright);
+            box-shadow: 
+                0 20px 50px rgba(0, 0, 0, 0.7),
+                inset 0 1px 1px rgba(255, 255, 255, 0.15),
+                inset 0 -10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 20px;
+            text-align: center;
+            z-index: 20;
+            overflow: hidden;
+        }
+
+        /* Merkez İçi: Soru Bilgisi */
+        .clue-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .clue-letter-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.4);
+        }
+        .clue-turn-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        /* Merkez İçi: Soru Metni */
+        .clue-text-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 90%;
+            margin-bottom: 12px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.2) transparent;
+        }
+        .clue-text {
+            font-size: clamp(12.5px, 2.4vw, 15px);
+            font-weight: 500;
+            line-height: 1.45;
+            color: #f1f5f9;
+            transition: opacity 0.2s ease;
+        }
+
+        /* Merkez İçi: Cevap Giriş Formu */
+        .answer-form {
+            width: 100%;
+            max-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .answer-input {
+            width: 100%;
+            background: rgba(10, 11, 16, 0.85);
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 10px 14px;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            text-align: center;
+            outline: none;
+            transition: all 0.25s ease;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+            letter-spacing: 0.5px;
+        }
+        .answer-input:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 16px rgba(139, 92, 246, 0.4), inset 0 2px 6px rgba(0, 0, 0, 0.5);
+            background: rgba(15, 17, 24, 0.95);
+        }
+        .answer-input::placeholder {
+            color: #475569;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        /* Buton Grubu */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+        .btn-action {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            border: none;
+            user-select: none;
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+        }
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-1.5px);
+            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.5);
+            filter: brightness(1.08);
+        }
+        .btn-pass {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+        }
+        .btn-pass:hover:not(:disabled) {
+            transform: translateY(-1.5px);
+            box-shadow: 0 6px 18px rgba(245, 158, 11, 0.5);
+            filter: brightness(1.08);
+        }
+        .btn-action:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+        .btn-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Geri Bildirim Toastı (Merkezde ufak efekt) */
+        .feedback-toast {
+            position: absolute;
+            top: 15px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            opacity: 0;
+            transform: translateY(-6px);
+            transition: all 0.25s ease;
+            pointer-events: none;
+            z-index: 30;
+        }
+        .feedback-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .feedback-toast.correct {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        .feedback-toast.wrong {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+        .feedback-toast.passed {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        /* OYUN SONU (GAME OVER) EKRANI */
+        .game-over-screen {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 35%, #1f2438 0%, #0d0f17 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 20px;
+            text-align: center;
+            z-index: 40;
+            animation: fadeInScale 0.4s ease forwards;
+        }
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.92); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .game-over-icon {
+            font-size: clamp(28px, 6vw, 36px);
+            margin-bottom: 4px;
+        }
+        .game-over-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(16px, 3.5vw, 20px);
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            width: 100%;
+            max-width: 250px;
+            margin-bottom: 16px;
+        }
+        .stat-box {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 8px 4px;
+        }
+        .stat-box.stat-green { border-color: rgba(16, 185, 129, 0.3); }
+        .stat-box.stat-red { border-color: rgba(239, 68, 68, 0.3); }
+        .stat-box.stat-yellow { border-color: rgba(245, 158, 11, 0.3); }
+        .stat-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            display: block;
+        }
+        .stat-box.stat-green .stat-num { color: var(--color-correct); }
+        .stat-box.stat-red .stat-num { color: var(--color-wrong); }
+        .stat-box.stat-yellow .stat-num { color: var(--color-passed); }
+        .stat-desc {
+            font-size: 10px;
+            color: var(--text-dim);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .btn-restart {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: #ffffff;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(139, 92, 246, 0.4);
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.6);
+            filter: brightness(1.1);
+        }
+
+        /* Nasıl Oynanır Rehber Kartı */
+        .info-card {
+            width: 100%;
+            max-width: 640px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 18px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .info-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+        .info-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 8px;
+            font-size: 12.5px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .info-list li {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .dot-green { background: var(--color-correct); }
+        .dot-red { background: var(--color-wrong); }
+        .dot-yellow { background: var(--color-passed); }
+        .dot-blue { background: var(--color-active); }
+
+        /* Mobil Ekran Uyarlamaları */
+        @media (max-width: 600px) {
+            .game-wrapper {
+                padding: 14px 10px 30px;
+            }
+            .hud-panel {
+                gap: 6px;
+                margin-bottom: 16px;
+            }
+            .hud-card {
+                padding: 10px 6px;
+                border-radius: 12px;
+            }
+            .hud-label {
+                font-size: 9.5px;
+            }
+            .hud-value {
+                font-size: 18px;
+            }
+            .arena-container {
+                width: 96vw;
+                height: 96vw;
+                margin-bottom: 20px;
+            }
+            .letter-node {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+                border-width: 1.5px;
+            }
+            .center-stage {
+                width: 69%;
+                height: 69%;
+                padding: 14px 12px;
+            }
+            .clue-meta {
+                margin-bottom: 4px;
+            }
+            .clue-letter-badge {
+                width: 26px;
+                height: 26px;
+                font-size: 13px;
+                border-radius: 6px;
+            }
+            .clue-turn-text {
+                font-size: 10.5px;
+            }
+            .clue-text {
+                font-size: 12px;
+                line-height: 1.35;
+            }
+            .answer-input {
+                font-size: 13px;
+                padding: 8px 10px;
+            }
+            .btn-action {
+                font-size: 12px;
+                padding: 8px 8px;
+            }
+            .stats-summary {
+                gap: 4px;
+            }
+            .stat-num {
+                font-size: 14px;
+            }
+            .stat-desc {
+                font-size: 9px;
+            }
+            .btn-restart {
+                font-size: 12px;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Arka Plan Atmosfer Glow Efektleri -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <!-- Üst Bar -->
+    <nav>
+        <a href="/" class="nav-brand">
+            <span class="nav-logo">HangiEasy</span>
+            <span class="nav-badge">Passaparola</span>
+        </a>
+        <div class="nav-actions">
+            <a href="/" class="nav-btn">
+                <span>←</span>
+                <span>Ana Sayfa</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Oyun Kapsayıcısı -->
+    <main class="game-wrapper">
+
+        <!-- Skor & Süre Paneli -->
+        <section class="hud-panel" aria-label="Oyun İstatistikleri">
+            <div class="hud-card hud-timer" id="hudTimerCard">
+                <span class="hud-label">Süre</span>
+                <span class="hud-value" id="timerDisplay">03:00</span>
+            </div>
+            <div class="hud-card hud-correct">
+                <span class="hud-label">Doğru</span>
+                <span class="hud-value" id="scoreCorrect">0</span>
+            </div>
+            <div class="hud-card hud-wrong">
+                <span class="hud-label">Yanlış</span>
+                <span class="hud-value" id="scoreWrong">0</span>
+            </div>
+            <div class="hud-card hud-passed">
+                <span class="hud-label">Pas</span>
+                <span class="hud-value" id="scorePassed">0</span>
+            </div>
+        </section>
+
+        <!-- Dairesel Harf Çarkı (Passaparola Arena) -->
+        <div class="arena-container" id="arenaContainer">
+            <div class="ring-track"></div>
+            <div class="ring-glow-pulse"></div>
+
+            <!-- 24 Harf Düğmesi JavaScript ile dairesel olarak yerleştirilecek -->
+            <div id="lettersWheel" aria-label="Harf Çarkı"></div>
+
+            <!-- Merkez Sahne (Center Stage) -->
+            <div class="center-stage" id="centerStage">
+                
+                <!-- Geri Bildirim Toastı -->
+                <div class="feedback-toast" id="feedbackToast">DOĞRU</div>
+
+                <!-- Soru Başlığı -->
+                <div class="clue-meta">
+                    <div class="clue-letter-badge" id="currentLetterBadge">A</div>
+                    <span class="clue-turn-text" id="clueTurnText">ile başlayan kelime</span>
+                </div>
+
+                <!-- Soru İpucu Metni -->
+                <div class="clue-text-container">
+                    <p class="clue-text" id="clueText">Yarışma hazırlanıyor...</p>
+                </div>
+
+                <!-- Cevap Giriş Formu -->
+                <form class="answer-form" id="answerForm" onsubmit="event.preventDefault(); handleAnswerSubmit();">
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="answerInput" 
+                            class="answer-input" 
+                            placeholder="Cevabınızı yazın..." 
+                            autocomplete="off" 
+                            autocapitalize="off" 
+                            spellcheck="false"
+                            required
+                        >
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="submit" class="btn-action btn-submit" id="btnSubmit">
+                            <span>✓</span>
+                            <span>Cevapla</span>
+                        </button>
+                        <button type="button" class="btn-action btn-pass" id="btnPass" onclick="handlePass()">
+                            <span>↷</span>
+                            <span>Pas</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Oyun Sonu Ekranı (Varsayılan olarak gizli) -->
+                <div class="game-over-screen" id="gameOverScreen" style="display: none;">
+                    <div class="game-over-icon" id="gameOverIcon">🏆</div>
+                    <h2 class="game-over-title" id="gameOverTitle">Tur Tamamlandı!</h2>
+                    
+                    <div class="stats-summary">
+                        <div class="stat-box stat-green">
+                            <span class="stat-num" id="finalCorrect">0</span>
+                            <span class="stat-desc">Doğru</span>
+                        </div>
+                        <div class="stat-box stat-red">
+                            <span class="stat-num" id="finalWrong">0</span>
+                            <span class="stat-desc">Yanlış</span>
+                        </div>
+                        <div class="stat-box stat-yellow">
+                            <span class="stat-num" id="finalEmpty">0</span>
+                            <span class="stat-desc">Boş</span>
+                        </div>
+                    </div>
+
+                    <button class="btn-restart" onclick="restartGame()">
+                        <span>↺</span>
+                        <span>Tekrar Oyna</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Nasıl Oynanır Rehberi -->
+        <section class="info-card">
+            <div class="info-header">
+                <span>💡</span>
+                <span>Nasıl Oynanır?</span>
+            </div>
+            <ul class="info-list">
+                <li><span class="dot dot-blue"></span> Harfler sırayla sorulur (A'dan Z'ye).</li>
+                <li><span class="dot dot-green"></span> Doğru cevap harfi yeşil yapar ve puan kazandırır.</li>
+                <li><span class="dot dot-yellow"></span> <strong>Pas</strong> dediğiniz sorular tur bitince tekrar karşınıza gelir.</li>
+                <li><span class="dot dot-red"></span> Yanlış cevap veya süre bitimi turu sonlandırır.</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <!-- OYUN MOTORU & DURUM YÖNETİMİ (JAVASCRIPT) -->
+    <script>
+        /**
+         * HangiEasy Passaparola (Parolla Clone) Oyun Motoru
+         * Standart Türk Alfabesi Harf Çarkı (24 Harf - Parolla TV Formatı)
+         * Harfler: A, B, C, Ç, D, E, F, G, H, I, İ, J, K, L, M, N, O, Ö, P, R, S, Ş, T, U, Ü, V, Y, Z
+         */
+
+        // 1. SORU HAVUZU (REST API / FastAPI / PostgreSQL Entegrasyonuna Uygun Format)
+        const DEFAULT_QUESTION_POOL = [
+            { letter: 'A', question: 'Dünyanın en geniş yüzölçümüne sahip olan kıtası.', answer: 'Asya' },
+            { letter: 'B', question: 'Türkiye Cumhuriyeti\'nin başkenti olan ilimiz.', answer: 'Ankara', customNote: 'Başkenti olan ilimiz' },
+            { letter: 'B', question: 'İpek böcekçiliği ve kestane şekeriyle ünlü Marmara şehri.', answer: 'Bursa' },
+            { letter: 'C', question: 'Haftanın çalışma günlerini tamamlayan beşinci günü.', answer: 'Cuma' },
+            { letter: 'Ç', question: 'Rize ve Doğu Karadeniz bölgesinde yaygın olarak yetiştirilen sıcak içecek bitkisi.', answer: 'Çay' },
+            { letter: 'D', question: 'Yer kabuğu sarsıntısına verilen bilimsel ve genel isim.', answer: 'Deprem' },
+            { letter: 'E', question: 'Fırınlarda pişirilen ve sofraların temel gıdası olan unlu yiyecek.', answer: 'Ekmek' },
+            { letter: 'F', question: 'On birer kişiden oluşan iki takım arasında topla oynanan popüler spor dalı.', answer: 'Futbol' },
+            { letter: 'G', question: 'Güneş sistemimizin merkezinde yer alan sıcak gazlardan oluşan dev yıldız.', answer: 'Güneş' },
+            { letter: 'H', question: 'İnsanların veya canlıların hastalandığında tedavi gördüğü sağlık kuruluşu.', answer: 'Hastane' },
+            { letter: 'I', question: 'Deniz veya göllerin kıyısında yer alan kumluk veya taşlık dinlenme alanı.', answer: 'Ilgın', alt: 'Irmak' },
+            { letter: 'İ', question: 'İki kıtayı (Asya ve Avrupa) birbirine bağlayan tarihi metropolümüz.', answer: 'İstanbul' },
+            { letter: 'J', question: 'Elektrik enerjisi kesildiğinde mekanik enerjiyi elektrik enerjisine çeviren aygıt.', answer: 'Jeneratör' },
+            { letter: 'K', question: 'Gündüzleri gökyüzünde beyaz küme şeklinde görülen su buharı kütlesi.', answer: 'Bulut', altLetter: 'K', questionAlt: 'Kış mevsiminde yağan beyaz kristal yağış şekli.', answerAlt: 'Kar' },
+            { letter: 'L', question: 'Sarı renkli, ekşi meyvesi olan C vitamini zengini narenciye türü.', answer: 'Limon' },
+            { letter: 'M', question: 'Sarı renkli kabuğu soyularak yenen tropikal ve tatlı bir meyve.', answer: 'Muz' },
+            { letter: 'N', question: 'Geceleri gökyüzünde beliren, sonbaharda nehir kenarlarında tüten beyaz sis tabakası.', answer: 'Sis', altLetter: 'N', questionAlt: 'Sonbaharda veya kışın soğuk algınlığına bağlı burun akıntılı hastalık.', answerAlt: 'Nezle' },
+            { letter: 'O', question: 'Ağaçlarla ve yeşilliklerle kaplı geniş doğal alan.', answer: 'Orman' },
+            { letter: 'Ö', question: 'Bir okulda öğrencilere bilgi ve beceri kazandıran kimse, muallim.', answer: 'Öğretmen' },
+            { letter: 'P', question: 'Hastalıklardan korunmak amacıyla hazırlanan ve vücuda enjekte edilen sıvı biyolojik madde.', answer: 'Aşı', altLetter: 'P', questionAlt: 'Alışverişte mal veya hizmet karşılığı ödenen resmi değişim aracı.', answerAlt: 'Para' },
+            { letter: 'R', question: 'Ses dalgalarını elektromanyetik yolla ileten ve dinlenen kitle iletişim aracı.', answer: 'Radyo' },
+            { letter: 'S', question: 'İki hidrojen ve bir oksijen atomundan oluşan yaşam kaynağı sıvı.', answer: 'Su' },
+            { letter: 'Ş', question: 'Yağmurdan veya güneşten korunmak için baş üstünde taşınan açılır kapanır araç.', answer: 'Şemsiye' },
+            { letter: 'T', question: 'Raylar üzerinde lokomotif tarafından çekilerek hareket eden demiryolu taşıtı.', answer: 'Tren' },
+            { letter: 'U', question: 'Hava yoluyla yolcu ve yük taşımaya yarayan kanatlı hava taşıtı, tayyare.', answer: 'Uçak' },
+            { letter: 'Ü', question: 'Salkım halinde yetişen, yaş veya kuru tüketilen şifalı tatlı meyve.', answer: 'Üzüm' },
+            { letter: 'V', question: 'Deniz ve göllerde yolcu veya yük taşımacılığında kullanılan motorlu deniz aracı.', answer: 'Vapur' },
+            { letter: 'Y', question: 'Bulutlardan su damlaları halinde yeryüzüne inen bereketli sıvı yağış türü.', answer: 'Yağmur' },
+            { letter: 'Z', question: 'Akdeniz ikliminde yetişen, kahvaltıların vazgeçilmezi ve yağı çıkarılan kutsal ağaç meyvesi.', answer: 'Zeytin' }
+        ];
+
+        // Standart Harf Çarkı Sırası (24 Parolla Harfi)
+        const ALPHABET = [
+            'A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'H', 'I', 'İ', 
+            'J', 'K', 'L', 'M', 'N', 'O', 'Ö', 'P', 'R', 'S', 'Ş', 
+            'T', 'U', 'Ü', 'V', 'Y', 'Z'
+        ];
+
+        // 2. OYUN DURUMU (STATE MANAGEMENT)
+        const gameState = {
+            questions: [],          // Aktif tur için filtrelenmiş harf soruları
+            currentIndex: 0,        // Şu anki harf indexi
+            passedIndices: [],      // Pas geçilip tekrar sorulacak indexler
+            isSecondLap: false,     // Pas soruları turunda mıyız?
+            stats: {
+                correct: 0,
+                wrong: 0,
+                passed: 0
+            },
+            timeLeft: 180,          // 3 Dakika (180 saniye)
+            timerInterval: null,
+            isGameOver: false,
+            apiEndpoint: '/api/passaparola' // Gelecekteki FastAPI / Django bağlantı noktası
+        };
+
+        // DOM Element Referansları
+        const lettersWheelEl = document.getElementById('lettersWheel');
+        const clueTextEl = document.getElementById('clueText');
+        const currentLetterBadgeEl = document.getElementById('currentLetterBadge');
+        const clueTurnTextEl = document.getElementById('clueTurnText');
+        const answerInputEl = document.getElementById('answerInput');
+        const answerFormEl = document.getElementById('answerForm');
+        const btnSubmitEl = document.getElementById('btnSubmit');
+        const btnPassEl = document.getElementById('btnPass');
+        const timerDisplayEl = document.getElementById('timerDisplay');
+        const hudTimerCardEl = document.getElementById('hudTimerCard');
+        const scoreCorrectEl = document.getElementById('scoreCorrect');
+        const scoreWrongEl = document.getElementById('scoreWrong');
+        const scorePassedEl = document.getElementById('scorePassed');
+        const feedbackToastEl = document.getElementById('feedbackToast');
+        const gameOverScreenEl = document.getElementById('gameOverScreen');
+        const gameOverTitleEl = document.getElementById('gameOverTitle');
+        const gameOverIconEl = document.getElementById('gameOverIcon');
+        const finalCorrectEl = document.getElementById('finalCorrect');
+        const finalWrongEl = document.getElementById('finalWrong');
+        const finalEmptyEl = document.getElementById('finalEmpty');
+
+        // 3. TÜRKÇE KARAKTER DUYARLI NORMALİZASYON YARDIMCISI
+        function normalizeTurkish(str) {
+            if (!str) return '';
+            return str
+                .toString()
+                .trim()
+                .replace(/I/g, 'ı')
+                .replace(/İ/g, 'i')
+                .toLowerCase()
+                .replace(/ğ/g, 'g')
+                .replace(/ü/g, 'u')
+                .replace(/ş/g, 's')
+                .replace(/ö/g, 'o')
+                .replace(/ç/g, 'c')
+                .replace(/[^a-z0-9]/g, '');
+        }
+
+        // 4. DAİRESEL HARF ÇARKINI ÇİZME (CIRCULAR RING CALCULATOR)
+        function renderCircularWheel() {
+            lettersWheelEl.innerHTML = '';
+            const total = ALPHABET.length;
+            
+            // Arena yarıçapı oranına göre yerleşim (yarıçap: %43)
+            const radiusPercentage = 43.5; 
+
+            ALPHABET.forEach((letter, index) => {
+                // Saat 12 yönünden (A harfi) başlamak için -90 derece offset
+                const angle = (index / total) * 2 * Math.PI - (Math.PI / 2);
+                
+                // Polar koordinatları kartezyene çevir (Yüzde cinsinden merkez 50%, 50%)
+                const left = 50 + radiusPercentage * Math.cos(angle);
+                const top = 50 + radiusPercentage * Math.sin(angle);
+
+                const node = document.createElement('div');
+                node.className = 'letter-node unanswered';
+                node.id = `node-${letter}`;
+                node.textContent = letter;
+                node.style.left = `${left}%`;
+                node.style.top = `${top}%`;
+
+                lettersWheelEl.appendChild(node);
+            });
+        }
+
+        // 5. OYUNU BAŞLATMA & SORULARI YÜKLEME
+        function initGame() {
+            // State Sıfırlama
+            gameState.currentIndex = 0;
+            gameState.passedIndices = [];
+            gameState.isSecondLap = false;
+            gameState.stats = { correct: 0, wrong: 0, passed: 0 };
+            gameState.timeLeft = 180;
+            gameState.isGameOver = false;
+
+            // UI Sıfırlama
+            gameOverScreenEl.style.display = 'none';
+            btnSubmitEl.disabled = false;
+            btnPassEl.disabled = false;
+            answerInputEl.disabled = false;
+            answerInputEl.value = '';
+            hudTimerCardEl.classList.remove('urgent');
+
+            updateHUD();
+
+            // Soruları Harf Sırasına Göre Eşle
+            gameState.questions = ALPHABET.map(letter => {
+                const candidates = DEFAULT_QUESTION_POOL.filter(q => (q.altLetter || q.letter) === letter);
+                if (candidates.length > 0) {
+                    const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+                    return {
+                        letter: letter,
+                        question: chosen.questionAlt || chosen.question,
+                        answer: chosen.answerAlt || chosen.answer,
+                        status: 'unanswered' // unanswered, correct, wrong, passed
+                    };
+                }
+                // Fallback soru
+                return {
+                    letter: letter,
+                    question: `${letter} harfi ile başlayan test kelimesi.`,
+                    answer: letter,
+                    status: 'unanswered'
+                };
+            });
+
+            // Çarkı oluştur ve ilk soruyu getir
+            renderCircularWheel();
+            startTimer();
+            displayCurrentQuestion();
+        }
+
+        // 6. GÜNCEL SORUYU MERKEZ SAHNEYE YANSITMA
+        function displayCurrentQuestion() {
+            if (gameState.isGameOver) return;
+
+            const currentQ = gameState.questions[gameState.currentIndex];
+            if (!currentQ) {
+                finishGame();
+                return;
+            }
+
+            // Aktif Düğmeyi Vurgula
+            document.querySelectorAll('.letter-node').forEach(node => node.classList.remove('active'));
+            const activeNode = document.getElementById(`node-${currentQ.letter}`);
+            if (activeNode) {
+                activeNode.classList.add('active');
+            }
+
+            // Merkez Sahneyi Güncelle
+            currentLetterBadgeEl.textContent = currentQ.letter;
+            clueTurnTextEl.textContent = gameState.isSecondLap 
+                ? `${currentQ.letter} Harfi (Pas Turu)` 
+                : `${currentQ.letter} ile başlayan kelime`;
+
+            clueTextEl.style.opacity = '0';
+            setTimeout(() => {
+                clueTextEl.textContent = currentQ.question;
+                clueTextEl.style.opacity = '1';
+            }, 150);
+
+            answerInputEl.value = '';
+            answerInputEl.focus();
+        }
+
+        // 7. CEVAP KONTROLÜ (SUBMIT LOGIC)
+        function handleAnswerSubmit() {
+            if (gameState.isGameOver) return;
+
+            const rawInput = answerInputEl.value.trim();
+            if (!rawInput) return;
+
+            const currentQ = gameState.questions[gameState.currentIndex];
+            const normalizedUser = normalizeTurkish(rawInput);
+            const normalizedCorrect = normalizeTurkish(currentQ.answer);
+
+            const isCorrect = (normalizedUser === normalizedCorrect);
+
+            const node = document.getElementById(`node-${currentQ.letter}`);
+            node.classList.remove('active', 'passed', 'unanswered');
+
+            if (isCorrect) {
+                currentQ.status = 'correct';
+                node.classList.add('correct');
+                gameState.stats.correct++;
+                showFeedback('DOĞRU', 'correct');
+            } else {
+                currentQ.status = 'wrong';
+                node.classList.add('wrong');
+                gameState.stats.wrong++;
+                showFeedback(`YANLIŞ (${currentQ.answer})`, 'wrong');
+            }
+
+            // Eğer pas listesindeyse bu indexi çıkar
+            gameState.passedIndices = gameState.passedIndices.filter(idx => idx !== gameState.currentIndex);
+
+            updateHUD();
+            advanceToNextQuestion();
+        }
+
+        // 8. PAS MEKANİZMASI (SKIP / PASS)
+        function handlePass() {
+            if (gameState.isGameOver) return;
+
+            const currentQ = gameState.questions[gameState.currentIndex];
+            currentQ.status = 'passed';
+
+            const node = document.getElementById(`node-${currentQ.letter}`);
+            node.classList.remove('active');
+            node.classList.add('passed');
+
+            if (!gameState.passedIndices.includes(gameState.currentIndex)) {
+                gameState.passedIndices.push(gameState.currentIndex);
+            }
+
+            gameState.stats.passed = gameState.passedIndices.length;
+            showFeedback('PAS GEÇİLDİ', 'passed');
+
+            updateHUD();
+            advanceToNextQuestion();
+        }
+
+        // 9. SONRAKİ SORUYA GEÇİŞ ALGORİTMASI
+        function advanceToNextQuestion() {
+            if (isAllAnswered()) {
+                finishGame();
+                return;
+            }
+
+            // İlk turda mıyız?
+            if (!gameState.isSecondLap) {
+                // Henüz ilk tur bitmediyse bir sonraki harfe ilerle
+                let nextIdx = gameState.currentIndex + 1;
+                if (nextIdx < gameState.questions.length) {
+                    gameState.currentIndex = nextIdx;
+                    displayCurrentQuestion();
+                    return;
+                } else {
+                    // İlk tur tamamlandı! Pas geçilen sorulara dön
+                    gameState.isSecondLap = true;
+                }
+            }
+
+            // İkinci tur: Sadece pas geçilen veya henüz cevaplanmamış soruları sor
+            if (gameState.passedIndices.length > 0) {
+                // Pas listesinin ilk elemanına geç
+                const nextPassedIndex = gameState.passedIndices.shift();
+                gameState.currentIndex = nextPassedIndex;
+                displayCurrentQuestion();
+            } else {
+                // Kalan başka soru var mı kontrol et
+                const remainingIndex = gameState.questions.findIndex(q => q.status === 'unanswered' || q.status === 'passed');
+                if (remainingIndex !== -1) {
+                    gameState.currentIndex = remainingIndex;
+                    displayCurrentQuestion();
+                } else {
+                    finishGame();
+                }
+            }
+        }
+
+        // Bütün sorular bitti mi kontrolü
+        function isAllAnswered() {
+            return gameState.questions.every(q => q.status === 'correct' || q.status === 'wrong');
+        }
+
+        // 10. GERİ BİLDİRİM BİLDİRİMİ (TOAST)
+        let feedbackTimeout = null;
+        function showFeedback(text, type) {
+            clearTimeout(feedbackTimeout);
+            feedbackToastEl.textContent = text;
+            feedbackToastEl.className = `feedback-toast show ${type}`;
+
+            feedbackTimeout = setTimeout(() => {
+                feedbackToastEl.classList.remove('show');
+            }, 1200);
+        }
+
+        // 11. ZAMANLAYICI (COUNTDOWN TIMER)
+        function startTimer() {
+            clearInterval(gameState.timerInterval);
+            renderTimerText();
+
+            gameState.timerInterval = setInterval(() => {
+                gameState.timeLeft--;
+                renderTimerText();
+
+                if (gameState.timeLeft <= 30) {
+                    hudTimerCardEl.classList.add('urgent');
+                }
+
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timerInterval);
+                    finishGame('time_out');
+                }
+            }, 1000);
+        }
+
+        function renderTimerText() {
+            const minutes = Math.floor(Math.max(0, gameState.timeLeft) / 60);
+            const seconds = Math.max(0, gameState.timeLeft) % 60;
+            timerDisplayEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // 12. ÜST HUD SKOR GÜNCELLEME
+        function updateHUD() {
+            scoreCorrectEl.textContent = gameState.stats.correct;
+            scoreWrongEl.textContent = gameState.stats.wrong;
+            scorePassedEl.textContent = gameState.passedIndices.length;
+        }
+
+        // 13. OYUN SONU (GAME OVER) EKRANI & BACKEND ENTEGRASYONU
+        function finishGame(reason = 'completed') {
+            gameState.isGameOver = true;
+            clearInterval(gameState.timerInterval);
+
+            // Aktif vurguları temizle
+            document.querySelectorAll('.letter-node').forEach(node => node.classList.remove('active'));
+
+            // Butonları pasife al
+            btnSubmitEl.disabled = true;
+            btnPassEl.disabled = true;
+            answerInputEl.disabled = true;
+
+            // Boş kalan soru sayısı
+            const totalEmpty = gameState.questions.filter(q => q.status === 'unanswered' || q.status === 'passed').length;
+
+            finalCorrectEl.textContent = gameState.stats.correct;
+            finalWrongEl.textContent = gameState.stats.wrong;
+            finalEmptyEl.textContent = totalEmpty;
+
+            if (reason === 'time_out') {
+                gameOverIconEl.textContent = '⏳';
+                gameOverTitleEl.textContent = 'Süre Doldu!';
+            } else if (gameState.stats.correct >= 20) {
+                gameOverIconEl.textContent = '👑';
+                gameOverTitleEl.textContent = 'Şampiyon Performans!';
+            } else {
+                gameOverIconEl.textContent = '🏁';
+                gameOverTitleEl.textContent = 'Tur Tamamlandı!';
+            }
+
+            gameOverScreenEl.style.display = 'flex';
+
+            // Backend / API Skor Gönderme Hook'u (FastAPI / PostgreSQL hazır altyapı)
+            sendScoreToBackend({
+                game_mode: 'passaparola',
+                correct_count: gameState.stats.correct,
+                wrong_count: gameState.stats.wrong,
+                empty_count: totalEmpty,
+                time_remaining: gameState.timeLeft,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        // Gelecek FastAPI / Flask DB Entegrasyon Fonksiyonu
+        async function sendScoreToBackend(payload) {
+            console.log('📊 Passaparola Oyun İstatistiği Hazırlandı:', payload);
+            try {
+                // Örnek API Çağrısı (Endpoint aktif edildiğinde doğrudan bağlanır)
+                /*
+                const response = await fetch(gameState.apiEndpoint + '/score', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                console.log('Skor kaydedildi:', data);
+                */
+            } catch (err) {
+                console.warn('Backend skor bağlantısı henüz kurulmadı (Statik moddasınız).', err);
+            }
+        }
+
+        // 14. YENİDEN BAŞLATMA
+        function restartGame() {
+            initGame();
+        }
+
+        // Klavye Kısayolları (Enter -> Cevapla, Boşluk / Tab -> Pas vb.)
+        document.addEventListener('keydown', (e) => {
+            if (gameState.isGameOver) return;
+            // Ctrl+Space veya Alt+P ile Pas Geçme Kısayolu
+            if (e.key === 'Tab' && document.activeElement === answerInputEl) {
+                e.preventDefault();
+                handlePass();
+            }
+        });
+
+        // Sayfa Yüklendiğinde Oyunu Başlat
+        document.addEventListener('DOMContentLoaded', () => {
+            initGame();
+        });
+    </script>
+</body>
+</html>

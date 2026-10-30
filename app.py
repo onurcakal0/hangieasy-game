@@ -985,6 +985,11 @@ def guess_world():
 def guess_word():
     return render_template('guess_word.html')
 
+@app.route('/passaparola')
+@app.route('/parolla')
+def passaparola():
+    return render_template('passaparola.html')
+
 
 
 @app.route('/test-olustur', methods=['GET', 'POST'])
@@ -2183,7 +2188,7 @@ def sitemap_xml():
         xml += '  </url>\n'
         
     # Dinamik Oyunlar (Ana Oyunlar)
-    oyunlar = ['/omu-bumu', '/world-cup-2026', '/piksel-avcisi', '/guess-word', '/guess-world', '/guess-turkey', '/guess-lol', '/guess-valorant']
+    oyunlar = ['/omu-bumu', '/world-cup-2026', '/piksel-avcisi', '/guess-word', '/passaparola', '/guess-world', '/guess-turkey', '/guess-lol', '/guess-valorant']
     for oyun in oyunlar:
         xml += '  <url>\n'
         xml += f'    <loc>https://hangieasy.com{oyun}</loc>\n'
