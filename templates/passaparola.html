@@ -856,46 +856,15 @@
 
     </main>
 
+    <!-- Passaparola Zengin Soru Kütüphanesi -->
+    <script src="/static/js/passaparola_questions.js"></script>
     <!-- OYUN MOTORU & DURUM YÖNETİMİ (JAVASCRIPT) -->
     <script>
         /**
          * HangiEasy Passaparola (Parolla Clone) Oyun Motoru
-         * Standart Türk Alfabesi Harf Çarkı (24 Harf - Parolla TV Formatı)
-         * Harfler: A, B, C, Ç, D, E, F, G, H, I, İ, J, K, L, M, N, O, Ö, P, R, S, Ş, T, U, Ü, V, Y, Z
+         * Limitsiz Oynanış: Her girişte ve her 'Tekrar Oyna' tıklamasında
+         * hafızadaki sorular karıştırılır, daha önce sorulanlar sonraya atılır.
          */
-
-        // 1. SORU HAVUZU (REST API / FastAPI / PostgreSQL Entegrasyonuna Uygun Format)
-        const DEFAULT_QUESTION_POOL = [
-            { letter: 'A', question: 'Dünyanın en geniş yüzölçümüne sahip olan kıtası.', answer: 'Asya' },
-            { letter: 'B', question: 'Türkiye Cumhuriyeti\'nin başkenti olan ilimiz.', answer: 'Ankara', customNote: 'Başkenti olan ilimiz' },
-            { letter: 'B', question: 'İpek böcekçiliği ve kestane şekeriyle ünlü Marmara şehri.', answer: 'Bursa' },
-            { letter: 'C', question: 'Haftanın çalışma günlerini tamamlayan beşinci günü.', answer: 'Cuma' },
-            { letter: 'Ç', question: 'Rize ve Doğu Karadeniz bölgesinde yaygın olarak yetiştirilen sıcak içecek bitkisi.', answer: 'Çay' },
-            { letter: 'D', question: 'Yer kabuğu sarsıntısına verilen bilimsel ve genel isim.', answer: 'Deprem' },
-            { letter: 'E', question: 'Fırınlarda pişirilen ve sofraların temel gıdası olan unlu yiyecek.', answer: 'Ekmek' },
-            { letter: 'F', question: 'On birer kişiden oluşan iki takım arasında topla oynanan popüler spor dalı.', answer: 'Futbol' },
-            { letter: 'G', question: 'Güneş sistemimizin merkezinde yer alan sıcak gazlardan oluşan dev yıldız.', answer: 'Güneş' },
-            { letter: 'H', question: 'İnsanların veya canlıların hastalandığında tedavi gördüğü sağlık kuruluşu.', answer: 'Hastane' },
-            { letter: 'I', question: 'Deniz veya göllerin kıyısında yer alan kumluk veya taşlık dinlenme alanı.', answer: 'Ilgın', alt: 'Irmak' },
-            { letter: 'İ', question: 'İki kıtayı (Asya ve Avrupa) birbirine bağlayan tarihi metropolümüz.', answer: 'İstanbul' },
-            { letter: 'J', question: 'Elektrik enerjisi kesildiğinde mekanik enerjiyi elektrik enerjisine çeviren aygıt.', answer: 'Jeneratör' },
-            { letter: 'K', question: 'Gündüzleri gökyüzünde beyaz küme şeklinde görülen su buharı kütlesi.', answer: 'Bulut', altLetter: 'K', questionAlt: 'Kış mevsiminde yağan beyaz kristal yağış şekli.', answerAlt: 'Kar' },
-            { letter: 'L', question: 'Sarı renkli, ekşi meyvesi olan C vitamini zengini narenciye türü.', answer: 'Limon' },
-            { letter: 'M', question: 'Sarı renkli kabuğu soyularak yenen tropikal ve tatlı bir meyve.', answer: 'Muz' },
-            { letter: 'N', question: 'Geceleri gökyüzünde beliren, sonbaharda nehir kenarlarında tüten beyaz sis tabakası.', answer: 'Sis', altLetter: 'N', questionAlt: 'Sonbaharda veya kışın soğuk algınlığına bağlı burun akıntılı hastalık.', answerAlt: 'Nezle' },
-            { letter: 'O', question: 'Ağaçlarla ve yeşilliklerle kaplı geniş doğal alan.', answer: 'Orman' },
-            { letter: 'Ö', question: 'Bir okulda öğrencilere bilgi ve beceri kazandıran kimse, muallim.', answer: 'Öğretmen' },
-            { letter: 'P', question: 'Hastalıklardan korunmak amacıyla hazırlanan ve vücuda enjekte edilen sıvı biyolojik madde.', answer: 'Aşı', altLetter: 'P', questionAlt: 'Alışverişte mal veya hizmet karşılığı ödenen resmi değişim aracı.', answerAlt: 'Para' },
-            { letter: 'R', question: 'Ses dalgalarını elektromanyetik yolla ileten ve dinlenen kitle iletişim aracı.', answer: 'Radyo' },
-            { letter: 'S', question: 'İki hidrojen ve bir oksijen atomundan oluşan yaşam kaynağı sıvı.', answer: 'Su' },
-            { letter: 'Ş', question: 'Yağmurdan veya güneşten korunmak için baş üstünde taşınan açılır kapanır araç.', answer: 'Şemsiye' },
-            { letter: 'T', question: 'Raylar üzerinde lokomotif tarafından çekilerek hareket eden demiryolu taşıtı.', answer: 'Tren' },
-            { letter: 'U', question: 'Hava yoluyla yolcu ve yük taşımaya yarayan kanatlı hava taşıtı, tayyare.', answer: 'Uçak' },
-            { letter: 'Ü', question: 'Salkım halinde yetişen, yaş veya kuru tüketilen şifalı tatlı meyve.', answer: 'Üzüm' },
-            { letter: 'V', question: 'Deniz ve göllerde yolcu veya yük taşımacılığında kullanılan motorlu deniz aracı.', answer: 'Vapur' },
-            { letter: 'Y', question: 'Bulutlardan su damlaları halinde yeryüzüne inen bereketli sıvı yağış türü.', answer: 'Yağmur' },
-            { letter: 'Z', question: 'Akdeniz ikliminde yetişen, kahvaltıların vazgeçilmezi ve yağı çıkarılan kutsal ağaç meyvesi.', answer: 'Zeytin' }
-        ];
 
         // Standart Harf Çarkı Sırası (24 Parolla Harfi)
         const ALPHABET = [
@@ -903,6 +872,83 @@
             'J', 'K', 'L', 'M', 'N', 'O', 'Ö', 'P', 'R', 'S', 'Ş', 
             'T', 'U', 'Ü', 'V', 'Y', 'Z'
         ];
+
+        // Soru Takip Geçmişi (Aynı soruların üst üste gelmesini önler)
+        const HISTORY_STORAGE_KEY = 'hangieasy_passaparola_history';
+        function getSeenQuestions() {
+            try {
+                return JSON.parse(sessionStorage.getItem(HISTORY_STORAGE_KEY) || '{}');
+            } catch (e) {
+                return {};
+            }
+        }
+        function recordSeenQuestion(letter, questionText) {
+            try {
+                const history = getSeenQuestions();
+                if (!history[letter]) history[letter] = [];
+                if (!history[letter].includes(questionText)) {
+                    history[letter].push(questionText);
+                }
+                sessionStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+            } catch (e) {}
+        }
+        function clearHistoryIfExhausted(letter, poolSize) {
+            try {
+                const history = getSeenQuestions();
+                if (history[letter] && history[letter].length >= poolSize) {
+                    history[letter] = [];
+                    sessionStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+                }
+            } catch (e) {}
+        }
+
+        // Her harf için taze ve daha önce çıkmamış soru seçici
+        function selectFreshQuestionForLetter(letter) {
+            const pool = (typeof PASSAPAROLA_POOLS !== 'undefined' && PASSAPAROLA_POOLS[letter]) 
+                ? PASSAPAROLA_POOLS[letter] 
+                : [];
+
+            if (pool.length === 0) {
+                return {
+                    letter: letter,
+                    question: `${letter} harfi ile başlayan kelime.`,
+                    answer: letter,
+                    status: 'unanswered'
+                };
+            }
+
+            // Gösterilenleri kontrol et
+            clearHistoryIfExhausted(letter, pool.length);
+            const history = getSeenQuestions();
+            const seenList = history[letter] || [];
+
+            // Henüz görülmemiş soruları filtrele
+            let unvisited = pool.filter(item => {
+                const qText = item.questionAlt || item.question;
+                return !seenList.includes(qText);
+            });
+
+            // Eğer hepsi görüldüyse havuzu baştan aç
+            if (unvisited.length === 0) {
+                unvisited = pool;
+                if (history[letter]) history[letter] = [];
+            }
+
+            // Rastgele bir soru çek
+            const chosen = unvisited[Math.floor(Math.random() * unvisited.length)];
+            const finalQText = chosen.questionAlt || chosen.question;
+            const finalAns = chosen.answerAlt || chosen.answer;
+
+            // Görülmüş olarak kaydet
+            recordSeenQuestion(letter, finalQText);
+
+            return {
+                letter: letter,
+                question: finalQText,
+                answer: finalAns,
+                status: 'unanswered'
+            };
+        }
 
         // 2. OYUN DURUMU (STATE MANAGEMENT)
         const gameState = {
@@ -1007,25 +1053,9 @@
 
             updateHUD();
 
-            // Soruları Harf Sırasına Göre Eşle
+            // Her harf için limitsiz ve tekrarsız taze soru oluştur
             gameState.questions = ALPHABET.map(letter => {
-                const candidates = DEFAULT_QUESTION_POOL.filter(q => (q.altLetter || q.letter) === letter);
-                if (candidates.length > 0) {
-                    const chosen = candidates[Math.floor(Math.random() * candidates.length)];
-                    return {
-                        letter: letter,
-                        question: chosen.questionAlt || chosen.question,
-                        answer: chosen.answerAlt || chosen.answer,
-                        status: 'unanswered' // unanswered, correct, wrong, passed
-                    };
-                }
-                // Fallback soru
-                return {
-                    letter: letter,
-                    question: `${letter} harfi ile başlayan test kelimesi.`,
-                    answer: letter,
-                    status: 'unanswered'
-                };
+                return selectFreshQuestionForLetter(letter);
             });
 
             // Çarkı oluştur ve ilk soruyu getir
