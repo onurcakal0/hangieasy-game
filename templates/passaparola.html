@@ -902,8 +902,11 @@
             } catch (e) {}
         }
 
-        // Her harf için taze ve daha önce çıkmamış soru seçici
-        function selectFreshQuestionForLetter(letter) {
+        // Her harf için kademeli ve dengeli zorlukta soru seçici
+        // A -> G: Giriş Isınma Seviyesi (Ağırlıklı Kolay / Orta)
+        // H -> P: Tempo Artışı (Ağırlıklı Orta)
+        // R -> Z: Final Etabı (Ağırlıklı Orta / Tatlı-Zor)
+        function selectFreshQuestionForLetter(letter, letterIndex) {
             const pool = (typeof PASSAPAROLA_POOLS !== 'undefined' && PASSAPAROLA_POOLS[letter]) 
                 ? PASSAPAROLA_POOLS[letter] 
                 : [];
@@ -928,14 +931,42 @@
                 return !seenList.includes(qText);
             });
 
-            // Eğer hepsi görüldüyse havuzu baştan aç
+            // Eğer o harfteki tüm sorular görüldüyse havuzu baştan aç
             if (unvisited.length === 0) {
                 unvisited = pool;
                 if (history[letter]) history[letter] = [];
             }
 
-            // Rastgele bir soru çek
-            const chosen = unvisited[Math.floor(Math.random() * unvisited.length)];
+            // Hedef Zorluk Seviyesi Belirleme (Dozunda ve akıcı zorlaşma)
+            // letterIndex: 0-23
+            let targetDifficulty;
+            const rand = Math.random();
+
+            if (letterIndex < 7) {
+                // Bölüm 1 (A-G): %60 Kolay (1), %40 Orta (2)
+                targetDifficulty = rand < 0.6 ? 1 : 2;
+            } else if (letterIndex < 16) {
+                // Bölüm 2 (H-P): %60 Orta (2), %25 Kolay (1), %15 Zor (3)
+                if (rand < 0.60) targetDifficulty = 2;
+                else if (rand < 0.85) targetDifficulty = 1;
+                else targetDifficulty = 3;
+            } else {
+                // Bölüm 3 (R-Z): %50 Tatlı-Zor (3), %40 Orta (2), %10 Kolay (1)
+                if (rand < 0.50) targetDifficulty = 3;
+                else if (rand < 0.90) targetDifficulty = 2;
+                else targetDifficulty = 1;
+            }
+
+            // Hedef zorluktaki soruları öncelikle eşleştirmeye çalış
+            let matchedByDiff = unvisited.filter(item => (item.difficulty || 2) === targetDifficulty);
+
+            // Eğer o zorlukta kalmadıysa en yakın zorluğu seç
+            if (matchedByDiff.length === 0) {
+                matchedByDiff = unvisited;
+            }
+
+            // Seçilen havuzdan rastgele soru çek
+            const chosen = matchedByDiff[Math.floor(Math.random() * matchedByDiff.length)];
             const finalQText = chosen.questionAlt || chosen.question;
             const finalAns = chosen.answerAlt || chosen.answer;
 
@@ -946,6 +977,7 @@
                 letter: letter,
                 question: finalQText,
                 answer: finalAns,
+                difficulty: chosen.difficulty || 2,
                 status: 'unanswered'
             };
         }
@@ -1053,9 +1085,9 @@
 
             updateHUD();
 
-            // Her harf için limitsiz ve tekrarsız taze soru oluştur
-            gameState.questions = ALPHABET.map(letter => {
-                return selectFreshQuestionForLetter(letter);
+            // Her harf için limitsiz, tekrarsız ve kademeli zorlukta taze soru oluştur
+            gameState.questions = ALPHABET.map((letter, index) => {
+                return selectFreshQuestionForLetter(letter, index);
             });
 
             // Çarkı oluştur ve ilk soruyu getir
