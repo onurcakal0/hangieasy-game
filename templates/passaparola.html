@@ -222,9 +222,9 @@
         /* DAİRESEL OYUN SAHASI (PASSAPAROLA ÇARKI) */
         .arena-container {
             position: relative;
-            width: min(640px, 94vw);
-            height: min(640px, 94vw);
-            margin: 10px auto 30px;
+            width: min(650px, 95vw);
+            height: min(650px, 95vw);
+            margin: 10px auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -318,20 +318,21 @@
             width: 72%;
             height: 72%;
             border-radius: 50%;
-            background: radial-gradient(circle at 50% 25%, #1d2134 0%, #0e1019 100%);
+            background: radial-gradient(circle at 50% 30%, #1e2238 0%, #0d0f17 100%);
             border: 1.5px solid rgba(255, 255, 255, 0.16);
             box-shadow: 
                 0 25px 60px rgba(0, 0, 0, 0.75),
-                inset 0 1px 2px rgba(255, 255, 255, 0.18),
+                inset 0 1px 2px rgba(255, 255, 255, 0.2),
                 inset 0 -12px 30px rgba(0, 0, 0, 0.6);
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            padding: 30px 24px 34px;
+            justify-content: center;
+            padding: 24px 30px;
             text-align: center;
             z-index: 20;
             overflow: hidden;
+            gap: 14px;
         }
 
         /* Merkez İçi: Üst Soru Bilgisi Rozeti */
@@ -339,12 +340,12 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 5px 14px 5px 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 5px 16px 5px 6px;
             border-radius: 30px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-            margin-top: 4px;
+            flex-shrink: 0;
         }
         .clue-letter-badge {
             width: 32px;
@@ -363,45 +364,59 @@
         .clue-turn-text {
             font-size: 13px;
             font-weight: 600;
-            color: #cbd5e1;
+            color: #e2e8f0;
             letter-spacing: 0.4px;
         }
 
         /* Merkez İçi: Soru Metni Kartı */
         .clue-text-container {
             width: 100%;
-            max-width: 380px;
-            min-height: 85px;
+            max-width: 340px;
+            min-height: 80px;
+            max-height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: auto 0;
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.025);
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.035);
             border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: rgba(255,255,255,0.2) transparent;
         }
         .clue-text {
-            font-size: clamp(13.5px, 2.5vw, 16px);
-            font-weight: 500;
-            line-height: 1.55;
-            color: #f8fafc;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+            font-size: clamp(14px, 2.5vw, 16.5px);
+            font-weight: 600;
+            line-height: 1.5;
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
             transition: opacity 0.2s ease;
         }
 
-        /* Merkez İçi: Cevap Giriş Formu & Butonlar */
-        .answer-form {
+        /* ALT AKSİYON PANELİ (BAĞIMSIZ, MERKEZ DIŞINA FERAHÇA OTURAN ALAN) */
+        .action-dock {
             width: 100%;
-            max-width: 330px;
+            max-width: 480px;
+            margin: 5px auto 25px;
             display: flex;
             flex-direction: column;
             gap: 12px;
             align-items: center;
-            margin-bottom: 2px;
+            padding: 16px 20px;
+            background: rgba(18, 20, 31, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        }
+        .answer-form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
         }
         .input-wrapper {
             position: relative;
@@ -409,71 +424,71 @@
         }
         .answer-input {
             width: 100%;
-            background: rgba(13, 15, 24, 0.95);
-            border: 1.5px solid rgba(139, 92, 246, 0.35);
+            background: rgba(10, 11, 18, 0.95);
+            border: 2px solid rgba(139, 92, 246, 0.4);
             border-radius: 14px;
-            padding: 12px 16px;
+            padding: 14px 20px;
             color: #ffffff;
-            font-size: 15.5px;
+            font-size: 16px;
             font-weight: 600;
             text-align: center;
             outline: none;
             transition: all 0.25s ease;
             box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6), 0 4px 15px rgba(0, 0, 0, 0.25);
-            letter-spacing: 0.6px;
+            letter-spacing: 0.8px;
         }
         .answer-input:focus {
             border-color: #a78bfa;
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.45), inset 0 2px 6px rgba(0, 0, 0, 0.6);
-            background: rgba(18, 20, 32, 0.98);
+            box-shadow: 0 0 22px rgba(139, 92, 246, 0.5), inset 0 2px 6px rgba(0, 0, 0, 0.6);
+            background: rgba(15, 17, 28, 0.98);
         }
         .answer-input::placeholder {
             color: #64748b;
             font-weight: 500;
-            font-size: 13.5px;
+            font-size: 14px;
         }
 
         /* Buton Grubu */
         .action-buttons {
             display: grid;
-            grid-template-columns: 1.15fr 0.85fr;
-            gap: 10px;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 12px;
             width: 100%;
         }
         .btn-action {
             width: 100%;
-            padding: 12px 14px;
+            padding: 14px 18px;
             border-radius: 12px;
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 15px;
+            font-weight: 800;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
             border: none;
             user-select: none;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.4px;
         }
         .btn-submit {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #ffffff;
-            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.25);
         }
         .btn-submit:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.55);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.6);
             filter: brightness(1.08);
         }
         .btn-pass {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: #ffffff;
-            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.25);
         }
         .btn-pass:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.55);
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.6);
             filter: brightness(1.08);
         }
         .btn-action:active:not(:disabled) {
@@ -488,10 +503,10 @@
         /* Geri Bildirim Toastı (Merkezde ufak efekt) */
         .feedback-toast {
             position: absolute;
-            top: 15px;
+            top: 20px;
             font-size: 11px;
             font-weight: 700;
-            padding: 4px 12px;
+            padding: 5px 14px;
             border-radius: 20px;
             text-transform: uppercase;
             letter-spacing: 0.8px;
@@ -812,33 +827,6 @@
                     <p class="clue-text" id="clueText">Yarışma hazırlanıyor...</p>
                 </div>
 
-                <!-- Cevap Giriş Formu -->
-                <form class="answer-form" id="answerForm" onsubmit="event.preventDefault(); handleAnswerSubmit();">
-                    <div class="input-wrapper">
-                        <input 
-                            type="text" 
-                            id="answerInput" 
-                            class="answer-input" 
-                            placeholder="Cevabınızı yazın..." 
-                            autocomplete="off" 
-                            autocapitalize="off" 
-                            spellcheck="false"
-                            required
-                        >
-                    </div>
-
-                    <div class="action-buttons">
-                        <button type="submit" class="btn-action btn-submit" id="btnSubmit">
-                            <span>✓</span>
-                            <span>Cevapla</span>
-                        </button>
-                        <button type="button" class="btn-action btn-pass" id="btnPass" onclick="handlePass()">
-                            <span>↷</span>
-                            <span>Pas</span>
-                        </button>
-                    </div>
-                </form>
-
                 <!-- Oyun Sonu Ekranı (Varsayılan olarak gizli) -->
                 <div class="game-over-screen" id="gameOverScreen" style="display: none;">
                     <div class="game-over-icon" id="gameOverIcon">🏆</div>
@@ -866,6 +854,35 @@
                 </div>
 
             </div>
+        </div>
+
+        <!-- Geniş & Ferah Alt Aksiyon Paneli (Cevap Kutusu + Butonlar) -->
+        <div class="action-dock">
+            <form class="answer-form" id="answerForm" onsubmit="event.preventDefault(); handleAnswerSubmit();">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="answerInput" 
+                        class="answer-input" 
+                        placeholder="Cevabınızı buraya yazın..." 
+                        autocomplete="off" 
+                        autocapitalize="off" 
+                        spellcheck="false"
+                        required
+                    >
+                </div>
+
+                <div class="action-buttons">
+                    <button type="submit" class="btn-action btn-submit" id="btnSubmit">
+                        <span>✓</span>
+                        <span>Cevapla</span>
+                    </button>
+                    <button type="button" class="btn-action btn-pass" id="btnPass" onclick="handlePass()">
+                        <span>↷</span>
+                        <span>Pas</span>
+                    </button>
+                </div>
+            </form>
         </div>
 
         <!-- Nasıl Oynanır Rehberi -->
